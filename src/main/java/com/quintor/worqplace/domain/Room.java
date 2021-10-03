@@ -22,6 +22,7 @@ public class Room {
     @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
 
+    @Enumerated(EnumType.STRING)
     private Floor floor;
 
     @OneToMany(
