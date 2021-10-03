@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Table(name = "timeslot")
 public class Timeslot {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private LocalDate date;

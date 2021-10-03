@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @Table(name = "openinghours")
 public class OpeningHours {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
 
