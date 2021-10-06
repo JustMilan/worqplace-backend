@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class LocationSerivce {
-    private LocationRepository locationRepository;
+    private final LocationRepository locationRepository;
 
     public List<LocationDTO> getAllLocations() {
         return locationRepository.findAll().stream().map(LocationDTO::new).collect(Collectors.toList());

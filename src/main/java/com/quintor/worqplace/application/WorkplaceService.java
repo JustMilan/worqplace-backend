@@ -23,20 +23,28 @@ public class WorkplaceService {
         return workplaceRepository.findAll().stream().map(WorkplaceAvailibilityDTO::new).collect(Collectors.toList());
     }
 
-    public WorkplaceAvailibilityDTO getWorkplaceById(Long id) {
+    public WorkplaceAvailibilityDTO getWorkplaceAvailibilityDTOById(Long id) {
         Workplace workplace = workplaceRepository.findById(id).orElseThrow(
                 () -> new WorkplaceNotFoundException("Workplace " + id + " not found"));
         return new WorkplaceAvailibilityDTO(workplace);
+    }
+
+    public Workplace getWorkplaceById(Long id) {
+        return workplaceRepository.findById(id).orElseThrow(
+                () -> new WorkplaceNotFoundException("Workplace " + id + " not found"));
+    }
+
+    public void saveWorkplace(Workplace workplace) {
+        workplaceRepository.save(workplace);
     }
 
     public List<WorkplaceDTO> getAllAvailableWorkplaces() {
         var allWorkplaces = workplaceRepository.findAll();
         List<Workplace> available = new ArrayList<>();
 
-        for (Workplace workplace : allWorkplaces)
-            for (var timeslot : workplace.getTimeslots())
-                if (timeslot.getReservation() == null)
-                    available.add(workplace);
+        allWorkplaces.forEach(workplace -> {
+            workplace.getTimeslots().stream().filter(timeslot -> timeslot.getReservation() == null).map(timeslot -> workplace).forEach(available::add);
+        });
 
         return available.stream().map(WorkplaceDTO::new).collect(Collectors.toList());
     }

@@ -1,6 +1,8 @@
 package com.quintor.worqplace.application.dto;
 
-import com.quintor.worqplace.domain.*;
+import com.quintor.worqplace.domain.Floor;
+import com.quintor.worqplace.domain.Reservation;
+import com.quintor.worqplace.domain.Timeslot;
 import lombok.Getter;
 
 import java.util.List;

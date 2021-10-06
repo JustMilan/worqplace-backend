@@ -33,12 +33,6 @@ public class Timeslot {
             return false;
         }
 
-        if (LocalDate.now().isAfter(date)) {
-            System.out.println("test2");
-            return false;
-        }
-
-        System.out.println("test3");
-        return true;
+        return !LocalDate.now().isAfter(date);
     }
 }

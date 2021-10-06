@@ -1,12 +1,10 @@
 package com.quintor.worqplace.application.dto;
 
 import com.quintor.worqplace.domain.Timeslot;
-import com.quintor.worqplace.domain.Workplace;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Getter
 public class TimeslotAvailibilityDTO {

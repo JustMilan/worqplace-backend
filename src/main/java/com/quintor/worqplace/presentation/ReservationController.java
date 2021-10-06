@@ -28,4 +28,10 @@ public class ReservationController {
             return new ResponseEntity<>(reservationNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+    @CrossOrigin(origins = {"http://localhost:4200"})
+    @PutMapping("/workplaces/{id}")
+    public ResponseEntity<?> placeReservationByWorkplaceId(@PathVariable long id) {
+        return new ResponseEntity<>(reservationService.placeReservationByWorkplaceId(id), HttpStatus.OK);
+    }
 }

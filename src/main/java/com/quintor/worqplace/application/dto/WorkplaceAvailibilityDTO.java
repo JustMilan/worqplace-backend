@@ -1,6 +1,5 @@
 package com.quintor.worqplace.application.dto;
 
-import com.quintor.worqplace.domain.Timeslot;
 import com.quintor.worqplace.domain.Workplace;
 import lombok.Getter;
 

@@ -16,28 +16,22 @@ public class WorkplaceController {
     @CrossOrigin(origins = {"http://localhost:4200"})
     @GetMapping
     public ResponseEntity<?> getAllWorkplaces() {
-        return new ResponseEntity<>(workplaceService.getAllWorkplaces(), HttpStatus.OK);
-    }
-
-    @CrossOrigin(origins = {"http://localhost:4200"})
-    @GetMapping("/available")
-    public ResponseEntity<?> getAllAvailableWorkplaces() {
-        return new ResponseEntity<>(workplaceService.getAllAvailableWorkplaces(), HttpStatus.OK);
+        return new ResponseEntity<>(workplaceService.getAllWorkplaces() , HttpStatus.OK);
     }
 
     @CrossOrigin(origins = {"http://localhost:4200"})
     @GetMapping("/{id}")
-    public ResponseEntity<?> getWorkplaceById(@PathVariable long id) {
+    public ResponseEntity<?> getWorkplaceAvailabilityDTOById(@PathVariable long id) {
         try {
-            return new ResponseEntity<>(workplaceService.getWorkplaceById(id), HttpStatus.OK);
+            return new ResponseEntity<>(workplaceService.getWorkplaceAvailibilityDTOById(id) , HttpStatus.OK);
         } catch (WorkplaceNotFoundException workplaceNotFoundException) {
             return new ResponseEntity<>(workplaceNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
     @CrossOrigin(origins = {"http://localhost:4200"})
-    @PostMapping("/book/{id}")
-    public HttpStatus reserveWorkplace(@PathVariable long id) {
-        return HttpStatus.OK;
+    @GetMapping("/available")
+    public ResponseEntity<?> getAllAvailableWorkplaces() {
+        return new ResponseEntity<>(workplaceService.getAllAvailableWorkplaces(), HttpStatus.OK);
     }
 }
