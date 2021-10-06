@@ -21,4 +21,24 @@ public class Timeslot {
     private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
+
+    @OneToOne
+    private Reservation reservation;
+
+    public boolean hasReservation() {
+        if (reservation == null)
+            return false;
+
+        if (LocalDate.now().isEqual(date) && LocalTime.now().isAfter(endTime)) {
+            return false;
+        }
+
+        if (LocalDate.now().isAfter(date)) {
+            System.out.println("test2");
+            return false;
+        }
+
+        System.out.println("test3");
+        return true;
+    }
 }

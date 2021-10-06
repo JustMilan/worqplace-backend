@@ -26,10 +26,6 @@ public class Location {
     @JoinColumn(name = "location_id")
     private List<OpeningHours> openingHours;
 
-    @OneToMany
-    @JoinColumn(name = "location_id")
-    private List<Timeslot> timeslots;
-
     @OneToMany(
             mappedBy = "location",
             cascade = CascadeType.ALL,
