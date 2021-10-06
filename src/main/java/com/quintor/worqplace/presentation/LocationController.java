@@ -2,14 +2,10 @@ package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.LocationSerivce;
 import com.quintor.worqplace.application.exceptions.LocationNotFoundException;
-import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/locations")
@@ -17,11 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class LocationController {
     private final LocationSerivce locationSerivce;
 
+    @CrossOrigin(origins = {"http://localhost:4200"})
     @GetMapping
     public ResponseEntity<?> getAllLocations() {
         return new ResponseEntity<>(locationSerivce.getAllLocations(), HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = {"http://localhost:4200"})
     @GetMapping("/{id}")
     public ResponseEntity<?> getLocationById(@PathVariable long id) {
         try {
