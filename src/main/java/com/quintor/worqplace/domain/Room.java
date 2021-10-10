@@ -17,7 +17,7 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int numberOfWorkplaces;
+    private int number;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Location location;
