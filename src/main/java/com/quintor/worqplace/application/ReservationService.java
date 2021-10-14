@@ -1,7 +1,7 @@
 package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.dto.ReservationDTO;
-import com.quintor.worqplace.application.dto.WorkplaceAvailibilityDTO;
+import com.quintor.worqplace.application.dto.WorkplaceReservationDTO;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
 import com.quintor.worqplace.data.EmployeeRepository;
 import com.quintor.worqplace.data.ReservationRepository;
@@ -33,17 +33,32 @@ public class ReservationService {
         return new ReservationDTO(reservation);
     }
 
-    public WorkplaceAvailibilityDTO placeReservationByWorkplaceId(Long id) {
+    //TODO: Add employee id parameter
+    //TODO: Add from and to parameter
+    public WorkplaceReservationDTO placeReservationByWorkplaceId(Long id) {
         Workplace workplace = workplaceService.getWorkplaceById(id);
+        //TODO: Get id from parameter
         Employee employee = employeeRepository.findById(6L).orElseThrow();
+
+        //TODO: Make this a safe reservation. Now it gets created anyway even if it is already reserved.
         Reservation reservation = new Reservation(1L, employee, workplace.getTimeslots(), workplace);
+        workplace.getTimeslots().forEach(timeslot -> timeslot.setReservation(reservation));
 
-        workplace.getTimeslots().forEach(timeslot -> {
-            timeslot.setReservation(reservation);
-        });
+        boolean successful;
+        var saveWorkplace = workplaceService.saveWorkplace(workplace);
 
-        workplaceService.saveWorkplace(workplace);
+//        Example of what could be done if domain structure has been fixed.
+//        for (var timeslot : saveWorkplace.getTimeslots()) {
+//            if (timeslot.getStartTime() == from && timeslot.getEndTime() == to && timeslot.getReservation().getEmployee().getId() == employeeId) {
+//                succesful = true;
+//            } else {
+//                succesful = false;
+//            }
+//        }
 
-        return new WorkplaceAvailibilityDTO(workplace);
+//        For development purposes
+        successful = true;
+
+        return new WorkplaceReservationDTO(workplace, successful);
     }
 }
