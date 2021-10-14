@@ -9,5 +9,4 @@ public class WorqplaceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WorqplaceApplication.class, args);
 	}
-
 }

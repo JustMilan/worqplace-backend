@@ -20,16 +20,9 @@ public class Location {
     private String name;
 
     @OneToOne
-    private Adress adress;
+    private Address address;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
-    private List<OpeningHours> openingHours;
-
-    @OneToMany(
-            mappedBy = "location",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
     private List<Room> rooms;
 }

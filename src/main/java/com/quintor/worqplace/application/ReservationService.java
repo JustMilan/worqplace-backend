@@ -1,13 +1,9 @@
 package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.dto.ReservationDTO;
-import com.quintor.worqplace.application.dto.WorkplaceAvailibilityDTO;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
-import com.quintor.worqplace.data.EmployeeRepository;
 import com.quintor.worqplace.data.ReservationRepository;
-import com.quintor.worqplace.domain.Employee;
 import com.quintor.worqplace.domain.Reservation;
-import com.quintor.worqplace.domain.Workplace;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +15,7 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
-    private final WorkplaceService workplaceService;
     private final ReservationRepository reservationRepository;
-    private final EmployeeRepository employeeRepository;
 
     public List<ReservationDTO> getAllReservations() {
         return reservationRepository.findAll().stream().map(ReservationDTO::new).collect(Collectors.toList());
@@ -29,21 +23,11 @@ public class ReservationService {
 
     public ReservationDTO getReservationById(Long id) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(
-                () -> new ReservationNotFoundException("Reservation " + id + " not found"));
+                () -> new ReservationNotFoundException(id));
         return new ReservationDTO(reservation);
     }
 
-    public WorkplaceAvailibilityDTO placeReservationByWorkplaceId(Long id) {
-        Workplace workplace = workplaceService.getWorkplaceById(id);
-        Employee employee = employeeRepository.findById(6L).orElseThrow();
-        Reservation reservation = new Reservation(1L, employee, workplace.getTimeslots(), workplace);
-
-        workplace.getTimeslots().forEach(timeslot -> {
-            timeslot.setReservation(reservation);
-        });
-
-        workplaceService.saveWorkplace(workplace);
-
-        return new WorkplaceAvailibilityDTO(workplace);
+    public List<ReservationDTO> getReservationByWorkplacesNotNull() {
+        return reservationRepository.findAllByWorkplaceIsNotNull().stream().map(ReservationDTO::new).collect(Collectors.toList());
     }
 }

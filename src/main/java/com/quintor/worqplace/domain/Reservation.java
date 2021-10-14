@@ -5,7 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -17,12 +18,15 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
+
     @OneToOne
     private Employee employee;
 
-    @OneToMany
-    @JoinColumn(name = "reservation_id")
-    private List<Timeslot> timeslots;
+    @OneToOne
+    private Room room;
 
     @OneToOne
     private Workplace workplace;
