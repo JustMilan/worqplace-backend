@@ -31,7 +31,7 @@ public class ReservationController {
 
     @CrossOrigin(origins = {"http://localhost:4200"})
     @PutMapping("/workplaces/{id}")
-    public ResponseEntity<?> placeReservationByWorkplaceId(@PathVariable long id) {
+    public ResponseEntity<?> placeReservationByWorkplaceId(@PathVariable long id) {    //TODO: Add employee id to parameters
         return new ResponseEntity<>(reservationService.placeReservationByWorkplaceId(id), HttpStatus.OK);
     }
 }

@@ -34,8 +34,8 @@ public class WorkplaceService {
                 () -> new WorkplaceNotFoundException("Workplace " + id + " not found"));
     }
 
-    public void saveWorkplace(Workplace workplace) {
-        workplaceRepository.save(workplace);
+    public Workplace saveWorkplace(Workplace workplace) {
+        return workplaceRepository.save(workplace);
     }
 
     public List<WorkplaceDTO> getAllAvailableWorkplaces() {
