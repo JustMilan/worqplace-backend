@@ -33,7 +33,7 @@ public class Address {
 	}
 
 	public void setHouseNumber(int number) {
-		char[] numberChars = Character.toChars(number);
+		char[] numberChars = String.valueOf(number).toCharArray();
 		for (char c : numberChars) {
 			if (! Character.isDigit(c))
 				throw new RuntimeException("HouseNumber must consist of numbers only");
@@ -44,19 +44,24 @@ public class Address {
 
 	public void setAddition(String addition) {
 		char[] additionChars = addition.toCharArray();
-		for (char c : additionChars) {
+		for (char c : additionChars)
 			if (! Character.isLetterOrDigit(c))
 				throw new RuntimeException("Addition must consist of numbers and letters only");
-		}
 
 		this.addition = addition;
 	}
 
 	public void setStreet(String street) {
 		char[] streetChars = street.toCharArray();
-		for (char c : streetChars)
-			if (! Character.isLetterOrDigit(c))
+		int listSize = streetChars.length;
+		for (int i = 0; i < streetChars.length; i++) {
+			char c = streetChars[i];
+			if (i == listSize - 1 && ! Character.isLetterOrDigit(c))
+				throw new RuntimeException("Streetname must end with a letter or a number");
+
+			if (c != '-' && ! Character.isLetterOrDigit(c) && ! Character.isWhitespace(c))
 				throw new RuntimeException("Streetname must consist of numbers and letters only");
+		}
 
 		this.street = street;
 	}
@@ -82,7 +87,7 @@ public class Address {
 	public void setCity(String city) {
 		char[] cityChars = city.toCharArray();
 		for (char c : cityChars)
-			if (! Character.isLetter(c))
+			if (! Character.isLetterOrDigit(c))
 				throw new RuntimeException("City name must consist of only letters");
 
 		this.city = city;
