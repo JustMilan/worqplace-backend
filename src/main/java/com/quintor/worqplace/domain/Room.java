@@ -17,18 +17,9 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private int number;
+    private int floor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Location location;
-
-    @Enumerated(EnumType.STRING)
-    private Floor floor;
-
-    @OneToMany(
-            mappedBy = "room",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "room_id")
     private List<Workplace> workplaces;
 }

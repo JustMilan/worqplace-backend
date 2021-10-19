@@ -1,64 +1,53 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.dto.ReservationDTO;
-import com.quintor.worqplace.application.dto.WorkplaceReservationDTO;
+import com.quintor.worqplace.application.dto.reservation.ReservationDTO;
+import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
-import com.quintor.worqplace.data.EmployeeRepository;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
 import com.quintor.worqplace.domain.Reservation;
+import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
+    private final EmployeeService employeeService;
     private final WorkplaceService workplaceService;
+    private final RoomService roomService;
     private final ReservationRepository reservationRepository;
-    private final EmployeeRepository employeeRepository;
 
-    public List<ReservationDTO> getAllReservations() {
-        return reservationRepository.findAll().stream().map(ReservationDTO::new).collect(Collectors.toList());
+    public List<Reservation> getAllReservations() {
+        return reservationRepository.findAll();
     }
 
-    public ReservationDTO getReservationById(Long id) {
-        Reservation reservation = reservationRepository.findById(id).orElseThrow(
-                () -> new ReservationNotFoundException("Reservation " + id + " not found"));
-        return new ReservationDTO(reservation);
+    public Reservation getReservationById(Long id) {
+        return reservationRepository.findById(id).orElseThrow(
+                () -> new ReservationNotFoundException(id));
     }
 
-    //TODO: Add employee id parameter
-    //TODO: Add from and to parameter
-    public WorkplaceReservationDTO placeReservationByWorkplaceId(Long id) {
-        Workplace workplace = workplaceService.getWorkplaceById(id);
-        //TODO: Get id from parameter
-        Employee employee = employeeRepository.findById(6L).orElseThrow();
+    public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
+        Reservation reservation = toReservation(reservationDTO);
 
-        //TODO: Make this a safe reservation. Now it gets created anyway even if it is already reserved.
-        Reservation reservation = new Reservation(1L, employee, workplace.getTimeslots(), workplace);
-        workplace.getTimeslots().forEach(timeslot -> timeslot.setReservation(reservation));
+        if (reservation.getWorkplace() == null)
+            throw new InvalidReservationTypeException();
 
-        boolean successful;
-        var saveWorkplace = workplaceService.saveWorkplace(workplace);
+        reservationRepository.save(reservation);
 
-//        Example of what could be done if domain structure has been fixed.
-//        for (var timeslot : saveWorkplace.getTimeslots()) {
-//            if (timeslot.getStartTime() == from && timeslot.getEndTime() == to && timeslot.getReservation().getEmployee().getId() == employeeId) {
-//                succesful = true;
-//            } else {
-//                succesful = false;
-//            }
-//        }
+        return reservation;
+    }
 
-//        For development purposes
-        successful = true;
+    public Reservation toReservation(ReservationDTO reservationDTO) {
+        Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
+        Workplace workplace = reservationDTO.getWorkplaceId() != null? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
+        Room room = reservationDTO.getRoomId() != null? roomService.getRoomById(reservationDTO.getRoomId()) : null;
 
-        return new WorkplaceReservationDTO(workplace, successful);
+        return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace);
     }
 }
