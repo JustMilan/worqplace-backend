@@ -1,33 +1,53 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.dto.ReservationDTO;
+import com.quintor.worqplace.application.dto.reservation.ReservationDTO;
+import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
 import com.quintor.worqplace.data.ReservationRepository;
+import com.quintor.worqplace.domain.Employee;
 import com.quintor.worqplace.domain.Reservation;
+import com.quintor.worqplace.domain.Room;
+import com.quintor.worqplace.domain.Workplace;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
+    private final EmployeeService employeeService;
+    private final WorkplaceService workplaceService;
+    private final RoomService roomService;
     private final ReservationRepository reservationRepository;
 
-    public List<ReservationDTO> getAllReservations() {
-        return reservationRepository.findAll().stream().map(ReservationDTO::new).collect(Collectors.toList());
+    public List<Reservation> getAllReservations() {
+        return reservationRepository.findAll();
     }
 
-    public ReservationDTO getReservationById(Long id) {
-        Reservation reservation = reservationRepository.findById(id).orElseThrow(
+    public Reservation getReservationById(Long id) {
+        return reservationRepository.findById(id).orElseThrow(
                 () -> new ReservationNotFoundException(id));
-        return new ReservationDTO(reservation);
     }
 
-    public List<ReservationDTO> getReservationByWorkplacesNotNull() {
-        return reservationRepository.findAllByWorkplaceIsNotNull().stream().map(ReservationDTO::new).collect(Collectors.toList());
+    public Reservation reservateWorkplace(ReservationDTO reservationDTO) {
+        Reservation reservation = toReservation(reservationDTO);
+
+        if (reservation.getWorkplace() == null)
+            throw new InvalidReservationTypeException();
+
+        reservationRepository.save(reservation);
+
+        return reservation;
+    }
+
+    public Reservation toReservation(ReservationDTO reservationDTO) {
+        Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
+        Workplace workplace = reservationDTO.getWorkplaceId() != null? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
+        Room room = reservationDTO.getRoomId() != null? roomService.getRoomById(reservationDTO.getRoomId()) : null;
+
+        return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace);
     }
 }

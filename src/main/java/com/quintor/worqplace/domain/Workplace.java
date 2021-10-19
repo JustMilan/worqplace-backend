@@ -15,4 +15,7 @@ public class Workplace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne
+    private Room room;
 }
