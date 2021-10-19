@@ -48,13 +48,31 @@ public class Reservation {
 			throw new InvalidStartAndEndTimeException();
 		if ((room == null && workplace == null) || (room != null && workplace != null))
 			throw new InvalidReservationTypeException();
-		this.date = date;
-		this.startTime = startTime;
-		this.endTime = endTime;
+		setDate(date);
+		setStartTime(startTime);
+		setEndTime(endTime);
 		this.employee = employee;
 		this.room = room;
 		this.workplace = workplace;
 		this.recurring = recurring;
+	}
+
+	public void setDate(LocalDate date) {
+		if (date.isBefore(LocalDate.now()))
+			throw new InvalidStartAndEndTimeException();
+
+		this.date = date;
+	}
+
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public void setEndTime(LocalTime endTime) {
+		if (endTime.isBefore(startTime))
+			throw new InvalidStartAndEndTimeException();
+
+		this.endTime = endTime;
 	}
 
 	@Override
