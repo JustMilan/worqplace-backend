@@ -38,6 +38,17 @@ public class Reservation {
 
 	private boolean recurring;
 
+	/**
+	 * @param id        used by Spring | don't use this manually
+	 * @param date      reservation date
+	 * @param startTime start time of reservation
+	 * @param endTime   end time of reservation
+	 * @param employee  employee that reserves
+	 * @param room      room that is being reserved | null if it is a workplace reservation
+	 * @param workplace workplace that is being reserved | null if it is a room reservation
+	 * @param recurring Is the reservation recurring
+	 * @implNote Is being used by Spring for retrieving reservations
+	 */
 	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace, boolean recurring) {
 		this(date, startTime, endTime, employee, room, workplace, recurring);
 		this.id = id;
@@ -48,6 +59,7 @@ public class Reservation {
 			throw new InvalidStartAndEndTimeException();
 		if ((room == null && workplace == null) || (room != null && workplace != null))
 			throw new InvalidReservationTypeException();
+
 		setDate(date);
 		setStartTime(startTime);
 		setEndTime(endTime);
@@ -62,10 +74,6 @@ public class Reservation {
 			throw new InvalidStartAndEndTimeException();
 
 		this.date = date;
-	}
-
-	public void setStartTime(LocalTime startTime) {
-		this.startTime = startTime;
 	}
 
 	public void setEndTime(LocalTime endTime) {
