@@ -27,4 +27,19 @@ public class Location {
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "location_id")
 	private List<Room> rooms;
+
+	public Location(String name, Address address, List<Room> rooms) {
+		setName(name);
+		this.address = address;
+		this.rooms = rooms;
+	}
+
+	public void setName(String name) {
+		char[] nameChars = name.strip().toCharArray();
+
+		if (!Character.isUpperCase(nameChars[0]))
+			throw new RuntimeException("Name must start with a capital letter");
+
+		this.name = name;
+	}
 }
