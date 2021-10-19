@@ -32,7 +32,7 @@ public class ReservationService {
                 () -> new ReservationNotFoundException(id));
     }
 
-    public Reservation reservateWorkplace(ReservationDTO reservationDTO) {
+    public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
         Reservation reservation = toReservation(reservationDTO);
 
         if (reservation.getWorkplace() == null)

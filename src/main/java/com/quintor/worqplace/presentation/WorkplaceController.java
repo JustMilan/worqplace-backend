@@ -41,10 +41,10 @@ public class WorkplaceController {
     @CrossOrigin(origins = {"http://localhost:4200"})
     @GetMapping("/availability")
     public ResponseEntity<?> getWorkplacesAvailability(@RequestParam("locationId") Long locationId,
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                          @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-                                          @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime
-                                          ) {
+                                                       @RequestParam("date")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                       @RequestParam("start")   @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+                                                       @RequestParam("end")     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime
+    ) {
         try {
             return new ResponseEntity<>(workplaceService.getWorkplacesAvailability(locationId, date, startTime, endTime)
                     .stream().map(workplaceMapper::toWorkplaceDTO).collect(Collectors.toList()), HttpStatus.OK);

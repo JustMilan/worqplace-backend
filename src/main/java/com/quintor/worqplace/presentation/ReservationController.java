@@ -38,9 +38,9 @@ public class ReservationController {
 
     @CrossOrigin(origins = {"http://localhost:4200"})
     @PostMapping("/workplaces")
-    public ResponseEntity<?> reservateWorkplace(@RequestBody ReservationDTO reservationDTO) {
+    public ResponseEntity<?> reserveWorkplace(@RequestBody ReservationDTO reservationDTO) {
         try {
-            return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reservateWorkplace(reservationDTO)), HttpStatus.CREATED);
+            return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplace(reservationDTO)), HttpStatus.CREATED);
         } catch (InvalidReservationTypeException invalidReservationTypeException) {
             return new ResponseEntity<>(invalidReservationTypeException.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
         }

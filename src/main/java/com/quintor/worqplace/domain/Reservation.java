@@ -40,7 +40,7 @@ public class Reservation {
 
     public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace) {
         if (startTime.isAfter(endTime))
-                throw new InvalidStartAndEndTimeException();
+            throw new InvalidStartAndEndTimeException();
         if ((room == null && workplace == null) || (room != null && workplace != null))
             throw new InvalidReservationTypeException();
         this.date = date;
