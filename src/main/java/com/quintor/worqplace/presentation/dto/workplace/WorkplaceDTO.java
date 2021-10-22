@@ -1,4 +1,4 @@
-package com.quintor.worqplace.application.dto.workplace;
+package com.quintor.worqplace.presentation.dto.workplace;
 
 import lombok.Getter;
 import lombok.Setter;

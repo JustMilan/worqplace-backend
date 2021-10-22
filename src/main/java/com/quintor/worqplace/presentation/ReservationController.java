@@ -1,8 +1,9 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.ReservationService;
-import com.quintor.worqplace.application.dto.reservation.ReservationDTO;
-import com.quintor.worqplace.application.dto.reservation.ReservationMapper;
+import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
+import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
+import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
 import lombok.AllArgsConstructor;
@@ -41,8 +42,8 @@ public class ReservationController {
     public ResponseEntity<?> reserveWorkplace(@RequestBody ReservationDTO reservationDTO) {
         try {
             return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplace(reservationDTO)), HttpStatus.CREATED);
-        } catch (InvalidReservationTypeException invalidReservationTypeException) {
-            return new ResponseEntity<>(invalidReservationTypeException.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+        } catch (InvalidReservationTypeException | WorkplaceNotAvailableException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
 }

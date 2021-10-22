@@ -1,7 +1,7 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.LocationService;
-import com.quintor.worqplace.application.dto.location.LocationMapper;
+import com.quintor.worqplace.presentation.dto.location.LocationMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

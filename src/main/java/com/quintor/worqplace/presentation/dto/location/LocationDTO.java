@@ -1,4 +1,4 @@
-package com.quintor.worqplace.application.dto.location;
+package com.quintor.worqplace.presentation.dto.location;
 
 import com.quintor.worqplace.domain.Address;
 import lombok.Getter;

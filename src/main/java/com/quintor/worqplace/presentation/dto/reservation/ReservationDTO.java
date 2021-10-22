@@ -1,4 +1,4 @@
-package com.quintor.worqplace.application.dto.reservation;
+package com.quintor.worqplace.presentation.dto.reservation;
 
 import lombok.Getter;
 import lombok.Setter;

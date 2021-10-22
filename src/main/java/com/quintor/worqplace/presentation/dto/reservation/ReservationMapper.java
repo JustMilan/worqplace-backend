@@ -1,4 +1,4 @@
-package com.quintor.worqplace.application.dto.reservation;
+package com.quintor.worqplace.presentation.dto.reservation;
 
 import com.quintor.worqplace.domain.Reservation;
 import org.mapstruct.Mapper;

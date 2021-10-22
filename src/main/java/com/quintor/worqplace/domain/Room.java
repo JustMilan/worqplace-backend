@@ -19,6 +19,9 @@ public class Room {
 
     private int floor;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Location location;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
     private List<Workplace> workplaces;

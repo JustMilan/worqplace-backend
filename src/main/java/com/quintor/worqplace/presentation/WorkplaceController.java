@@ -1,7 +1,7 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.WorkplaceService;
-import com.quintor.worqplace.application.dto.workplace.WorkplaceMapper;
+import com.quintor.worqplace.presentation.dto.workplace.WorkplaceMapper;
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;

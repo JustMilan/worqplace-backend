@@ -1,4 +1,4 @@
-package com.quintor.worqplace.application.dto.employee;
+package com.quintor.worqplace.presentation.dto.employee;
 
 import com.quintor.worqplace.domain.Employee;
 import org.mapstruct.Mapper;

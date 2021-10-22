@@ -1,6 +1,7 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.dto.reservation.ReservationDTO;
+import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
+import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
 import com.quintor.worqplace.data.ReservationRepository;
@@ -35,8 +36,15 @@ public class ReservationService {
     public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
         Reservation reservation = toReservation(reservationDTO);
 
+        List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
+                reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
+
         if (reservation.getWorkplace() == null)
             throw new InvalidReservationTypeException();
+
+        // check if workplace is available
+        if (availableWorkplaces.stream().noneMatch(workplace -> workplace.getId().equals(reservation.getWorkplace().getId())))
+            throw new WorkplaceNotAvailableException();
 
         reservationRepository.save(reservation);
 
@@ -50,4 +58,5 @@ public class ReservationService {
 
         return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace);
     }
+
 }
