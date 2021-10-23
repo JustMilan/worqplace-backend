@@ -19,78 +19,71 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class WorkplaceService {
-    private final ReservationRepository reservationRepository;
-    private final WorkplaceRepository workplaceRepository;
-    private final LocationService locationService;
+	private final ReservationRepository reservationRepository;
+	private final WorkplaceRepository workplaceRepository;
+	private final LocationService locationService;
 
-    public List<Workplace> getAllWorkplaces() {
-        return workplaceRepository.findAll();
-    }
+	public List<Workplace> getAllWorkplaces() {
+		return workplaceRepository.findAll();
+	}
 
-    public Workplace getWorkplaceById(Long id) {
-        return workplaceRepository.findById(id).orElseThrow(
-                () -> new WorkplaceNotFoundException(id));
-    }
+	public Workplace getWorkplaceById(Long id) {
+		return workplaceRepository.findById(id)
+				.orElseThrow(() -> new WorkplaceNotFoundException(id));
+	}
 
-    public List<Workplace> getWorkplacesAvailability(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-        if (startTime.isAfter(endTime))
-            throw new InvalidStartAndEndTimeException();
+	public List<Workplace> getWorkplacesAvailability(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		checkReservationDateTime(date, startTime, endTime);
 
-        if (date.isBefore(LocalDate.now()))
-            throw new InvalidDayException();
+		Map<Long, Map<LocalTime, LocalTime>> startAndEndTimesByWorkplace = new HashMap<>();
+		List<Workplace> availableWorkplaces = findWorkplacesByLocationId(locationId);
+		List<Reservation> reservations = reservationRepository.findAllByWorkplaceIsInAndWorkplaceIsNotNullAndDate(availableWorkplaces, date);
 
-        Map<Long, Map<LocalTime, LocalTime>> startAndEndTimesByWorkplace = new HashMap<>();
+		reservations.forEach(reservation -> {
+			Long key = reservation.getWorkplace().getId();
+			Map<LocalTime, LocalTime> innerMap = new HashMap<>();
 
-        List<Workplace> availableWorkplaces = findWorkplacesByLocationId(locationId);
-        List<Reservation> reservations = reservationRepository.findAllByWorkplaceIsInAndWorkplaceIsNotNullAndDate(availableWorkplaces, date);
+			if (! startAndEndTimesByWorkplace.containsKey(key)) {
+				innerMap.put(reservation.getStartTime(), reservation.getEndTime());
+				startAndEndTimesByWorkplace.put(reservation.getWorkplace().getId(), innerMap);
+			} else {
+				innerMap = startAndEndTimesByWorkplace.get(key);
+				innerMap.put(reservation.getStartTime(), reservation.getEndTime());
+			}
+		});
 
-        reservations.forEach((reservation -> {
-            Long key = reservation.getWorkplace().getId();
+		startAndEndTimesByWorkplace.forEach((key, value) ->
+				value.forEach((reservationStartTime, reservationEndTime) -> {
+					// to be reserved time and reserved times are overlapping
+					if (reservationStartTime.isBefore(endTime) && startTime.isBefore(reservationEndTime))
+						availableWorkplaces.remove(getWorkplaceById(key));
+				}));
 
-            if (!startAndEndTimesByWorkplace.containsKey(key)) {
-                Map<LocalTime, LocalTime> innerMap = new HashMap<>();
-                innerMap.put(reservation.getStartTime(), reservation.getEndTime());
-                startAndEndTimesByWorkplace.put(reservation.getWorkplace().getId(), innerMap);
-            } else {
-                Map<LocalTime, LocalTime> innerMap = startAndEndTimesByWorkplace.get(key);
-                innerMap.put(reservation.getStartTime(), reservation.getEndTime());
-            }
-        }));
+		// only return unique workplaces
+		return availableWorkplaces.stream().distinct().collect(Collectors.toList());
+	}
 
-        for (Entry<Long, Map<LocalTime, LocalTime>> entry : startAndEndTimesByWorkplace.entrySet()) {
-            Long key = entry.getKey();
-            Map<LocalTime, LocalTime> value = entry.getValue();
+	public List<Workplace> findWorkplacesByLocationId(Long locationId) {
+		List<Workplace> workplacesByLocation = new ArrayList<>();
+		Location location = locationService.getLocationById(locationId);
 
-            for (Entry<LocalTime, LocalTime> entry1 : value.entrySet()) {
-                LocalTime reservationStartTime = entry1.getKey();
-                LocalTime reservationEndTime = entry1.getValue();
+		for (Room room : location.getRooms())
+			workplacesByLocation.addAll(room.getWorkplaces());
 
-                // to be reserved time and reserved times are overlapping
-                if (reservationStartTime.isBefore(endTime) && startTime.isBefore(reservationEndTime)) {
-                    availableWorkplaces.remove(getWorkplaceById(key));
-                }
-            }
-        }
-        // only return unique workplaces
-        return availableWorkplaces.stream().distinct().collect(Collectors.toList());
-    }
+		return workplacesByLocation;
+	}
 
-    public List<Workplace> findWorkplacesByLocationId(Long locationId) {
-        List<Workplace> workplacesByLocation = new ArrayList<>();
+	private void checkReservationDateTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
+		if (startTime.isAfter(endTime))
+			throw new InvalidStartAndEndTimeException();
 
-        Location location = locationService.getLocationById(locationId);
-
-        for (Room room : location.getRooms()) {
-            workplacesByLocation.addAll(room.getWorkplaces());
-        }
-
-        return workplacesByLocation;
-    }
+		if (date.isBefore(LocalDate.now()))
+			throw new InvalidDayException();
+	}
 }
