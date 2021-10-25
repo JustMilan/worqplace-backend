@@ -24,4 +24,13 @@ public class Workplace {
 
 	@OneToMany(mappedBy = "workplace")
 	private List<Reservation> reservations;
+
+	public Workplace(Room room) {
+		this.room = room;
+	}
+
+	public Workplace(Room room, List<Reservation> reservations) {
+		this.room = room;
+		this.reservations = reservations;
+	}
 }
