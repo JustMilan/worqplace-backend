@@ -1,7 +1,5 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.exceptions.InvalidDayException;
-import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.data.WorkplaceRepository;
@@ -9,25 +7,33 @@ import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
-import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.quintor.worqplace.application.util.DateTimeUtils.checkReservationDateTime;
 
 @Service
 @Transactional
-@AllArgsConstructor
 public class WorkplaceService {
+	//TODO: Move to reservationService
 	private final ReservationRepository reservationRepository;
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
+	private final ReservationService reservationService;
+
+	@Lazy
+	public WorkplaceService(ReservationRepository reservationRepository, WorkplaceRepository workplaceRepository, LocationService locationService, ReservationService reservationService) {
+		this.reservationRepository = reservationRepository;
+		this.workplaceRepository = workplaceRepository;
+		this.locationService = locationService;
+		this.reservationService = reservationService;
+	}
 
 	public List<Workplace> getAllWorkplaces() {
 		return workplaceRepository.findAll();
@@ -79,11 +85,29 @@ public class WorkplaceService {
 		return workplacesByLocation;
 	}
 
-	private void checkReservationDateTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
-		if (startTime.isAfter(endTime))
-			throw new InvalidStartAndEndTimeException();
+	public List<Workplace> findWorkplacesByLocationAndRoomId(Long locationId, Long roomId) {
+		List<Workplace> workplacesByLocation = findWorkplacesByLocationId(locationId);
+		return workplacesByLocation
+				.stream()
+				.filter(workplace -> Objects.equals(workplace.getRoom().getId(), roomId))
+				.collect(Collectors.toList());
+	}
 
-		if (date.isBefore(LocalDate.now()))
-			throw new InvalidDayException();
+	public List<Reservation> checkWorkplaceAvailabilityForDay(Workplace workplace, LocalDate date) {
+		return reservationService.getReservationsForWorkplaceAtDate(workplace.getId(), date);
+	}
+
+	public List<Reservation> getWorkplaceAvailability(Long locationId, Long workplaceId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		List<Workplace> workplacesByLocation = findWorkplacesByLocationId(locationId);
+		Workplace workplace = null;
+
+		for (Workplace w : workplacesByLocation)
+			if (w.getId().equals(workplaceId))
+				workplace = w;
+
+		if (workplace == null)
+			throw new WorkplaceNotFoundException(workplaceId);
+
+		return reservationService.getReservationsForWorkplaceAtDate(workplaceId, date);
 	}
 }
