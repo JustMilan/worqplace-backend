@@ -20,7 +20,8 @@ public class LocationService {
 	}
 
 	public Location getLocationById(Long id) {
-		return locationRepository.findById(id).orElseThrow(
-				() -> new LocationNotFoundException(id));
+		return locationRepository
+				.findById(id)
+				.orElseThrow(() -> new LocationNotFoundException(id));
 	}
 }

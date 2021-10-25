@@ -22,25 +22,34 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
+	private final RoomService roomService;
 	private final EmployeeService employeeService;
 	private final WorkplaceService workplaceService;
-	private final RoomService roomService;
 	private final ReservationRepository reservationRepository;
 
+	public static boolean isWorkplaceAvailable(List<Workplace> workplaces, Long workplaceId) {
+		return workplaces.stream().anyMatch(workplace -> workplace.getId().equals(workplaceId));
+	}
+
 	public List<Reservation> getAllReservations() {
-		return reservationRepository.findAll();
+		return Collections.unmodifiableList(reservationRepository.findAll());
 	}
 
 	public Reservation getReservationById(Long id) {
-		return reservationRepository.findById(id).orElseThrow(
-				() -> new ReservationNotFoundException(id));
+		return reservationRepository
+				.findById(id)
+				.orElseThrow(() -> new ReservationNotFoundException(id));
 	}
 
 	public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
 		Reservation reservation = toReservation(reservationDTO);
 
-		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
-				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
+		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(
+				reservation.getWorkplace().getRoom().getLocation().getId(),
+				reservation.getDate(),
+				reservation.getStartTime(),
+				reservation.getEndTime()
+		);
 
 		if (reservation.getWorkplace() == null)
 			throw new InvalidReservationTypeException();
@@ -49,13 +58,7 @@ public class ReservationService {
 		if (! isWorkplaceAvailable(availableWorkplaces, reservation.getWorkplace().getId()))
 			throw new WorkplaceNotAvailableException();
 
-		reservationRepository.save(reservation);
-
-		return reservation;
-	}
-
-	public static boolean isWorkplaceAvailable(List<Workplace> workplaces, Long workplaceId) {
-		return workplaces.stream().anyMatch(workplace -> workplace.getId().equals(workplaceId));
+		return reservationRepository.save(reservation);
 	}
 
 	public Reservation toReservation(ReservationDTO reservationDTO) {
@@ -97,17 +100,12 @@ public class ReservationService {
 	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		List<Reservation> reservations = getReservationsForWorkplaceAtDate(workplace.getId(), date);
 
-		for (Reservation reservation : reservations) {
-			LocalTime reservationStartTime = reservation.getStartTime();
-			LocalTime reservationEndTime = reservation.getEndTime();
-			if (reservationStartTime.equals(startTime) ||
-					reservationEndTime.equals(endTime) ||
-					(startTime.isAfter(reservationStartTime) && startTime.isBefore(reservationEndTime)) ||
-					(endTime.isBefore(reservationEndTime) && endTime.isAfter(reservationStartTime)))
-				return false;
-		}
-
-		return true;
+		return reservations
+				.stream()
+				.noneMatch(reservation -> reservation.getStartTime().equals(startTime) ||
+						reservation.getEndTime().equals(endTime) ||
+						(reservation.getStartTime().isAfter(reservation.getStartTime()) && startTime.isBefore(reservation.getEndTime())) ||
+						(endTime.isBefore(reservation.getEndTime()) && endTime.isAfter(reservation.getStartTime())));
 	}
 
 	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date) {
