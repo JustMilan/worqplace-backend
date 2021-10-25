@@ -12,10 +12,10 @@ import javax.transaction.Transactional;
 @Transactional
 @AllArgsConstructor
 public class EmployeeService {
-    private final EmployeeRepository employeeRepository;
+	private final EmployeeRepository employeeRepository;
 
-    public Employee getEmployeeById(Long id) {
-        return employeeRepository.findById(id).orElseThrow(
-                () -> new EmployeeNotFoundException(id));
-    }
+	public Employee getEmployeeById(Long id) {
+		return employeeRepository.findById(id).orElseThrow(
+				() -> new EmployeeNotFoundException(id));
+	}
 }

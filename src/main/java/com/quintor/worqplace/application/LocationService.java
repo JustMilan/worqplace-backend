@@ -13,14 +13,14 @@ import java.util.List;
 @Transactional
 @AllArgsConstructor
 public class LocationService {
-    private final LocationRepository locationRepository;
+	private final LocationRepository locationRepository;
 
-    public List<Location> getAllLocations() {
-        return locationRepository.findAll();
-    }
+	public List<Location> getAllLocations() {
+		return locationRepository.findAll();
+	}
 
-    public Location getLocationById(Long id) {
-        return locationRepository.findById(id).orElseThrow(
-                () -> new LocationNotFoundException(id));
-    }
+	public Location getLocationById(Long id) {
+		return locationRepository.findById(id).orElseThrow(
+				() -> new LocationNotFoundException(id));
+	}
 }

@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/locations")
 @AllArgsConstructor
 public class LocationController {
-    private final LocationService locationService;
-    private final LocationMapper locationMapper;
+	private final LocationService locationService;
+	private final LocationMapper locationMapper;
 
-    @CrossOrigin(origins = {"http://localhost:4200"})
-    @GetMapping
-    private ResponseEntity<?> getAllLocations() {
-        return new ResponseEntity<>(locationService.getAllLocations().stream().map(locationMapper::toLocationDTO)
-                .collect(Collectors.toList()), HttpStatus.OK);
-    }
+	@CrossOrigin(origins = {"http://localhost:4200"})
+	@GetMapping
+	private ResponseEntity<?> getAllLocations() {
+		return new ResponseEntity<>(locationService.getAllLocations().stream().map(locationMapper::toLocationDTO)
+				.collect(Collectors.toList()), HttpStatus.OK);
+	}
 
 }

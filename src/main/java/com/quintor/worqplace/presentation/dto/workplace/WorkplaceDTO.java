@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class WorkplaceDTO {
-    private Long id;
-    private int floor;
+	private Long id;
+	private int floor;
 }

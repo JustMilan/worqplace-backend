@@ -12,10 +12,10 @@ import javax.persistence.*;
 @Entity
 @Table(name = "workplace")
 public class Workplace {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Room room;
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Room room;
 }

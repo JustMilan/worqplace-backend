@@ -17,33 +17,33 @@ import java.util.stream.Collectors;
 @RequestMapping("/reservations")
 @AllArgsConstructor
 public class ReservationController {
-    private final ReservationService reservationService;
-    private final ReservationMapper reservationMapper;
+	private final ReservationService reservationService;
+	private final ReservationMapper reservationMapper;
 
-    @CrossOrigin(origins = {"http://localhost:4200"})
-    @GetMapping
-    public ResponseEntity<?> getAllReservations() {
-        return new ResponseEntity<>(reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO)
-                .collect(Collectors.toList()), HttpStatus.OK);
-    }
+	@CrossOrigin(origins = {"http://localhost:4200"})
+	@GetMapping
+	public ResponseEntity<?> getAllReservations() {
+		return new ResponseEntity<>(reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO)
+				.collect(Collectors.toList()), HttpStatus.OK);
+	}
 
-    @CrossOrigin(origins = {"http://localhost:4200"})
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getReservationById(@PathVariable long id) {
-        try {
-            return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.getReservationById(id)), HttpStatus.OK);
-        } catch (ReservationNotFoundException reservationNotFoundException) {
-            return new ResponseEntity<>(reservationNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
-        }
-    }
+	@CrossOrigin(origins = {"http://localhost:4200"})
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getReservationById(@PathVariable long id) {
+		try {
+			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.getReservationById(id)), HttpStatus.OK);
+		} catch (ReservationNotFoundException reservationNotFoundException) {
+			return new ResponseEntity<>(reservationNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @CrossOrigin(origins = {"http://localhost:4200"})
-    @PostMapping("/workplaces")
-    public ResponseEntity<?> reserveWorkplace(@RequestBody ReservationDTO reservationDTO) {
-        try {
-            return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplace(reservationDTO)), HttpStatus.CREATED);
-        } catch (InvalidReservationTypeException | WorkplaceNotAvailableException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-    }
+	@CrossOrigin(origins = {"http://localhost:4200"})
+	@PostMapping("/workplaces")
+	public ResponseEntity<?> reserveWorkplace(@RequestBody ReservationDTO reservationDTO) {
+		try {
+			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplace(reservationDTO)), HttpStatus.CREATED);
+		} catch (InvalidReservationTypeException | WorkplaceNotAvailableException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
 }
