@@ -1,7 +1,6 @@
 package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
-import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.data.WorkplaceRepository;
 import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Reservation;
@@ -21,15 +20,12 @@ import static com.quintor.worqplace.application.util.DateTimeUtils.checkReservat
 @Service
 @Transactional
 public class WorkplaceService {
-	//TODO: Move to reservationService
-	private final ReservationRepository reservationRepository;
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
 	private final ReservationService reservationService;
 
 	@Lazy
-	public WorkplaceService(ReservationRepository reservationRepository, WorkplaceRepository workplaceRepository, LocationService locationService, ReservationService reservationService) {
-		this.reservationRepository = reservationRepository;
+	public WorkplaceService(WorkplaceRepository workplaceRepository, LocationService locationService, ReservationService reservationService) {
 		this.workplaceRepository = workplaceRepository;
 		this.locationService = locationService;
 		this.reservationService = reservationService;
@@ -40,7 +36,8 @@ public class WorkplaceService {
 	}
 
 	public Workplace getWorkplaceById(Long id) {
-		return workplaceRepository.findById(id)
+		return workplaceRepository
+				.findById(id)
 				.orElseThrow(() -> new WorkplaceNotFoundException(id));
 	}
 
@@ -49,7 +46,7 @@ public class WorkplaceService {
 
 		Map<Long, Map<LocalTime, LocalTime>> startAndEndTimesByWorkplace = new HashMap<>();
 		List<Workplace> availableWorkplaces = findWorkplacesByLocationId(locationId);
-		List<Reservation> reservations = reservationRepository.findAllByWorkplaceIsInAndWorkplaceIsNotNullAndDate(availableWorkplaces, date);
+		List<Reservation> reservations = reservationService.findAllByWorkplacesAndDate(availableWorkplaces, date);
 
 		reservations.forEach(reservation -> {
 			Long key = reservation.getWorkplace().getId();
@@ -97,7 +94,7 @@ public class WorkplaceService {
 		return reservationService.getReservationsForWorkplaceAtDate(workplace.getId(), date);
 	}
 
-	public List<Reservation> getWorkplaceAvailability(Long locationId, Long workplaceId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public List<Reservation> getWorkplaceAvailability(Long locationId, Long workplaceId, LocalDate date) {
 		List<Workplace> workplacesByLocation = findWorkplacesByLocationId(locationId);
 		Workplace workplace = null;
 

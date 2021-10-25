@@ -61,6 +61,10 @@ public class ReservationService {
 		return reservationRepository.save(reservation);
 	}
 
+	public List<Reservation> findAllByWorkplacesAndDate(List<Workplace> workplaces, LocalDate date) {
+		return reservationRepository.findAllByWorkplaceIsInAndWorkplaceIsNotNullAndDate(workplaces, date);
+	}
+
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
 		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
