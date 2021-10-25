@@ -16,18 +16,17 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/reservations")
 @AllArgsConstructor
+@CrossOrigin(origins = {"http://localhost:4200"})
 public class ReservationController {
 	private final ReservationService reservationService;
 	private final ReservationMapper reservationMapper;
 
-	@CrossOrigin(origins = {"http://localhost:4200"})
 	@GetMapping
 	public ResponseEntity<?> getAllReservations() {
 		return new ResponseEntity<>(reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO)
 				.collect(Collectors.toList()), HttpStatus.OK);
 	}
 
-	@CrossOrigin(origins = {"http://localhost:4200"})
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getReservationById(@PathVariable long id) {
 		try {
@@ -37,7 +36,6 @@ public class ReservationController {
 		}
 	}
 
-	@CrossOrigin(origins = {"http://localhost:4200"})
 	@PostMapping("/workplaces")
 	public ResponseEntity<?> reserveWorkplace(@RequestBody ReservationDTO reservationDTO) {
 		try {
