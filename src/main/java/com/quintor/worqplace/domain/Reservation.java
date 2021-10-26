@@ -24,13 +24,16 @@ public class Reservation {
 	private LocalTime startTime;
 	private LocalTime endTime;
 
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name = "employee_id")
 	private Employee employee;
 
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name = "room_id")
 	private Room room;
 
-	@OneToOne
+	@ManyToOne
+	@JoinColumn(name = "workplace_id")
 	private Workplace workplace;
 
 	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace) {

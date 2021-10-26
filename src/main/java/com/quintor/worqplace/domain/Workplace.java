@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +19,7 @@ public class Workplace {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Room room;
+
+	@OneToMany(mappedBy = "workplace")
+	private List<Reservation> reservations;
 }

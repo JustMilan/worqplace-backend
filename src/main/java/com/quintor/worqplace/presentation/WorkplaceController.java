@@ -60,7 +60,7 @@ public class WorkplaceController {
 	                                              @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
 	                                              @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 		try {
-			return new ResponseEntity<>(roomService.getRoomsAvailabilityForDateAndTime(locationId, date, startTime, endTime)
+			return new ResponseEntity<>(roomService.getAvailableRoomsForDateAndTime(locationId, date, startTime, endTime)
 					.stream().map(roomMapper::toRoomDTO).collect(Collectors.toList()), HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);

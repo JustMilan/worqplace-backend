@@ -49,7 +49,7 @@ public class RoomService {
 				.collect(Collectors.toList());
 	}
 
-	public List<Room> getRoomsAvailabilityForDateAndTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public List<Room> getAvailableRoomsForDateAndTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> rooms = findRoomsByLocationId(locationId);
 
