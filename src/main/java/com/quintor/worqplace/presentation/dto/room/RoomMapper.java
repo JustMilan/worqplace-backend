@@ -13,11 +13,11 @@ import java.util.List;
 public interface RoomMapper {
 	RoomMapper INSTANCE = Mappers.getMapper(RoomMapper.class);
 
-	@Mapping(source = "room.workplaces", target = "capacity", qualifiedByName = "workplaceAmountToSize")
-	RoomDTO toRoomDTO(Room room);
-
 	@Named("workplaceAmountToSize")
 	static int workplaceAmountToSize(List<Workplace> workplaces) {
 		return workplaces.size();
 	}
+
+	@Mapping(source = "room.workplaces", target = "capacity", qualifiedByName = "workplaceAmountToSize")
+	RoomDTO toRoomDTO(Room room);
 }
