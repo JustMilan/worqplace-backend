@@ -54,6 +54,14 @@ public class ReservationService {
 		return reservation;
 	}
 
+	public Reservation toReservation(ReservationDTO reservationDTO) {
+		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
+		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
+		Room room = reservationDTO.getRoomId() != null ? roomService.getRoomById(reservationDTO.getRoomId()) : null;
+
+        return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
+    }
+
 	/**
 	 * @param reservationDTO DTO input for creating a reservation.
 	 * @return {@link List<Reservation>} of all the reserved workplaces
@@ -68,15 +76,6 @@ public class ReservationService {
 		if (! available) throw new WorkplaceNotAvailableException();
 
 		return reservationRepository.save(reservation);
-	}
-
-
-	public Reservation toReservation(ReservationDTO reservationDTO) {
-		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
-		Room room = reservationDTO.getRoomId() != null ? roomService.getRoomById(reservationDTO.getRoomId()) : null;
-
-		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
 	}
 
 	/**

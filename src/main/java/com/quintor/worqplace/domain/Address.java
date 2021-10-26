@@ -46,7 +46,7 @@ public class Address {
 	public void setAddition(String addition) {
 		char[] additionChars = addition.toCharArray();
 		for (char c : additionChars)
-			if (! Character.isLetterOrDigit(c))
+			if (! Character.isLetterOrDigit(c) && ! Character.isWhitespace(c))
 				throw new RuntimeException("Addition must consist of numbers and letters only");
 
 		this.addition = addition;
