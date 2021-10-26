@@ -31,36 +31,36 @@ class ReservationTest {
 
 	@Test
 	void shouldCreateReservationCorrectlyWithRoomNull() {
-		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, null, workplace));
+		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, null, workplace, false));
 	}
 
 	@Test
 	void shouldCreateReservationCorrectlyWithWorkplaceNull() {
-		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, room, null));
+		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, room, null, false));
 	}
 
 	@Test
 	void shouldCreateReservationCorrectlyWithCustomId() {
-		assertDoesNotThrow(() -> new Reservation(1L, date, startTime, endTime, employee, room, null));
+		assertDoesNotThrow(() -> new Reservation(1L, date, startTime, endTime, employee, room, null, false));
 	}
 
 	@Test
 	void shouldThrowIfRoomAndWorkplaceAreNull() {
-		assertThrows(InvalidReservationTypeException.class, () -> new Reservation(date, startTime, endTime, employee, null, null));
+		assertThrows(InvalidReservationTypeException.class, () -> new Reservation(date, startTime, endTime, employee, null, null, false));
 	}
 
 	@Test
 	void shouldThrowIfRoomAndWorkplaceAreNotNull() {
-		assertThrows(InvalidReservationTypeException.class, () -> new Reservation(date, startTime, endTime, employee, room, workplace));
+		assertThrows(InvalidReservationTypeException.class, () -> new Reservation(date, startTime, endTime, employee, room, workplace, false));
 	}
 
 	@Test
 	void ShouldThrowWhenDateIsBeforeToday() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, workplace));
+		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, workplace, false));
 	}
 
 	@Test
 	void shouldThrowIfEndTimeIsBeforeStartTime() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(date, startTime, startTime.minusMinutes(1), employee, null, workplace));
+		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(date, startTime, startTime.minusMinutes(1), employee, null, workplace, false));
 	}
 }

@@ -23,6 +23,6 @@ class RoomTest {
 
 	@Test
 	void shouldCreateRoomCorrectly() {
-		assertDoesNotThrow(() -> new Room(id, floor, location, workplaces));
+		assertDoesNotThrow(() -> new Room(id, floor, location, workplaces, null));
 	}
 }
