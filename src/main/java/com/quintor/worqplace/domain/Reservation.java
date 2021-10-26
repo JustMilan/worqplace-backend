@@ -24,12 +24,13 @@ public class Reservation {
     private LocalTime startTime;
     private LocalTime endTime;
 
-    @OneToOne
-    private Employee employee;
+	@ManyToOne
+	@JoinColumn(name = "employee_id")
+	private Employee employee;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
+	@ManyToOne
+	@JoinColumn(name = "room_id")
+	private Room room;
 
     @ManyToOne
     @JoinColumn(name = "workplace_id")

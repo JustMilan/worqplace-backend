@@ -1,19 +1,22 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
-import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
+import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
+import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -59,4 +62,48 @@ public class ReservationService {
         return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
     }
 
+	/**
+	 * @param workplaceId Long
+	 * @param date        LocalDate
+	 * @return List of reservations for a workplace at the given date
+	 */
+	public List<Reservation> getReservationsForWorkplaceAtDate(Long workplaceId, LocalDate date) {
+		List<Reservation> reservations = reservationRepository.findAll();
+
+		return reservations
+				.stream()
+				.filter(reservation ->
+						reservation.getDate().toString().equals(date.toString()) &&
+								Objects.equals(reservation.getWorkplace().getId(), workplaceId))
+				.collect(Collectors.toList());
+	}
+
+	public Map<LocalDate, List<Reservation>> getReservationsForWorkplaceAtDates(Long workplaceId, List<LocalDate> dates) {
+		Map<LocalDate, List<Reservation>> reservations = new HashMap<>();
+
+		dates.forEach(date -> {
+			List<Reservation> reservationsForDate = new ArrayList<>(getReservationsForWorkplaceAtDate(workplaceId, date));
+			reservations.put(date, reservationsForDate);
+		});
+
+		return reservations;
+	}
+
+
+	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		List<Reservation> reservations = getReservationsForWorkplaceAtDate(workplace.getId(), date);
+
+		return reservations
+				.stream()
+				.noneMatch(reservation -> reservation.getStartTime().equals(startTime) ||
+						reservation.getEndTime().equals(endTime) ||
+						(reservation.getStartTime().isAfter(reservation.getStartTime()) && startTime.isBefore(reservation.getEndTime())) ||
+						(endTime.isBefore(reservation.getEndTime()) && endTime.isAfter(reservation.getStartTime())));
+	}
+
+	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date) {
+		return getReservationsForWorkplaceAtDate(workplace.getId(), date)
+				.stream()
+				.noneMatch(reservation -> reservation.getDate().equals(date));
+	}
 }

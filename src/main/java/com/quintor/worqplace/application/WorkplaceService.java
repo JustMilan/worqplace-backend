@@ -1,9 +1,6 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.exceptions.InvalidDayException;
-import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
-import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.data.WorkplaceRepository;
 import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Reservation;
@@ -28,14 +25,23 @@ import java.util.stream.Collectors;
 public class WorkplaceService {
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
+	private final ReservationService reservationService;
+
+	@Lazy
+	public WorkplaceService(WorkplaceRepository workplaceRepository, LocationService locationService, ReservationService reservationService) {
+		this.workplaceRepository = workplaceRepository;
+		this.locationService = locationService;
+		this.reservationService = reservationService;
+	}
 
 	public List<Workplace> getAllWorkplaces() {
 		return workplaceRepository.findAll();
 	}
 
 	public Workplace getWorkplaceById(Long id) {
-		return workplaceRepository.findById(id).orElseThrow(
-				() -> new WorkplaceNotFoundException(id));
+		return workplaceRepository
+				.findById(id)
+				.orElseThrow(() -> new WorkplaceNotFoundException(id));
 	}
 
 	public List<Workplace> getWorkplacesAvailability(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {

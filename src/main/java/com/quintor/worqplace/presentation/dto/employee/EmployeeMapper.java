@@ -6,7 +6,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
-    EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
+	EmployeeMapper INSTANCE = Mappers.getMapper(EmployeeMapper.class);
 
-    EmployeeDTO toEmployeeDTO(Employee employee);
+	EmployeeDTO toEmployeeDTO(Employee employee);
 }

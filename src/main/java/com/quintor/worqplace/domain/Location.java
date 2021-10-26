@@ -13,16 +13,16 @@ import java.util.List;
 @Entity
 @Table(name = "location")
 public class Location {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String name;
+	private String name;
 
-    @OneToOne
-    private Address address;
+	@OneToOne
+	private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "location_id")
-    private List<Room> rooms;
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinColumn(name = "location_id")
+	private List<Room> rooms;
 }
