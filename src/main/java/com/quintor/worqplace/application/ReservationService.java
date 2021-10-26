@@ -59,8 +59,8 @@ public class ReservationService {
 		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
 		Room room = reservationDTO.getRoomId() != null ? roomService.getRoomById(reservationDTO.getRoomId()) : null;
 
-        return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
-    }
+		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
+	}
 
 	/**
 	 * @param reservationDTO DTO input for creating a reservation.
