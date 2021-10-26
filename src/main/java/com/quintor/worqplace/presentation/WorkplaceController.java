@@ -40,13 +40,13 @@ public class WorkplaceController {
 
     @CrossOrigin(origins = {"http://localhost:4200"})
     @GetMapping("/availability")
-    public ResponseEntity<?> getWorkplacesAvailability(@RequestParam("locationId") int locationId,
+    public ResponseEntity<?> getWorkplacesAvailability(@RequestParam("locationId") Long locationId,
                                                        @RequestParam("date")    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
                                                        @RequestParam("start")   @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
                                                        @RequestParam("end")     @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime
     ) {
         try {
-            return new ResponseEntity<>(workplaceService.getWorkplacesAvailability((long) locationId, date, startTime, endTime)
+            return new ResponseEntity<>(workplaceService.getWorkplacesAvailability(locationId, date, startTime, endTime)
                     .stream().map(workplaceMapper::toWorkplaceDTO).collect(Collectors.toList()), HttpStatus.OK);
         } catch (InvalidDayException | InvalidStartAndEndTimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
