@@ -9,6 +9,7 @@ import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
+import com.quintor.worqplace.presentation.dto.reservation.RoomReservationDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +55,28 @@ public class ReservationService {
         return reservation;
     }
 
-    public Reservation toReservation(ReservationDTO reservationDTO) {
+	/**
+	 * @param roomReservationDTO
+	 * @return {@link List<Reservation>} of all the reserved workplaces
+	 */
+	public List<Reservation> reserveRoom(RoomReservationDTO roomReservationDTO) {
+		Employee employee = employeeService.getEmployeeById(roomReservationDTO.getEmployeeId());
+		Room room = roomReservationDTO.getRoomId() != null? roomService.getRoomById(roomReservationDTO.getRoomId()) : null;
+
+		if(room == null) throw new WorkplaceNotAvailableException();
+
+		boolean available = roomService.isRoomAvailable(room, roomReservationDTO.getDate(), roomReservationDTO.getStartTime(), roomReservationDTO.getEndTime());
+		if(!available) throw new InvalidReservationTypeException();
+
+		List<Reservation> res = room.getWorkplaces().stream().map(workplace -> new Reservation(roomReservationDTO.getDate(), roomReservationDTO.getStartTime(), roomReservationDTO.getEndTime(), employee, room, workplace, roomReservationDTO.isRecurring())).collect(Collectors.toList());
+
+		res.forEach(reservationRepository::save);
+
+		return res;
+	}
+
+
+	public Reservation toReservation(ReservationDTO reservationDTO) {
         Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
         Workplace workplace = reservationDTO.getWorkplaceId() != null? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
         Room room = reservationDTO.getRoomId() != null? roomService.getRoomById(reservationDTO.getRoomId()) : null;

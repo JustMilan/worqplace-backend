@@ -45,7 +45,7 @@ public class RoomService {
 
 		return rooms
 				.stream()
-				.filter(room -> isRoomAvailable(locationId, room, date))
+				.filter(room -> isRoomAvailable(room, date))
 				.collect(Collectors.toList());
 	}
 
@@ -55,17 +55,17 @@ public class RoomService {
 
 		return rooms
 				.stream()
-				.filter(room -> isRoomAvailable(locationId, room, date, startTime, endTime))
+				.filter(room -> isRoomAvailable(room, date, startTime, endTime))
 				.collect(Collectors.toList());
 	}
 
-	public boolean isRoomAvailable(Long locationId, Room room, LocalDate date) {
+	public boolean isRoomAvailable(Room room, LocalDate date) {
 		return room.getWorkplaces()
 				.stream()
 				.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date));
 	}
 
-	public boolean isRoomAvailable(Long locationId, Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		return room.getWorkplaces()
 				.stream()
 				.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));

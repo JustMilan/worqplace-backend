@@ -1,5 +1,7 @@
 package com.quintor.worqplace.application;
 
+import com.quintor.worqplace.application.exceptions.InvalidDayException;
+import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
 import com.quintor.worqplace.data.WorkplaceRepository;
 import com.quintor.worqplace.domain.Location;
@@ -7,6 +9,7 @@ import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -21,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-@AllArgsConstructor
 public class WorkplaceService {
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
