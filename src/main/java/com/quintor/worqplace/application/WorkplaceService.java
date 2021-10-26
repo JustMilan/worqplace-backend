@@ -23,11 +23,13 @@ import java.util.stream.Collectors;
 public class WorkplaceService {
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
+	private final RoomService roomService;
 
 	@Lazy
-	public WorkplaceService(WorkplaceRepository workplaceRepository, LocationService locationService) {
+	public WorkplaceService(WorkplaceRepository workplaceRepository, LocationService locationService, RoomService roomService) {
 		this.workplaceRepository = workplaceRepository;
 		this.locationService = locationService;
+		this.roomService = roomService;
 	}
 
 	public List<Workplace> getAllWorkplaces() {
@@ -77,6 +79,9 @@ public class WorkplaceService {
 	 */
 	public boolean isWorkplaceAvailableDuringDateAndTime(Workplace workplace, LocalDate date,
 														 LocalTime startTime, LocalTime endTime) {
+		if(!roomService.isRoomAvailable(workplace.getRoom(), date, startTime, endTime))
+			return false;
+
 		for (Reservation reservation : workplace.getReservations()) {
 			if ((! reservation.getDate().equals(date)) ||
 					(reservation.isRecurring() && ! reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {

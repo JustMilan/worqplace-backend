@@ -6,8 +6,6 @@ import com.quintor.worqplace.application.exceptions.ReservationNotFoundException
 import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
-import com.quintor.worqplace.presentation.dto.reservation.RoomReservationDTO;
-import com.quintor.worqplace.presentation.dto.reservation.RoomReservationMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +20,6 @@ import java.util.stream.Collectors;
 public class ReservationController {
 	private final ReservationService reservationService;
 	private final ReservationMapper reservationMapper;
-	private final RoomReservationMapper roomReservationMapper;
 
 	@GetMapping
 	public ResponseEntity<?> getAllReservations() {

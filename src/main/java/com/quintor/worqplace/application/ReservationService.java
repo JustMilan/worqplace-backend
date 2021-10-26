@@ -9,7 +9,6 @@ import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
-import com.quintor.worqplace.presentation.dto.reservation.RoomReservationDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -94,10 +93,9 @@ public class ReservationService {
 				.stream()
 				.filter(reservation ->
 						reservation.getDate().toString().equals(date.toString()) &&
-								reservation.getRoom() == null ?
-								Objects.equals(reservation.getWorkplace().getId(), workplaceId)
+								(reservation.getRoom() == null ? Objects.equals(reservation.getWorkplace().getId(), workplaceId)
 								:
-								reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId))
+								reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId)))
 				)
 				.collect(Collectors.toList());
 	}
