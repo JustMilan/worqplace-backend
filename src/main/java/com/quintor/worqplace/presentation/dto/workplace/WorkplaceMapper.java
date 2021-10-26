@@ -7,8 +7,8 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface WorkplaceMapper {
-    WorkplaceMapper INSTANCE = Mappers.getMapper(WorkplaceMapper.class);
+	WorkplaceMapper INSTANCE = Mappers.getMapper(WorkplaceMapper.class);
 
-    @Mapping(source = "workplace.room.floor", target = "floor")
-    WorkplaceDTO toWorkplaceDTO(Workplace workplace);
+	@Mapping(source = "workplace.room.floor", target = "floor")
+	WorkplaceDTO toWorkplaceDTO(Workplace workplace);
 }

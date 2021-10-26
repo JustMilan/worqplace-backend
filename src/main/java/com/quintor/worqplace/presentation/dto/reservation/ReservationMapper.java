@@ -7,10 +7,10 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface ReservationMapper {
-    ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
+	ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
 
-    @Mapping(source = "employee.id", target = "employeeId")
-    @Mapping(source = "room.id", target = "roomId")
-    @Mapping(source = "workplace.id", target = "workplaceId")
-    ReservationDTO toReservationDTO(Reservation reservation);
+	@Mapping(source = "employee.id", target = "employeeId")
+	@Mapping(source = "room.id", target = "roomId")
+	@Mapping(source = "workplace.id", target = "workplaceId")
+	ReservationDTO toReservationDTO(Reservation reservation);
 }

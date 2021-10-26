@@ -12,12 +12,12 @@ import javax.persistence.*;
 @Entity
 @Table(name = "address")
 public class Address {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String number;
-    private String street;
-    private String postalCode;
-    private String city;
+	private String number;
+	private String street;
+	private String postalCode;
+	private String city;
 }
