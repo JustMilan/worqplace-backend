@@ -116,4 +116,10 @@ public class ReservationService {
 				.stream()
 				.noneMatch(reservation -> reservation.getDate().equals(date));
 	}
+
+	public List<Reservation> getAllMyReservations(Long id){
+		List<Reservation> myReservations = reservationRepository.findAllByEmployeeId(id);
+
+		return myReservations;
+	}
 }
