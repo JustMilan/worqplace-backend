@@ -65,7 +65,7 @@ public class ReservationService {
 			throw new InvalidReservationTypeException();
 
 		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
-		if(!available) throw new WorkplaceNotAvailableException();
+		if (! available) throw new WorkplaceNotAvailableException();
 
 		reservationRepository.save(reservation);
 
@@ -74,9 +74,9 @@ public class ReservationService {
 
 
 	public Reservation toReservation(ReservationDTO reservationDTO) {
-        Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-        Workplace workplace = reservationDTO.getWorkplaceId() != null? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
-        Room room = reservationDTO.getRoomId() != null? roomService.getRoomById(reservationDTO.getRoomId()) : null;
+		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
+		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
+		Room room = reservationDTO.getRoomId() != null ? roomService.getRoomById(reservationDTO.getRoomId()) : null;
 
 		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
 	}
@@ -93,9 +93,9 @@ public class ReservationService {
 				.stream()
 				.filter(reservation ->
 						reservation.getDate().toString().equals(date.toString()) &&
-								(reservation.getRoom() == null ? Objects.equals(reservation.getWorkplace().getId(), workplaceId)
-								:
-								reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId)))
+								(reservation.getRoom() == null
+										? Objects.equals(reservation.getWorkplace().getId(), workplaceId)
+										: reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId)))
 				)
 				.collect(Collectors.toList());
 	}

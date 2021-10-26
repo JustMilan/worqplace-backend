@@ -5,7 +5,6 @@ import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeExcept
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;

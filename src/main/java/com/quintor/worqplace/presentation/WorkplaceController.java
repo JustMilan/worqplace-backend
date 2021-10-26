@@ -1,11 +1,9 @@
 package com.quintor.worqplace.presentation;
 
-import com.quintor.worqplace.application.RoomService;
 import com.quintor.worqplace.application.WorkplaceService;
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
-import com.quintor.worqplace.presentation.dto.room.RoomMapper;
 import com.quintor.worqplace.presentation.dto.workplace.WorkplaceMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

@@ -79,7 +79,7 @@ public class WorkplaceService {
 	 */
 	public boolean isWorkplaceAvailableDuringDateAndTime(Workplace workplace, LocalDate date,
 														 LocalTime startTime, LocalTime endTime) {
-		if(!roomService.isRoomAvailable(workplace.getRoom(), date, startTime, endTime))
+		if (! roomService.isRoomAvailable(workplace.getRoom(), date, startTime, endTime))
 			return false;
 
 		for (Reservation reservation : workplace.getReservations()) {

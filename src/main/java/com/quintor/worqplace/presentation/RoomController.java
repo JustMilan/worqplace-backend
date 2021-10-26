@@ -19,19 +19,19 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @CrossOrigin(origins = {"http://localhost:4200"})
 public class RoomController {
-    private final RoomService roomService;
-    private final RoomMapper roomMapper;
+	private final RoomService roomService;
+	private final RoomMapper roomMapper;
 
-    @GetMapping("/availability")
-    public ResponseEntity<?> getRoomsAvailability(@RequestParam("locationId") Long locationId,
-                                                  @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                                  @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-                                                  @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
-        try {
-            return new ResponseEntity<>(roomService.getAvailableRoomsForDateAndTime(locationId, date, startTime, endTime)
-                    .stream().map(roomMapper::toRoomDTO).collect(Collectors.toList()), HttpStatus.OK);
-        } catch (InvalidDayException | InvalidStartAndEndTimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        }
-    }
+	@GetMapping("/availability")
+	public ResponseEntity<?> getRoomsAvailability(@RequestParam("locationId") Long locationId,
+												  @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+												  @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+												  @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+		try {
+			return new ResponseEntity<>(roomService.getAvailableRoomsForDateAndTime(locationId, date, startTime, endTime)
+					.stream().map(roomMapper::toRoomDTO).collect(Collectors.toList()), HttpStatus.OK);
+		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
 }
