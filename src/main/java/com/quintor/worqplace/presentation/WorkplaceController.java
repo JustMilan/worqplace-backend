@@ -23,9 +23,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = {"http://localhost:4200"})
 public class WorkplaceController {
 	private final WorkplaceService workplaceService;
-	private final RoomService roomService;
 	private final WorkplaceMapper workplaceMapper;
-	private final RoomMapper roomMapper;
 
 	@GetMapping
 	public ResponseEntity<?> getAllWorkplaces() {
@@ -41,7 +39,7 @@ public class WorkplaceController {
 		}
 	}
 
-	@GetMapping("/availability/workplaces")
+	@GetMapping("/availability")
 	public ResponseEntity<?> getWorkplacesAvailability(@RequestParam("locationId") Long locationId,
 													   @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 													   @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
@@ -49,19 +47,6 @@ public class WorkplaceController {
 		try {
 			return new ResponseEntity<>(workplaceService.getWorkplacesAvailability(locationId, date, startTime, endTime)
 					.stream().map(workplaceMapper::toWorkplaceDTO).collect(Collectors.toList()), HttpStatus.OK);
-		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-		}
-	}
-
-	@GetMapping("/availability/rooms")
-	public ResponseEntity<?> getRoomsAvailability(@RequestParam("locationId") Long locationId,
-												  @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-												  @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-												  @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
-		try {
-			return new ResponseEntity<>(roomService.getAvailableRoomsForDateAndTime(locationId, date, startTime, endTime)
-					.stream().map(roomMapper::toRoomDTO).collect(Collectors.toList()), HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}

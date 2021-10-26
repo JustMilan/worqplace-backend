@@ -56,23 +56,21 @@ public class ReservationService {
 	}
 
 	/**
-	 * @param roomReservationDTO
+	 * @param reservationDTO DTO input for creating a reservation.
 	 * @return {@link List<Reservation>} of all the reserved workplaces
 	 */
-	public List<Reservation> reserveRoom(RoomReservationDTO roomReservationDTO) {
-		Employee employee = employeeService.getEmployeeById(roomReservationDTO.getEmployeeId());
-		Room room = roomReservationDTO.getRoomId() != null? roomService.getRoomById(roomReservationDTO.getRoomId()) : null;
+	public Reservation reserveRoom(ReservationDTO reservationDTO) {
+		Reservation reservation = toReservation(reservationDTO);
 
-		if(room == null) throw new WorkplaceNotAvailableException();
+		if (reservation.getRoom() == null)
+			throw new InvalidReservationTypeException();
 
-		boolean available = roomService.isRoomAvailable(room, roomReservationDTO.getDate(), roomReservationDTO.getStartTime(), roomReservationDTO.getEndTime());
-		if(!available) throw new InvalidReservationTypeException();
+		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
+		if(!available) throw new WorkplaceNotAvailableException();
 
-		List<Reservation> res = room.getWorkplaces().stream().map(workplace -> new Reservation(roomReservationDTO.getDate(), roomReservationDTO.getStartTime(), roomReservationDTO.getEndTime(), employee, room, workplace, roomReservationDTO.isRecurring())).collect(Collectors.toList());
+		reservationRepository.save(reservation);
 
-		res.forEach(reservationRepository::save);
-
-		return res;
+		return reservation;
 	}
 
 
@@ -96,7 +94,11 @@ public class ReservationService {
 				.stream()
 				.filter(reservation ->
 						reservation.getDate().toString().equals(date.toString()) &&
-								Objects.equals(reservation.getWorkplace().getId(), workplaceId))
+								reservation.getRoom() == null ?
+								Objects.equals(reservation.getWorkplace().getId(), workplaceId)
+								:
+								reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId))
+				)
 				.collect(Collectors.toList());
 	}
 

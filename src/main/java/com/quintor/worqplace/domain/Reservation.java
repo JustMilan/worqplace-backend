@@ -5,6 +5,7 @@ import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeExcept
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -55,5 +56,15 @@ public class Reservation {
 		this.room = room;
 		this.workplace = workplace;
 		this.recurring = recurring;
+	}
+
+	@Override
+	public String toString() {
+		return "Reservation{" +
+				"employee=" + employee +
+				", room=" + room +
+				", workplace=" + workplace +
+				", recurring=" + recurring +
+				'}';
 	}
 }
