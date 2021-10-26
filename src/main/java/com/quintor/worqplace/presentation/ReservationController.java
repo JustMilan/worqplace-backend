@@ -44,4 +44,14 @@ public class ReservationController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
+
+
+	@PostMapping("/rooms")
+	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
+		try {
+			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)), HttpStatus.CREATED);
+		} catch (InvalidReservationTypeException | WorkplaceNotAvailableException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
 }

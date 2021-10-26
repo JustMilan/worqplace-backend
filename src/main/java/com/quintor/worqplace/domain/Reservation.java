@@ -56,4 +56,14 @@ public class Reservation {
 		this.workplace = workplace;
 		this.recurring = recurring;
 	}
+
+	@Override
+	public String toString() {
+		return "Reservation{" +
+				"employee=" + employee +
+				", room=" + room +
+				", workplace=" + workplace +
+				", recurring=" + recurring +
+				'}';
+	}
 }

@@ -54,6 +54,23 @@ public class ReservationService {
 		return reservation;
 	}
 
+	/**
+	 * @param reservationDTO DTO input for creating a reservation.
+	 * @return {@link List<Reservation>} of all the reserved workplaces
+	 */
+	public Reservation reserveRoom(ReservationDTO reservationDTO) {
+		Reservation reservation = toReservation(reservationDTO);
+
+		if (reservation.getRoom() == null)
+			throw new InvalidReservationTypeException();
+
+		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
+		if (! available) throw new WorkplaceNotAvailableException();
+
+		return reservationRepository.save(reservation);
+	}
+
+
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
 		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
@@ -74,7 +91,10 @@ public class ReservationService {
 				.stream()
 				.filter(reservation ->
 						reservation.getDate().toString().equals(date.toString()) &&
-								Objects.equals(reservation.getWorkplace().getId(), workplaceId))
+								(reservation.getRoom() == null
+										? Objects.equals(reservation.getWorkplace().getId(), workplaceId)
+										: reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId)))
+				)
 				.collect(Collectors.toList());
 	}
 
