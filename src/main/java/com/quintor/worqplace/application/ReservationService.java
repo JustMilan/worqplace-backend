@@ -23,37 +23,37 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
-    private final EmployeeService employeeService;
-    private final WorkplaceService workplaceService;
-    private final RoomService roomService;
-    private final ReservationRepository reservationRepository;
+	private final EmployeeService employeeService;
+	private final WorkplaceService workplaceService;
+	private final RoomService roomService;
+	private final ReservationRepository reservationRepository;
 
-    public List<Reservation> getAllReservations() {
-        return reservationRepository.findAll();
-    }
+	public List<Reservation> getAllReservations() {
+		return reservationRepository.findAll();
+	}
 
-    public Reservation getReservationById(Long id) {
-        return reservationRepository.findById(id).orElseThrow(
-                () -> new ReservationNotFoundException(id));
-    }
+	public Reservation getReservationById(Long id) {
+		return reservationRepository.findById(id).orElseThrow(
+				() -> new ReservationNotFoundException(id));
+	}
 
-    public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
-        Reservation reservation = toReservation(reservationDTO);
+	public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
+		Reservation reservation = toReservation(reservationDTO);
 
-        List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
-                reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
+		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
+				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
 
-        if (reservation.getWorkplace() == null)
-            throw new InvalidReservationTypeException();
+		if (reservation.getWorkplace() == null)
+			throw new InvalidReservationTypeException();
 
-        // check if workplace is available
-        if (availableWorkplaces.stream().noneMatch(workplace -> workplace.getId().equals(reservation.getWorkplace().getId())))
-            throw new WorkplaceNotAvailableException();
+		// check if workplace is available
+		if (availableWorkplaces.stream().noneMatch(workplace -> workplace.getId().equals(reservation.getWorkplace().getId())))
+			throw new WorkplaceNotAvailableException();
 
-        reservationRepository.save(reservation);
+		reservationRepository.save(reservation);
 
-        return reservation;
-    }
+		return reservation;
+	}
 
 	/**
 	 * @param roomReservationDTO
@@ -81,8 +81,8 @@ public class ReservationService {
         Workplace workplace = reservationDTO.getWorkplaceId() != null? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
         Room room = reservationDTO.getRoomId() != null? roomService.getRoomById(reservationDTO.getRoomId()) : null;
 
-        return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
-    }
+		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
+	}
 
 	/**
 	 * @param workplaceId Long

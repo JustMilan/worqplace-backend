@@ -8,7 +8,6 @@ import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +15,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +23,11 @@ import java.util.stream.Collectors;
 public class WorkplaceService {
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
-	private final ReservationService reservationService;
 
 	@Lazy
-	public WorkplaceService(WorkplaceRepository workplaceRepository, LocationService locationService, ReservationService reservationService) {
+	public WorkplaceService(WorkplaceRepository workplaceRepository, LocationService locationService) {
 		this.workplaceRepository = workplaceRepository;
 		this.locationService = locationService;
-		this.reservationService = reservationService;
 	}
 
 	public List<Workplace> getAllWorkplaces() {
@@ -74,17 +68,18 @@ public class WorkplaceService {
 
 	/**
 	 * Function that iterates through workplaces to determine whether they are available during the provided timeslot.
+	 *
 	 * @param workplace The workplace that requires checking.
-	 * @param date The date of the timeslot.
+	 * @param date      The date of the timeslot.
 	 * @param startTime The start time of the timeslot.
-	 * @param endTime The end time of the timeslot.
+	 * @param endTime   The end time of the timeslot.
 	 * @return True if the workplace
 	 */
 	public boolean isWorkplaceAvailableDuringDateAndTime(Workplace workplace, LocalDate date,
-	                                                     LocalTime startTime, LocalTime endTime) {
+														 LocalTime startTime, LocalTime endTime) {
 		for (Reservation reservation : workplace.getReservations()) {
-			if ((!reservation.getDate().equals(date)) ||
-					(reservation.isRecurring() && !reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {
+			if ((! reservation.getDate().equals(date)) ||
+					(reservation.isRecurring() && ! reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {
 				continue;
 			}
 			if (endTime.isBefore(reservation.getStartTime()) ||

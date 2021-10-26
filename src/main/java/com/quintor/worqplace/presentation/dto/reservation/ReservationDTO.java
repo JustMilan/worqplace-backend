@@ -9,12 +9,12 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class ReservationDTO {
-    private Long id;
-    private LocalDate date;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private Long employeeId;
-    private Long roomId;
-    private Long workplaceId;
-    private boolean recurring;
+	private Long id;
+	private LocalDate date;
+	private LocalTime startTime;
+	private LocalTime endTime;
+	private Long employeeId;
+	private Long roomId;
+	private Long workplaceId;
+	private boolean recurring;
 }
