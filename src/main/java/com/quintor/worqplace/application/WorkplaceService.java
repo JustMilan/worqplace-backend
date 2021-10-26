@@ -6,19 +6,22 @@ import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
-import org.springframework.context.annotation.Lazy;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
-
-import static com.quintor.worqplace.application.util.DateTimeUtils.checkReservationDateTime;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class WorkplaceService {
 	private final WorkplaceRepository workplaceRepository;
 	private final LocationService locationService;
@@ -42,69 +45,52 @@ public class WorkplaceService {
 	}
 
 	public List<Workplace> getWorkplacesAvailability(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-		checkReservationDateTime(date, startTime, endTime);
+		if (startTime.isAfter(endTime))
+			throw new InvalidStartAndEndTimeException();
 
-		Map<Long, Map<LocalTime, LocalTime>> startAndEndTimesByWorkplace = new HashMap<>();
+		if (date.isBefore(LocalDate.now()))
+			throw new InvalidDayException();
+
 		List<Workplace> availableWorkplaces = findWorkplacesByLocationId(locationId);
-		List<Reservation> reservations = reservationService.findAllByWorkplacesAndDate(availableWorkplaces, date);
 
-		reservations.forEach(reservation -> {
-			Long key = reservation.getWorkplace().getId();
-			Map<LocalTime, LocalTime> innerMap = new HashMap<>();
-
-			if (! startAndEndTimesByWorkplace.containsKey(key)) {
-				innerMap.put(reservation.getStartTime(), reservation.getEndTime());
-				startAndEndTimesByWorkplace.put(reservation.getWorkplace().getId(), innerMap);
-			} else {
-				innerMap = startAndEndTimesByWorkplace.get(key);
-				innerMap.put(reservation.getStartTime(), reservation.getEndTime());
-			}
-		});
-
-		startAndEndTimesByWorkplace.forEach((key, value) ->
-				value.forEach((reservationStartTime, reservationEndTime) -> {
-					// to be reserved time and reserved times are overlapping
-					if (reservationStartTime.isBefore(endTime) && startTime.isBefore(reservationEndTime))
-						availableWorkplaces.remove(getWorkplaceById(key));
-				}));
-
-		// only return unique workplaces
-		return availableWorkplaces.stream().distinct().collect(Collectors.toList());
+		return availableWorkplaces.stream()
+				.filter(workplace -> isWorkplaceAvailableDuringDateAndTime(workplace, date, startTime, endTime))
+				.collect(Collectors.toList());
 	}
 
 	public List<Workplace> findWorkplacesByLocationId(Long locationId) {
 		List<Workplace> workplacesByLocation = new ArrayList<>();
+
 		Location location = locationService.getLocationById(locationId);
 
-		for (Room room : location.getRooms())
+		for (Room room : location.getRooms()) {
 			workplacesByLocation.addAll(room.getWorkplaces());
+		}
 
 		return workplacesByLocation;
 	}
 
-	public List<Workplace> findWorkplacesByLocationAndRoomId(Long locationId, Long roomId) {
-		List<Workplace> workplacesByLocation = findWorkplacesByLocationId(locationId);
-		return workplacesByLocation
-				.stream()
-				.filter(workplace -> Objects.equals(workplace.getRoom().getId(), roomId))
-				.collect(Collectors.toList());
-	}
-
-	public List<Reservation> checkWorkplaceAvailabilityForDay(Workplace workplace, LocalDate date) {
-		return reservationService.getReservationsForWorkplaceAtDate(workplace.getId(), date);
-	}
-
-	public List<Reservation> getWorkplaceAvailability(Long locationId, Long workplaceId, LocalDate date) {
-		List<Workplace> workplacesByLocation = findWorkplacesByLocationId(locationId);
-		Workplace workplace = null;
-
-		for (Workplace w : workplacesByLocation)
-			if (w.getId().equals(workplaceId))
-				workplace = w;
-
-		if (workplace == null)
-			throw new WorkplaceNotFoundException(workplaceId);
-
-		return reservationService.getReservationsForWorkplaceAtDate(workplaceId, date);
+	/**
+	 * Function that iterates through workplaces to determine whether they are available during the provided timeslot.
+	 * @param workplace The workplace that requires checking.
+	 * @param date The date of the timeslot.
+	 * @param startTime The start time of the timeslot.
+	 * @param endTime The end time of the timeslot.
+	 * @return True if the workplace
+	 */
+	public boolean isWorkplaceAvailableDuringDateAndTime(Workplace workplace, LocalDate date,
+	                                                     LocalTime startTime, LocalTime endTime) {
+		for (Reservation reservation : workplace.getReservations()) {
+			if ((!reservation.getDate().equals(date)) ||
+					(reservation.isRecurring() && !reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {
+				continue;
+			}
+			if (endTime.isBefore(reservation.getStartTime()) ||
+					(startTime.isAfter(reservation.getEndTime()))) {
+				continue;
+			}
+			return false;
+		}
+		return true;
 	}
 }

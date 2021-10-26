@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -13,13 +12,13 @@ import java.util.List;
 @Entity
 @Table(name = "workplace")
 public class Workplace {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	private Room room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Room room;
 
-	@OneToMany(mappedBy = "workplace")
-	private List<Reservation> reservations;
+    @OneToMany(mappedBy = "workplace")
+    private List<Reservation> reservations;
 }

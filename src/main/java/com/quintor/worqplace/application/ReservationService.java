@@ -22,56 +22,45 @@ import java.util.stream.Collectors;
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
-	private final RoomService roomService;
-	private final EmployeeService employeeService;
-	private final WorkplaceService workplaceService;
-	private final ReservationRepository reservationRepository;
+    private final EmployeeService employeeService;
+    private final WorkplaceService workplaceService;
+    private final RoomService roomService;
+    private final ReservationRepository reservationRepository;
 
-	public static boolean isWorkplaceAvailable(List<Workplace> workplaces, Long workplaceId) {
-		return workplaces.stream().anyMatch(workplace -> workplace.getId().equals(workplaceId));
-	}
+    public List<Reservation> getAllReservations() {
+        return reservationRepository.findAll();
+    }
 
-	public List<Reservation> getAllReservations() {
-		return Collections.unmodifiableList(reservationRepository.findAll());
-	}
+    public Reservation getReservationById(Long id) {
+        return reservationRepository.findById(id).orElseThrow(
+                () -> new ReservationNotFoundException(id));
+    }
 
-	public Reservation getReservationById(Long id) {
-		return reservationRepository
-				.findById(id)
-				.orElseThrow(() -> new ReservationNotFoundException(id));
-	}
+    public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
+        Reservation reservation = toReservation(reservationDTO);
 
-	public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
-		Reservation reservation = toReservation(reservationDTO);
+        List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
+                reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
 
-		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(
-				reservation.getWorkplace().getRoom().getLocation().getId(),
-				reservation.getDate(),
-				reservation.getStartTime(),
-				reservation.getEndTime()
-		);
+        if (reservation.getWorkplace() == null)
+            throw new InvalidReservationTypeException();
 
-		if (reservation.getWorkplace() == null)
-			throw new InvalidReservationTypeException();
+        // check if workplace is available
+        if (availableWorkplaces.stream().noneMatch(workplace -> workplace.getId().equals(reservation.getWorkplace().getId())))
+            throw new WorkplaceNotAvailableException();
 
-		// check if workplace is available
-		if (! isWorkplaceAvailable(availableWorkplaces, reservation.getWorkplace().getId()))
-			throw new WorkplaceNotAvailableException();
+        reservationRepository.save(reservation);
 
-		return reservationRepository.save(reservation);
-	}
+        return reservation;
+    }
 
-	public List<Reservation> findAllByWorkplacesAndDate(List<Workplace> workplaces, LocalDate date) {
-		return reservationRepository.findAllByWorkplaceIsInAndWorkplaceIsNotNullAndDate(workplaces, date);
-	}
+    public Reservation toReservation(ReservationDTO reservationDTO) {
+        Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
+        Workplace workplace = reservationDTO.getWorkplaceId() != null? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
+        Room room = reservationDTO.getRoomId() != null? roomService.getRoomById(reservationDTO.getRoomId()) : null;
 
-	public Reservation toReservation(ReservationDTO reservationDTO) {
-		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
-		Room room = reservationDTO.getRoomId() != null ? roomService.getRoomById(reservationDTO.getRoomId()) : null;
-
-		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace);
-	}
+        return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
+    }
 
 	/**
 	 * @param workplaceId Long
