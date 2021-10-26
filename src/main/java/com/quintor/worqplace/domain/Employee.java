@@ -29,11 +29,11 @@ public class Employee {
 	public void setFirstName(String firstName) {
 		char[] firstNameChars = firstName.toCharArray();
 
-		if (!Character.isUpperCase(firstNameChars[0]))
+		if (! Character.isUpperCase(firstNameChars[0]))
 			throw new RuntimeException("Name must start with a capital letter");
 
 		for (char c : firstNameChars)
-			if (!Character.isLetter(c))
+			if (! Character.isLetter(c))
 				throw new RuntimeException("first name must consist letters only");
 
 
@@ -43,11 +43,11 @@ public class Employee {
 	public void setLastName(String lastName) {
 		char[] lastNameChars = lastName.toCharArray();
 
-		if (!Character.isUpperCase(lastNameChars[0]))
+		if (! Character.isUpperCase(lastNameChars[0]))
 			throw new RuntimeException("Name must start with a capital letter");
 
 		for (char c : lastNameChars)
-			if (!Character.isLetter(c))
+			if (! Character.isLetter(c))
 				throw new RuntimeException("last name must consist letters only");
 
 		this.lastName = lastName;
