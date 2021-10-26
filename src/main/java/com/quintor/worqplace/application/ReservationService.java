@@ -67,9 +67,7 @@ public class ReservationService {
 		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
 		if (! available) throw new WorkplaceNotAvailableException();
 
-		reservationRepository.save(reservation);
-
-		return reservation;
+		return reservationRepository.save(reservation);
 	}
 
 
