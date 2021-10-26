@@ -27,18 +27,22 @@ public class Reservation {
     @OneToOne
     private Employee employee;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "room_id")
     private Room room;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "workplace_id")
     private Workplace workplace;
 
-    public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace) {
-        this(date, startTime, endTime, employee, room, workplace);
+    private boolean recurring;
+
+    public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace, boolean recurring) {
+        this(date, startTime, endTime, employee, room, workplace, recurring);
         this.id = id;
     }
 
-    public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace) {
+    public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace, boolean recurring) {
         if (startTime.isAfter(endTime))
             throw new InvalidStartAndEndTimeException();
         if ((room == null && workplace == null) || (room != null && workplace != null))
@@ -49,5 +53,6 @@ public class Reservation {
         this.employee = employee;
         this.room = room;
         this.workplace = workplace;
+        this.recurring = recurring;
     }
 }

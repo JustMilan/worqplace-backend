@@ -16,4 +16,5 @@ public class ReservationDTO {
     private Long employeeId;
     private Long roomId;
     private Long workplaceId;
+    private boolean recurring;
 }

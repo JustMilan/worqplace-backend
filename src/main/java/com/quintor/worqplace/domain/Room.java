@@ -25,4 +25,7 @@ public class Room {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "room_id")
     private List<Workplace> workplaces;
+
+    @OneToMany(mappedBy = "room")
+    private List<Reservation> reservations;
 }
