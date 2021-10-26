@@ -37,7 +37,7 @@ public class Location {
 	public void setName(String name) {
 		char[] nameChars = name.strip().toCharArray();
 
-		if (!Character.isUpperCase(nameChars[0]))
+		if (! Character.isUpperCase(nameChars[0]))
 			throw new RuntimeException("Name must start with a capital letter");
 
 		this.name = name;
