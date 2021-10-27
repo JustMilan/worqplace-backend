@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,13 +39,13 @@ public class ReservationService {
 	}
 
 	public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
-		Reservation reservation = toReservation(reservationDTO);
-
-		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
-				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
+		Reservation reservation = toReservation(reservationDTO); // id will be null
 
 		if (reservation.getWorkplace() == null)
 			throw new InvalidReservationTypeException();
+
+		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
+				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
 
 		// check if workplace is available
 		if (availableWorkplaces.stream().noneMatch(workplace -> workplace.getId().equals(reservation.getWorkplace().getId())))
@@ -86,7 +87,6 @@ public class ReservationService {
 	 */
 	public List<Reservation> getReservationsForWorkplaceAtDate(Long workplaceId, LocalDate date) {
 		List<Reservation> reservations = reservationRepository.findAll();
-
 		return reservations
 				.stream()
 				.filter(reservation ->

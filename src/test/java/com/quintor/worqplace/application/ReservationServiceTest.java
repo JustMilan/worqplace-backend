@@ -13,8 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +39,6 @@ class ReservationServiceTest {
 	private Reservation reservation;
 	private Reservation reservation1;
 	private Reservation reservation2;
-	private Reservation reservation3;
 
 	@BeforeEach
 	void initialize() {
@@ -56,6 +54,8 @@ class ReservationServiceTest {
 		this.workplaceService = new WorkplaceService(workplaceRepository, locationService, roomService);
 		this.reservationService = new ReservationService(employeeService, workplaceService, roomService, reservationRepository);
 
+		this.roomService.setReservationService(reservationService);
+
 		this.employee = new Employee(1L, "QFirstname", "QLastname");
 		this.address = new Address(12, "", "TestStreet", "2098GS", "QuintorCity");
 
@@ -65,8 +65,7 @@ class ReservationServiceTest {
 		this.location = new Location(1L, "QuintorTest", address, List.of(room));
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(15, 0), employee, null, workplace, false);
 		this.reservation1 = new Reservation(2L, LocalDate.now().plusDays(4), LocalTime.of(12, 0), LocalTime.of(13, 0), employee, room, null, false);
-		this.reservation2 = new Reservation(3L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(13, 0), employee, null, workplace, false);
-		this.reservation3 = new Reservation(3L, LocalDate.now().plusMonths(3), LocalTime.of(9, 36), LocalTime.of(13, 10), employee, null, workplace, false);
+		this.reservation2 = new Reservation(3L, LocalDate.now().plusMonths(3), LocalTime.of(9, 36), LocalTime.of(13, 10), employee, null, workplace, false);
 
 		this.room.setLocation(location);
 		room.setWorkplaces(List.of(workplace, workplace1));
@@ -89,20 +88,6 @@ class ReservationServiceTest {
 	void getReservationByIdShouldThrowIfNotFound() {
 		assertThrows(ReservationNotFoundException.class, () -> reservationService.getReservationById(3L));
 	}
-
-//	@Test TODO: FIX
-//	void reserveWorkplaceShouldReserve() {
-//		ReservationDTO reservationDTO = new ReservationDTO();
-//		reservationDTO.setId(4L);
-//		reservationDTO.setDate(reservation.getDate());
-//		reservationDTO.setStartTime(reservation.getStartTime());
-//		reservationDTO.setEndTime(reservation.getEndTime());
-//		reservationDTO.setEmployeeId(employee.getId());
-//		reservationDTO.setWorkplaceId(reservation.getWorkplace().getId());
-//		reservationDTO.setRecurring(false);
-//
-//		assertEquals(reservation.getId(), reservationService.reserveWorkplace(reservationDTO).getId());
-//	}
 
 	@Test
 	void reserveWorkplaceShouldThrowWhenRoomIdAndWorkplaceIdArePresent() {
@@ -130,31 +115,21 @@ class ReservationServiceTest {
 		reservationDTO.setRoomId(reservation1.getRoom().getId());
 		reservationDTO.setRecurring(false);
 
-		assertThrows(NullPointerException.class, () -> reservationService.reserveWorkplace(reservationDTO));
+		assertThrows(InvalidReservationTypeException.class, () -> reservationService.reserveWorkplace(reservationDTO));
 	}
 
-	@Test //TODO: FIX
+	@Test
 	void reserveWorkplaceShouldThrowWhenWorkplaceIsNotAvailable() {
-//		ReservationDTO reservationDTO = new ReservationDTO();
-//		reservationDTO.setId(5L);
-//		reservationDTO.setDate(reservation.getDate());
-//		reservationDTO.setStartTime(reservation.getStartTime());
-//		reservationDTO.setEndTime(reservation.getEndTime());
-//		reservationDTO.setEmployeeId(employee.getId());
-//		reservationDTO.setWorkplaceId(workplace.getId());
-//		reservationDTO.setRecurring(false);
-//
-//		ReservationDTO reservationDTO1 = new ReservationDTO();
-//		reservationDTO1.setId(6L);
-//		reservationDTO1.setDate(reservation.getDate());
-//		reservationDTO1.setStartTime(reservation.getStartTime());
-//		reservationDTO1.setEndTime(reservation.getEndTime());
-//		reservationDTO1.setEmployeeId(employee.getId());
-//		reservationDTO1.setWorkplaceId(workplace.getId());
-//		reservationDTO1.setRecurring(false);
-//
-//		reservationService.reserveWorkplace(reservationDTO);
-//		assertThrows(WorkplaceNotAvailableException.class, () -> reservationService.reserveWorkplace(reservationDTO1));
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setId(5L);
+		reservationDTO.setDate(reservation.getDate());
+		reservationDTO.setStartTime(reservation.getStartTime());
+		reservationDTO.setEndTime(reservation.getEndTime());
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setWorkplaceId(workplace.getId());
+		reservationDTO.setRecurring(false);
+
+		assertThrows(WorkplaceNotAvailableException.class, () -> reservationService.reserveWorkplace(reservationDTO));
 	}
 
 	@Test
@@ -172,42 +147,68 @@ class ReservationServiceTest {
 
 	}
 
-	@Test //TODO: FIX
+	@Test
 	void reserveWorkplaceShouldThrowWhenDateIsBeforeToday() {
-//		ReservationDTO reservationDTO = new ReservationDTO();
-//		reservationDTO.setId(8L);
-//		reservationDTO.setDate(LocalDate.now().minusDays(5));
-//		reservationDTO.setStartTime(LocalTime.of(8, 0));
-//		reservationDTO.setEndTime(LocalTime.of(19, 3));
-//		reservationDTO.setEmployeeId(employee.getId());
-//		reservationDTO.setWorkplaceId(workplace.getId());
-//		reservationDTO.setRecurring(false);
-//
-//		assertThrows(InvalidDayException.class, () -> reservationService.reserveWorkplace(reservationDTO));
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setId(8L);
+		reservationDTO.setDate(LocalDate.now().minusDays(5));
+		reservationDTO.setStartTime(LocalTime.of(8, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 3));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setWorkplaceId(workplace.getId());
+		reservationDTO.setRecurring(false);
+
+		assertThrows(InvalidDayException.class, () -> reservationService.reserveWorkplace(reservationDTO));
 	}
 
 	@Test
 	void toReservationShouldConvertCorrectly() {
 		ReservationDTO reservationDTO = new ReservationDTO();
 		reservationDTO.setId(8L);
-		reservationDTO.setDate(reservation3.getDate());
-		reservationDTO.setStartTime(reservation3.getStartTime());
-		reservationDTO.setEndTime(reservation3.getEndTime());
-		reservationDTO.setEmployeeId(reservation3.getEmployee().getId());
-		reservationDTO.setWorkplaceId(reservation3.getWorkplace().getId());
+		reservationDTO.setDate(reservation2.getDate());
+		reservationDTO.setStartTime(reservation2.getStartTime());
+		reservationDTO.setEndTime(reservation2.getEndTime());
+		reservationDTO.setEmployeeId(reservation2.getEmployee().getId());
+		reservationDTO.setWorkplaceId(reservation2.getWorkplace().getId());
 		reservationDTO.setRecurring(false);
 
-		assertEquals(reservation3.getDate(), reservationService.toReservation(reservationDTO).getDate());
-		assertEquals(reservation3.getRoom(), reservationService.toReservation(reservationDTO).getRoom());
-		assertEquals(reservation3.getEmployee(), reservationService.toReservation(reservationDTO).getEmployee());
-		assertEquals(reservation3.getStartTime(), reservationService.toReservation(reservationDTO).getStartTime());
-		assertEquals(reservation3.getEndTime(), reservationService.toReservation(reservationDTO).getEndTime());
-		assertEquals(reservation3.getWorkplace(), reservationService.toReservation(reservationDTO).getWorkplace());
+		assertEquals(reservation2.getDate(), reservationService.toReservation(reservationDTO).getDate());
+		assertEquals(reservation2.getRoom(), reservationService.toReservation(reservationDTO).getRoom());
+		assertEquals(reservation2.getEmployee(), reservationService.toReservation(reservationDTO).getEmployee());
+		assertEquals(reservation2.getStartTime(), reservationService.toReservation(reservationDTO).getStartTime());
+		assertEquals(reservation2.getEndTime(), reservationService.toReservation(reservationDTO).getEndTime());
+		assertEquals(reservation2.getWorkplace(), reservationService.toReservation(reservationDTO).getWorkplace());
+	}
+
+	@Test
+	void reserveRoomShouldThrowWhenRoomIsNull() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setId(8L);
+		reservationDTO.setDate(reservation2.getDate());
+		reservationDTO.setStartTime(reservation2.getStartTime());
+		reservationDTO.setEndTime(reservation2.getEndTime());
+		reservationDTO.setEmployeeId(reservation2.getEmployee().getId());
+		reservationDTO.setRecurring(false);
+
+		assertThrows(InvalidReservationTypeException.class, () -> reservationService.reserveRoom(reservationDTO));
+	}
+
+	@Test
+	void reserveRoomShouldThrowIfItNotAvailable() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setId(8L);
+		reservationDTO.setDate(reservation1.getDate());
+		reservationDTO.setStartTime(reservation1.getStartTime());
+		reservationDTO.setEndTime(reservation1.getEndTime());
+		reservationDTO.setEmployeeId(reservation1.getEmployee().getId());
+		reservationDTO.setRoomId(reservation1.getRoom().getId());
+		reservationDTO.setRecurring(false);
+
+		assertThrows(WorkplaceNotAvailableException.class, () -> reservationService.reserveRoom(reservationDTO));
 	}
 
 	@Test
 	void getReservationsForWorkplaceAtDateShouldReturnAvailableWorkplaces() {
-		
 	}
 
 	@Test
@@ -217,12 +218,12 @@ class ReservationServiceTest {
 
 	@Test
 	void isWorkplaceAvailableAtDateAndTimeShouldReturnAvailableWorkplaces() {
-
+		assertTrue(reservationService.isWorkplaceAvailableAt(workplace, LocalDate.now().plusDays(33), LocalTime.of(5, 11), LocalTime.of(9, 6)));
 	}
 
 	@Test
 	void isWorkplaceAvailableAtDateShouldReturnAvailableWorkplaces() {
-
+		assertTrue(reservationService.isWorkplaceAvailableAt(workplace, LocalDate.now().plusDays(33)));
 	}
 
 	private void setRepositoryBehaviour() {

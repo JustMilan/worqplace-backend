@@ -1,5 +1,6 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +57,7 @@ class ReservationTest {
 
 	@Test
 	void ShouldThrowWhenDateIsBeforeToday() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, workplace, false));
+		assertThrows(InvalidDayException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, workplace, false));
 	}
 
 	@Test
