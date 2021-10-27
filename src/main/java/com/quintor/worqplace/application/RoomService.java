@@ -23,7 +23,7 @@ import static com.quintor.worqplace.application.util.DateTimeUtils.checkReservat
 public class RoomService {
 	private final RoomRepository roomRepository;
 	private final LocationService locationService;
-	private final ReservationService reservationService;
+	private ReservationService reservationService;
 
 	@Lazy
 	public RoomService(RoomRepository roomRepository, LocationService locationService, ReservationService reservationService) {
@@ -74,5 +74,14 @@ public class RoomService {
 	public List<Room> findRoomsByLocationId(Long locationId) {
 		Location location = locationService.getLocationById(locationId);
 		return new ArrayList<>(location.getRooms());
+	}
+
+	/**
+	 * For testing purposes
+	 *
+	 * @param reservationService reservationsService
+	 */
+	public void setReservationService(ReservationService reservationService) {
+		this.reservationService = reservationService;
 	}
 }
