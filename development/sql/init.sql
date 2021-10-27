@@ -1,34 +1,34 @@
 /* Queries for Quintor Amersfoort */
-INSERT INTO address (street, number , postal_code, city)
-VALUES ('Maanlander', '14m', '3824 MP', 'Amersfoort');
+INSERT INTO address (street, number , postal_code, city, addition)
+VALUES ('Maanlander', '14', '3824 MP', 'Amersfoort', 'm');
 
 INSERT INTO location (name, address_id)
 VALUES ('Quintor Amersfoort', 1);
 
 /* Queries for Quintor Den Bosch */
-INSERT INTO address (street, number , postal_code, city)
-VALUES ('Havensingel', '1', '5211 TX', 'Den Bosch');
+INSERT INTO address (street, number , postal_code, city, addition)
+VALUES ('Havensingel', '1', '5211 TX', 'Den Bosch', '');
 
 INSERT INTO location (name, address_id)
 VALUES ('Quintor Den Bosch', 2);
 
 /* Queries for Quintor Deventer */
-INSERT INTO address (street, number , postal_code, city)
-VALUES ('Zutphenseweg', '6', '7418 AJ', 'Deventer');
+INSERT INTO address (street, number , postal_code, city, addition)
+VALUES ('Zutphenseweg', '6', '7418 AJ', 'Deventer', '');
 
 INSERT INTO location (name, address_id)
 VALUES ('Quintor Deventer', 3);
 
 /* Queries for Quintor Den Haag */
-INSERT INTO address (street, number , postal_code, city)
-VALUES ('Lange Vijverberg', '4-5', '2513 AC', 'Den Haag');
+INSERT INTO address (street, number , postal_code, city, addition)
+VALUES ('Lange Vijverberg', '4', '2513 AC', 'Den Haag', '-5');
 
 INSERT INTO location (name, address_id)
 VALUES ('Quintor Den Haag', 4);
 
 /* Queries for Quintor Groningen */
-INSERT INTO address (street, number , postal_code, city)
-VALUES ('Ubbo Emmiussingel', '112', '9711 BK', 'Groningen');
+INSERT INTO address (street, number , postal_code, city, addition)
+VALUES ('Ubbo Emmiussingel', '112', '9711 BK', 'Groningen', '');
 
 INSERT INTO location (name, address_id)
 VALUES ('Quintor Groningen', 5);
