@@ -29,7 +29,7 @@ class RoomServiceTest {
 
 		this.locationService = new LocationService(locationRepository);
 		this.employeeService = new EmployeeService(employeeRepository);
-		this.workplaceService = new WorkplaceService(workplaceRepository, locationService, reservationService);
+		this.workplaceService = new WorkplaceService(workplaceRepository, locationService, roomService);
 		this.roomService = new RoomService(roomRepository, locationService, reservationService);
 		this.reservationService = new ReservationService(employeeService, workplaceService, roomService, reservationRepository);
 	}
