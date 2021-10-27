@@ -61,9 +61,8 @@ public class WorkplaceService {
 
 		Location location = locationService.getLocationById(locationId);
 
-		for (Room room : location.getRooms()) {
+		for (Room room : location.getRooms())
 			workplacesByLocation.addAll(room.getWorkplaces());
-		}
 
 		return workplacesByLocation;
 	}

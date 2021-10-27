@@ -32,8 +32,9 @@ public class ReservationService {
 	}
 
 	public Reservation getReservationById(Long id) {
-		return reservationRepository.findById(id).orElseThrow(
-				() -> new ReservationNotFoundException(id));
+		return reservationRepository
+				.findById(id)
+				.orElseThrow(() -> new ReservationNotFoundException(id));
 	}
 
 	public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
