@@ -109,11 +109,8 @@ class WorkplaceServiceTest {
 		LocalDate localDate = LocalDate.now().plusDays(2);
 		LocalTime startTime = LocalTime.of(9, 33);
 		LocalTime endTime = LocalTime.of(14, 54);
-		Reservation reservation = new Reservation(1L, localDate, startTime, endTime, employee, null, workplace, false);
 
-		when(this.reservationRepository.findAll()).thenReturn(List.of(reservation));
-
-		assertFalse(() -> workplaceService.isWorkplaceAvailableDuringDateAndTime(workplace, localDate, startTime, endTime));
+		assertTrue(() -> workplaceService.isWorkplaceAvailableDuringDateAndTime(workplace, localDate, startTime, endTime));
 	}
 
 	@Test

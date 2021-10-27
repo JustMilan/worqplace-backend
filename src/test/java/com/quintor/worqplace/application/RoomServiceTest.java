@@ -76,16 +76,6 @@ class RoomServiceTest {
 	}
 
 	@Test
-	void getRoomsAvailabilityForDateShouldReturnAvailableRooms() {
-		assertEquals(List.of(room), roomService.getRoomsAvailabilityForDate(location.getId(), LocalDate.now().plusDays(1)));
-	}
-
-	@Test
-	void getRoomsAvailabilityForDateShouldThrowIfDateIsInvalid() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.getRoomsAvailabilityForDate(location.getId(), LocalDate.now().minusDays(1)));
-	}
-
-	@Test
 	void getAvailableRoomsForDateAndTimeShouldReturnAvailableRooms() {
 		assertEquals(List.of(room), roomService.getAvailableRoomsForDateAndTime(location.getId(), LocalDate.now().plusDays(4), LocalTime.of(5, 9), LocalTime.of(20, 8)));
 	}
@@ -101,26 +91,8 @@ class RoomServiceTest {
 	}
 
 	@Test
-	void isRoomAvailableShouldReturnTrueIfRoomIsAvailable() {
-		assertTrue(() -> roomService.isRoomAvailable(room, LocalDate.now().plusDays(12)));
-	}
-
-	@Test
-	void isRoomAvailableShouldReturnFalseIfRoomIsNotAvailable() {
-		LocalDate localDate = LocalDate.now().plusDays(12);
-		Reservation reservation = new Reservation(1L, localDate, LocalTime.of(2, 3), LocalTime.of(5, 6), employee, room, null, false);
-		when(reservationRepository.findAll()).thenReturn(List.of(reservation));
-		assertFalse(() -> roomService.isRoomAvailable(room, localDate));
-	}
-
-	@Test
-	void isRoomAvailableShouldThrowIfDateIsInvalid() {
-		assertThrows(InvalidDayException.class, () -> roomService.isRoomAvailable(room, LocalDate.now().minusMonths(1)));
-	}
-
-	@Test
 	void isRoomAvailableShouldThrowIfTimeIsInvalid() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.isRoomAvailable(room, LocalDate.now().plusDays(3), LocalTime.of(18, 1), LocalTime.of(16, 1)));
+		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.isRoomAvailable(room, LocalDate.now().plusDays(3), LocalTime.of(18, 1), LocalTime.of(16, 1), false));
 	}
 
 	@Test

@@ -1,7 +1,5 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.exceptions.InvalidDayException;
-import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
 import com.quintor.worqplace.data.RoomRepository;
 import com.quintor.worqplace.domain.Location;
@@ -16,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.quintor.worqplace.application.util.DateTimeUtils.checkReservationDate;
 import static com.quintor.worqplace.application.util.DateTimeUtils.checkReservationDateTime;
 
 @Service
@@ -38,43 +35,29 @@ public class RoomService {
 				.orElseThrow(() -> new RoomNotFoundException(id));
 	}
 
-	public List<Room> getRoomsAvailabilityForDate(Long locationId, LocalDate date) {
-		if (checkReservationDate(date))
-			throw new InvalidStartAndEndTimeException();
-
-		List<Room> rooms = findRoomsByLocationId(locationId);
-
-		return rooms
-				.stream()
-				.filter(room -> isRoomAvailable(room, date))
-				.collect(Collectors.toList());
-	}
-
 	public List<Room> getAvailableRoomsForDateAndTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
+
 		List<Room> rooms = findRoomsByLocationId(locationId);
 
 		return rooms
 				.stream()
-				.filter(room -> isRoomAvailable(room, date, startTime, endTime))
+				.filter(room -> isRoomAvailable(room, date, startTime, endTime, false))
 				.collect(Collectors.toList());
 	}
 
-	public boolean isRoomAvailable(Room room, LocalDate date) {
-		if (checkReservationDate(date))
-			throw new InvalidDayException();
-
-		return room.getWorkplaces()
-				.stream()
-				.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date));
-	}
-
-	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime, boolean isCheckForWorkplace) {
 		checkReservationDateTime(date, startTime, endTime);
 
-		return room.getWorkplaces()
-				.stream()
-				.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));
+		if (isCheckForWorkplace) {
+			return room.getWorkplaces()
+					.stream()
+					.anyMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));
+		} else {
+			return room.getWorkplaces()
+					.stream()
+					.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));
+		}
 	}
 
 	public List<Room> findRoomsByLocationId(Long locationId) {

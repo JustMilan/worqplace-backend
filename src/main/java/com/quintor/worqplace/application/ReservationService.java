@@ -2,6 +2,7 @@ package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
+import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
@@ -74,8 +75,8 @@ public class ReservationService {
 		if (reservation.getRoom() == null)
 			throw new InvalidReservationTypeException();
 
-		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
-		if (! available) throw new WorkplaceNotAvailableException();
+		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), false);
+		if (! available) throw new RoomNotAvailableException();
 
 		return reservationRepository.save(reservation);
 	}

@@ -7,6 +7,7 @@ import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.PrintStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
@@ -67,6 +68,9 @@ class ReservationServiceTest {
 		this.reservation1 = new Reservation(2L, LocalDate.now().plusDays(4), LocalTime.of(12, 0), LocalTime.of(13, 0), employee, room, null, false);
 		this.reservation2 = new Reservation(3L, LocalDate.now().plusMonths(3), LocalTime.of(9, 36), LocalTime.of(13, 10), employee, null, workplace, false);
 
+		this.workplace.setReservations(List.of(reservation));
+		this.workplace1.setReservations(List.of(reservation1));
+
 		this.room.setLocation(location);
 		room.setWorkplaces(List.of(workplace, workplace1));
 		room.setReservations(List.of(reservation1));
@@ -121,7 +125,7 @@ class ReservationServiceTest {
 	@Test
 	void reserveWorkplaceShouldThrowWhenWorkplaceIsNotAvailable() {
 		ReservationDTO reservationDTO = new ReservationDTO();
-		reservationDTO.setId(5L);
+		reservationDTO.setId(1L);
 		reservationDTO.setDate(reservation.getDate());
 		reservationDTO.setStartTime(reservation.getStartTime());
 		reservationDTO.setEndTime(reservation.getEndTime());

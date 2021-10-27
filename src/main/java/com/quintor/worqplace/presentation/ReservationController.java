@@ -3,6 +3,7 @@ package com.quintor.worqplace.presentation;
 import com.quintor.worqplace.application.ReservationService;
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
+import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
@@ -50,7 +51,7 @@ public class ReservationController {
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)), HttpStatus.CREATED);
-		} catch (InvalidReservationTypeException | WorkplaceNotAvailableException e) {
+		} catch (InvalidReservationTypeException | RoomNotAvailableException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
