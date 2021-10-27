@@ -61,8 +61,8 @@ public class Reservation {
 			throw new InvalidReservationTypeException();
 
 		setDate(date);
-		setStartTime(startTime);
-		setEndTime(endTime);
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.employee = employee;
 		this.room = room;
 		this.workplace = workplace;
@@ -74,13 +74,6 @@ public class Reservation {
 			throw new InvalidStartAndEndTimeException();
 
 		this.date = date;
-	}
-
-	public void setEndTime(LocalTime endTime) {
-		if (endTime.isBefore(startTime))
-			throw new InvalidStartAndEndTimeException();
-
-		this.endTime = endTime;
 	}
 
 	@Override
