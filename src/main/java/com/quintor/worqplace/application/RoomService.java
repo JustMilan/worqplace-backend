@@ -1,5 +1,6 @@
 package com.quintor.worqplace.application;
 
+import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
 import com.quintor.worqplace.data.RoomRepository;
@@ -38,7 +39,7 @@ public class RoomService {
 	}
 
 	public List<Room> getRoomsAvailabilityForDate(Long locationId, LocalDate date) {
-		if (! checkReservationDate(date))
+		if (checkReservationDate(date))
 			throw new InvalidStartAndEndTimeException();
 
 		List<Room> rooms = findRoomsByLocationId(locationId);
@@ -60,12 +61,17 @@ public class RoomService {
 	}
 
 	public boolean isRoomAvailable(Room room, LocalDate date) {
+		if (checkReservationDate(date))
+			throw new InvalidDayException();
+
 		return room.getWorkplaces()
 				.stream()
 				.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date));
 	}
 
 	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		checkReservationDateTime(date, startTime, endTime);
+
 		return room.getWorkplaces()
 				.stream()
 				.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));
