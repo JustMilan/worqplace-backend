@@ -1,5 +1,6 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import lombok.Getter;
@@ -71,7 +72,7 @@ public class Reservation {
 
 	public void setDate(LocalDate date) {
 		if (date.isBefore(LocalDate.now()))
-			throw new InvalidStartAndEndTimeException();
+			throw new InvalidDayException();
 
 		this.date = date;
 	}

@@ -98,17 +98,6 @@ public class ReservationService {
 				.collect(Collectors.toList());
 	}
 
-	public Map<LocalDate, List<Reservation>> getReservationsForWorkplaceAtDates(Long workplaceId, List<LocalDate> dates) {
-		Map<LocalDate, List<Reservation>> reservations = new HashMap<>();
-
-		dates.forEach(date -> {
-			List<Reservation> reservationsForDate = new ArrayList<>(getReservationsForWorkplaceAtDate(workplaceId, date));
-			reservations.put(date, reservationsForDate);
-		});
-
-		return reservations;
-	}
-
 
 	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		List<Reservation> reservations = getReservationsForWorkplaceAtDate(workplace.getId(), date);

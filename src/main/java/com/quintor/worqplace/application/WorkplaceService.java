@@ -1,8 +1,7 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.exceptions.InvalidDayException;
-import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
+import com.quintor.worqplace.application.util.DateTimeUtils;
 import com.quintor.worqplace.data.WorkplaceRepository;
 import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Room;
@@ -42,11 +41,7 @@ public class WorkplaceService {
 	}
 
 	public List<Workplace> getWorkplacesAvailability(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
-		if (startTime.isAfter(endTime))
-			throw new InvalidStartAndEndTimeException();
-
-		if (date.isBefore(LocalDate.now()))
-			throw new InvalidDayException();
+		DateTimeUtils.checkReservationDateTime(date, startTime, endTime);
 
 		List<Workplace> availableWorkplaces = findWorkplacesByLocationId(locationId);
 
