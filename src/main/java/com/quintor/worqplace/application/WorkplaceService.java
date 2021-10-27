@@ -5,7 +5,6 @@ import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeExcept
 import com.quintor.worqplace.application.exceptions.WorkplaceNotFoundException;
 import com.quintor.worqplace.data.WorkplaceRepository;
 import com.quintor.worqplace.domain.Location;
-import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.domain.Workplace;
 import org.springframework.context.annotation.Lazy;
@@ -78,20 +77,6 @@ public class WorkplaceService {
 	 */
 	public boolean isWorkplaceAvailableDuringDateAndTime(Workplace workplace, LocalDate date,
 														 LocalTime startTime, LocalTime endTime) {
-		if (! roomService.isRoomAvailable(workplace.getRoom(), date, startTime, endTime))
-			return false;
-
-		for (Reservation reservation : workplace.getReservations()) {
-			if ((! reservation.getDate().equals(date)) ||
-					(reservation.isRecurring() && ! reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {
-				continue;
-			}
-			if (endTime.isBefore(reservation.getStartTime()) ||
-					(startTime.isAfter(reservation.getEndTime()))) {
-				continue;
-			}
-			return false;
-		}
-		return true;
+		return roomService.isRoomAvailable(workplace.getRoom(), date, startTime, endTime);
 	}
 }

@@ -81,7 +81,7 @@ class WorkplaceServiceTest {
 
 	@Test
 	void getWorkplacesAvailabilityShouldReturnAvailableWorkplaces() {
-
+		assertEquals(List.of(workplace, workplace1), workplaceService.getWorkplacesAvailability(location.getId(), LocalDate.now().plusDays(65), LocalTime.of(3, 1), LocalTime.of(18, 37)));
 	}
 
 	@Test
@@ -112,6 +112,19 @@ class WorkplaceServiceTest {
 		Reservation reservation = new Reservation(1L, localDate, startTime, endTime, employee, null, workplace, false);
 
 		when(this.reservationRepository.findAll()).thenReturn(List.of(reservation));
+
+		assertFalse(() -> workplaceService.isWorkplaceAvailableDuringDateAndTime(workplace, localDate, startTime, endTime));
+	}
+
+	@Test
+	void isWorkplaceAvailableDuringDateAndTimeShouldReturnFalseWhenNotAvailable() {
+		LocalDate localDate = LocalDate.now().plusDays(12);
+		LocalTime startTime = LocalTime.of(9, 2);
+		LocalTime endTime = LocalTime.of(9, 3);
+
+		Reservation reservation = new Reservation(1L, localDate, startTime, endTime, employee, room, null, false);
+
+		when(reservationRepository.findAll()).thenReturn(List.of(reservation));
 
 		assertFalse(() -> workplaceService.isWorkplaceAvailableDuringDateAndTime(workplace, localDate, startTime, endTime));
 	}
