@@ -84,8 +84,8 @@ public class WorkplaceService {
 		}
 
 		for (Reservation reservation : workplace.getReservations()) {
-			if ((! reservation.getDate().equals(date)) ||
-					(reservation.isRecurring() && ! reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {
+			if ((!reservation.getDate().equals(date)) ||
+					(reservation.isRecurring() && !reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek()))) {
 				continue;
 			}
 			if (endTime.isBefore(reservation.getStartTime()) ||

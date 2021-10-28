@@ -91,7 +91,8 @@ public class ReservationService {
 		return reservations
 				.stream()
 				.filter(reservation ->
-						reservation.getDate().toString().equals(date.toString()) &&
+						(reservation.getDate().toString().equals(date.toString()) ||
+								reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek())) &&
 								(reservation.getRoom() == null
 										? Objects.equals(reservation.getWorkplace().getId(), workplaceId)
 										: reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId)))
