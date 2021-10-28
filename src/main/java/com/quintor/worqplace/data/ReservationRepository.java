@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 	List<Reservation> findAllByWorkplaceIsInAndWorkplaceIsNotNullAndDate(List<Workplace> workplaces, LocalDate date);
+	List<Reservation> findAllByEmployeeId(Long id);
 }

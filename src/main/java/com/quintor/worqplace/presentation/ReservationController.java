@@ -55,4 +55,10 @@ public class ReservationController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
+
+	@GetMapping("/{id}/all")
+	public ResponseEntity<?> getAllMyReservations(@PathVariable long id) {
+		return new ResponseEntity<>(reservationService.getAllMyReservations(id).stream().map(reservationMapper::toReservationDTO)
+				.collect(Collectors.toList()), HttpStatus.OK);
+	}
 }
