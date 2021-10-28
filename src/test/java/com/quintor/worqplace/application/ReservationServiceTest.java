@@ -208,7 +208,7 @@ class ReservationServiceTest {
 		reservationDTO.setRoomId(reservation1.getRoom().getId());
 		reservationDTO.setRecurring(false);
 
-		assertThrows(WorkplaceNotAvailableException.class, () -> reservationService.reserveRoom(reservationDTO));
+		assertThrows(RoomNotAvailableException.class, () -> reservationService.reserveRoom(reservationDTO));
 	}
 
 	@Test
