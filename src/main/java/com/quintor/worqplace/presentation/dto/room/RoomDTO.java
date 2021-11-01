@@ -9,4 +9,5 @@ public class RoomDTO {
 	private Long id;
 	private int floor;
 	private int capacity;
+	private int available;
 }

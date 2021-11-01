@@ -16,7 +16,11 @@ public class DateTimeUtils {
 			throw new InvalidDayException();
 	}
 
-	public static boolean checkReservationDate(LocalDate date) {
-		return date.isBefore(LocalDate.now());
+	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
+	                                       LocalTime existingEndTime, LocalDate newDate,
+	                                       LocalTime newStartTime, LocalTime newEndTime) {
+		if (!existingDate.equals(newDate)) return false;
+		return !newStartTime.isAfter(existingEndTime) && !newEndTime.isBefore(existingStartTime);
 	}
+
 }

@@ -20,47 +20,32 @@ import static org.mockito.Mockito.when;
 class RoomServiceTest {
 	private RoomRepository roomRepository;
 	private LocationRepository locationRepository;
-	private EmployeeRepository employeeRepository;
-	private WorkplaceRepository workplaceRepository;
-	private ReservationRepository reservationRepository;
 
 	private RoomService roomService;
-	private LocationService locationService;
-	private EmployeeService employeeService;
-	private WorkplaceService workplaceService;
 	private ReservationService reservationService;
 
 	private Room room;
-	private Address address;
 	private Location location;
-	private Employee employee;
-	private Workplace workplace;
-	private Workplace workplace1;
 
 
 	@BeforeEach
 	void initialize() {
 		this.roomRepository = mock(RoomRepository.class);
-		this.employeeRepository = mock(EmployeeRepository.class);
+		EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
 		this.locationRepository = mock(LocationRepository.class);
-		this.workplaceRepository = mock(WorkplaceRepository.class);
-		this.reservationRepository = mock(ReservationRepository.class);
+		ReservationRepository reservationRepository = mock(ReservationRepository.class);
 
-		this.locationService = new LocationService(locationRepository);
-		this.employeeService = new EmployeeService(employeeRepository);
-		this.workplaceService = new WorkplaceService(workplaceRepository, locationService, roomService);
+		LocationService locationService = new LocationService(locationRepository);
+		EmployeeService employeeService = new EmployeeService(employeeRepository);
 		this.roomService = new RoomService(roomRepository, locationService, reservationService);
-		this.reservationService = new ReservationService(employeeService, workplaceService, roomService, reservationRepository);
+		this.reservationService = new ReservationService(employeeService, roomService, reservationRepository);
 		this.roomService.setReservationService(reservationService);
 
-		this.room = new Room(1L, 1, null, null, Collections.emptyList());
-		this.workplace = new Workplace(1L, room, Collections.emptyList());
-		this.workplace1 = new Workplace(2L, room, Collections.emptyList());
-		this.address = new Address(1L, 12, "", "QuintorStreet", "1454LJ", "QuintorCity");
+		this.room = new Room(1L, 1, null, 15, Collections.emptyList());
+		Address address = new Address(1L, 12, "", "QuintorStreet", "1454LJ", "QuintorCity");
 		this.location = new Location(1L, "QuintorTest", address, List.of(room));
 
-		this.room.setWorkplaces(List.of(workplace, workplace1));
-		this.employee = new Employee(1L, "Firstname", "Lastname");
+		Employee employee = new Employee(1L, "Firstname", "Lastname");
 
 		setRepositoryBehaviour();
 	}
@@ -77,27 +62,39 @@ class RoomServiceTest {
 
 	@Test
 	void getAvailableRoomsForDateAndTimeShouldReturnAvailableRooms() {
-		assertEquals(List.of(room), roomService.getAvailableRoomsForDateAndTime(location.getId(), LocalDate.now().plusDays(4), LocalTime.of(5, 9), LocalTime.of(20, 8)));
+		assertEquals(List.of(room), roomService.getRoomsAvailableAtDateTime(location.getId(), LocalDate.now().plusDays(4), LocalTime.of(5, 9), LocalTime.of(20, 8)));
 	}
 
 	@Test
 	void getAvailableRoomsForDateAndTimeShouldThrowIfTimesAreInvalid() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.getAvailableRoomsForDateAndTime(location.getId(), LocalDate.now().plusDays(4), LocalTime.of(5, 9), LocalTime.of(5, 8)));
+		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.getRoomsAvailableAtDateTime(location.getId(), LocalDate.now().plusDays(4), LocalTime.of(5, 9), LocalTime.of(5, 8)));
 	}
 
 	@Test
 	void getAvailableRoomsForDateAndTimeShouldThrowIfDateIsInvalid() {
-		assertThrows(InvalidDayException.class, () -> roomService.getAvailableRoomsForDateAndTime(location.getId(), LocalDate.now().minusDays(4), LocalTime.of(5, 9), LocalTime.of(5, 10)));
+		assertThrows(InvalidDayException.class, () -> roomService.getRoomsAvailableAtDateTime(location.getId(), LocalDate.now().minusDays(4), LocalTime.of(5, 9), LocalTime.of(5, 10)));
 	}
 
 	@Test
 	void isRoomAvailableShouldThrowIfTimeIsInvalid() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.isRoomAvailable(room, LocalDate.now().plusDays(3), LocalTime.of(18, 1), LocalTime.of(16, 1), false));
+		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.isRoomAvailable(room, LocalDate.now().plusDays(3), LocalTime.of(18, 1), LocalTime.of(16, 1)));
 	}
 
 	@Test
 	void findRoomsByLocationIdShouldReturnRooms() {
 		assertEquals(List.of(room), roomService.findRoomsByLocationId(1L));
+	}
+
+	@Test
+	void getRoomsWithWorkplacesAvailableAtDateTimeShouldThrowOnInvalidTime() {
+		assertThrows(InvalidDayException.class, () -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L,
+				LocalDate.now().minusDays(1), LocalTime.now(), LocalTime.now()));
+	}
+
+	@Test
+	void getRoomsWithWorkplacesAvailableAtDateTimeShouldExecute() {
+		assertDoesNotThrow(() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L,
+				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON));
 	}
 
 	private void setRepositoryBehaviour() {

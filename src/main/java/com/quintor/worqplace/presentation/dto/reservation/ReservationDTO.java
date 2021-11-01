@@ -15,6 +15,6 @@ public class ReservationDTO {
 	private LocalTime endTime;
 	private Long employeeId;
 	private Long roomId;
-	private Long workplaceId;
+	private int workplaceAmount;
 	private boolean recurring;
 }

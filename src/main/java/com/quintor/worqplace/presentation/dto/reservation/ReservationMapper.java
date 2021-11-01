@@ -11,6 +11,5 @@ public interface ReservationMapper {
 
 	@Mapping(source = "employee.id", target = "employeeId")
 	@Mapping(source = "room.id", target = "roomId")
-	@Mapping(source = "workplace.id", target = "workplaceId")
 	ReservationDTO toReservationDTO(Reservation reservation);
 }

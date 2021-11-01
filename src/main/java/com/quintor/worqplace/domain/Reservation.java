@@ -1,8 +1,8 @@
 package com.quintor.worqplace.domain;
 
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
-import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,9 +33,7 @@ public class Reservation {
 	@JoinColumn(name = "room_id")
 	private Room room;
 
-	@ManyToOne
-	@JoinColumn(name = "workplace_id")
-	private Workplace workplace;
+	private int workplaceAmount;
 
 	private boolean recurring;
 
@@ -46,27 +44,24 @@ public class Reservation {
 	 * @param endTime   end time of reservation
 	 * @param employee  employee that reserves
 	 * @param room      room that is being reserved | null if it is a workplace reservation
-	 * @param workplace workplace that is being reserved | null if it is a room reservation
 	 * @param recurring Is the reservation recurring
 	 * @implNote Is being used by Spring for retrieving reservations
 	 */
-	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace, boolean recurring) {
-		this(date, startTime, endTime, employee, room, workplace, recurring);
+	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, int amount, boolean recurring) {
+		this(date, startTime, endTime, employee, room, amount, recurring);
 		this.id = id;
 	}
 
-	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, Workplace workplace, boolean recurring) {
+	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, int amount, boolean recurring) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
-		if ((room == null && workplace == null) || (room != null && workplace != null))
-			throw new InvalidReservationTypeException();
 
 		setDate(date);
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.employee = employee;
 		this.room = room;
-		this.workplace = workplace;
+		this.workplaceAmount = amount;
 		this.recurring = recurring;
 	}
 
@@ -80,9 +75,13 @@ public class Reservation {
 	@Override
 	public String toString() {
 		return "Reservation{" +
-				"employee=" + employee +
-				", room=" + room +
-				", workplace=" + workplace +
+				"id=" + id +
+				", date=" + date +
+				", startTime=" + startTime +
+				", endTime=" + endTime +
+				", employee=" + employee.getId() +
+				", room=" + room.getId() +
+				", workplaceAmount=" + workplaceAmount +
 				", recurring=" + recurring +
 				'}';
 	}
