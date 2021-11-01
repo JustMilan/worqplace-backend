@@ -1,6 +1,7 @@
 package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
+import com.quintor.worqplace.application.util.DateTimeUtils;
 import com.quintor.worqplace.data.RoomRepository;
 import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Room;
@@ -35,29 +36,32 @@ public class RoomService {
 				.orElseThrow(() -> new RoomNotFoundException(id));
 	}
 
-	public List<Room> getAvailableRoomsForDateAndTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public List<Room> getRoomsAvailableAtDateTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 
 		List<Room> rooms = findRoomsByLocationId(locationId);
 
 		return rooms
 				.stream()
-				.filter(room -> isRoomAvailable(room, date, startTime, endTime, false))
+				.filter(room -> isRoomAvailable(room, date, startTime, endTime))
 				.collect(Collectors.toList());
 	}
 
-	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime, boolean isCheckForWorkplace) {
+	public List<Room> getRoomsWithWorkplacesAvailableAtDateTime(Long locationId, LocalDate date,
+	                                                            LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
+		List<Room> allRooms = findRoomsByLocationId(locationId);
 
-		if (isCheckForWorkplace) {
-			return room.getWorkplaces()
-					.stream()
-					.anyMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));
-		} else {
-			return room.getWorkplaces()
-					.stream()
-					.allMatch(workplace -> reservationService.isWorkplaceAvailableAt(workplace, date, startTime, endTime));
-		}
+		return allRooms.stream().filter(room ->
+				room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
+				.collect(Collectors.toList());
+	}
+
+	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		DateTimeUtils.checkReservationDateTime(date, startTime, endTime);
+		return room.getReservations().stream().noneMatch((reservation -> DateTimeUtils.timeslotsOverlap(
+				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime(),
+				date, startTime, endTime)));
 	}
 
 	public List<Room> findRoomsByLocationId(Long locationId) {

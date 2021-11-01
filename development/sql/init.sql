@@ -33,15 +33,10 @@ VALUES ('Ubbo Emmiussingel', '112', '9711 BK', 'Groningen', '');
 INSERT INTO location (name, address_id)
 VALUES ('Quintor Groningen', 5);
 
-INSERT INTO room(floor, location_id)
+INSERT INTO room(floor, location_id, capacity)
 VALUES
-(3 , 5),
-(-1, 5);
-
-INSERT INTO workplace(room_id)
-VALUES
-(1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1), (1),
-(2), (2), (2), (2), (2), (2);
+(3 , 5, 24),
+(-1, 5, 6);
 
 /* Queries for employee */
 INSERT INTO employee (last_name, first_name)

@@ -1,31 +1,24 @@
 package com.quintor.worqplace.application;
 
-import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
 import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
-import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
+import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
-import com.quintor.worqplace.domain.Workplace;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
 @AllArgsConstructor
 public class ReservationService {
 	private final EmployeeService employeeService;
-	private final WorkplaceService workplaceService;
 	private final RoomService roomService;
 	private final ReservationRepository reservationRepository;
 
@@ -39,30 +32,26 @@ public class ReservationService {
 				.orElseThrow(() -> new ReservationNotFoundException(id));
 	}
 
-	public Reservation reserveWorkplace(ReservationDTO reservationDTO) {
-		Reservation reservation = toReservation(reservationDTO); // id will be null
+	public Reservation reserveWorkplaces(ReservationDTO reservationDTO) {
+		Reservation reservation = this.toReservation(reservationDTO);
+		Room room = reservation.getRoom();
+		int available = room.getCapacity() - room.countReservedWorkspaces(reservation.getDate(),
+				reservation.getStartTime(), reservation.getEndTime());
+		int wanted = reservation.getWorkplaceAmount();
 
-		if (reservation.getWorkplace() == null)
-			throw new InvalidReservationTypeException();
-
-		List<Workplace> availableWorkplaces = workplaceService.getWorkplacesAvailability(reservation.getWorkplace().getRoom().getLocation().getId(),
-				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime());
-
-		// check if workplace is available
-		if (availableWorkplaces.stream().noneMatch(workplace -> workplace.getId().equals(reservation.getWorkplace().getId())))
-			throw new WorkplaceNotAvailableException();
-
-		reservationRepository.save(reservation);
-
-		return reservation;
+		if (available >= wanted) {
+			room.addReservation(reservation);
+			reservationRepository.save(reservation);
+			return reservation;
+		} else throw new WorkplacesNotAvailableException(wanted, available);
 	}
 
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-		Workplace workplace = reservationDTO.getWorkplaceId() != null ? workplaceService.getWorkplaceById(reservationDTO.getWorkplaceId()) : null;
-		Room room = reservationDTO.getRoomId() != null ? roomService.getRoomById(reservationDTO.getRoomId()) : null;
+		Room room = roomService.getRoomById(reservationDTO.getRoomId());
 
-		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), employee, room, workplace, reservationDTO.isRecurring());
+		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(),
+				employee, room, reservationDTO.getWorkplaceAmount(), reservationDTO.isRecurring());
 	}
 
 	/**
@@ -71,56 +60,15 @@ public class ReservationService {
 	 */
 	public Reservation reserveRoom(ReservationDTO reservationDTO) {
 		Reservation reservation = toReservation(reservationDTO);
+		reservation.setWorkplaceAmount(reservation.getRoom().getCapacity());
 
-		if (reservation.getRoom() == null)
-			throw new InvalidReservationTypeException();
-
-		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(), false);
-		if (! available) throw new RoomNotAvailableException();
+		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
+		if (!available) throw new RoomNotAvailableException();
 
 		return reservationRepository.save(reservation);
 	}
 
-	/**
-	 * @param workplaceId Long
-	 * @param date        LocalDate
-	 * @return List of reservations for a workplace at the given date
-	 */
-	public List<Reservation> getReservationsForWorkplaceAtDate(Long workplaceId, LocalDate date) {
-		List<Reservation> reservations = reservationRepository.findAll();
-		return reservations
-				.stream()
-				.filter(reservation ->
-						(reservation.getDate().toString().equals(date.toString()) ||
-								reservation.getDate().getDayOfWeek().equals(date.getDayOfWeek())) &&
-								(reservation.getRoom() == null
-										? Objects.equals(reservation.getWorkplace().getId(), workplaceId)
-										: reservation.getRoom().getWorkplaces().stream().anyMatch(wp -> Objects.equals(wp.getId(), workplaceId)))
-				)
-				.collect(Collectors.toList());
-	}
-
-
-	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date, LocalTime startTime, LocalTime endTime) {
-		List<Reservation> reservations = getReservationsForWorkplaceAtDate(workplace.getId(), date);
-
-		return reservations
-				.stream()
-				.noneMatch(reservation -> reservation.getStartTime().equals(startTime) ||
-						reservation.getEndTime().equals(endTime) ||
-						(reservation.getStartTime().isAfter(reservation.getStartTime()) && startTime.isBefore(reservation.getEndTime())) ||
-						(endTime.isBefore(reservation.getEndTime()) && endTime.isAfter(reservation.getStartTime())));
-	}
-
-	public boolean isWorkplaceAvailableAt(Workplace workplace, LocalDate date) {
-		return getReservationsForWorkplaceAtDate(workplace.getId(), date)
-				.stream()
-				.noneMatch(reservation -> reservation.getDate().equals(date));
-	}
-
 	public List<Reservation> getAllMyReservations(Long id){
-		List<Reservation> myReservations = reservationRepository.findAllByEmployeeId(id);
-
-		return myReservations;
+		return reservationRepository.findAllByEmployeeId(id);
 	}
 }

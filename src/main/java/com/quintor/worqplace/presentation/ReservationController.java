@@ -1,10 +1,7 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.ReservationService;
-import com.quintor.worqplace.application.exceptions.InvalidReservationTypeException;
-import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
-import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
-import com.quintor.worqplace.application.exceptions.WorkplaceNotAvailableException;
+import com.quintor.worqplace.application.exceptions.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
@@ -38,10 +35,11 @@ public class ReservationController {
 	}
 
 	@PostMapping("/workplaces")
-	public ResponseEntity<?> reserveWorkplace(@RequestBody ReservationDTO reservationDTO) {
+	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO reservationDTO) {
 		try {
-			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplace(reservationDTO)), HttpStatus.CREATED);
-		} catch (InvalidReservationTypeException | WorkplaceNotAvailableException e) {
+			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplaces(reservationDTO)), HttpStatus.CREATED);
+		} catch (WorkplacesNotAvailableException | InvalidStartAndEndTimeException |
+				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
@@ -51,7 +49,8 @@ public class ReservationController {
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)), HttpStatus.CREATED);
-		} catch (InvalidReservationTypeException | RoomNotAvailableException e) {
+		} catch (WorkplacesNotAvailableException | InvalidStartAndEndTimeException |
+				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}

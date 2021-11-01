@@ -28,8 +28,25 @@ public class RoomController {
 												  @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
 												  @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 		try {
-			return new ResponseEntity<>(roomService.getAvailableRoomsForDateAndTime(locationId, date, startTime, endTime)
-					.stream().map(roomMapper::toRoomDTO).collect(Collectors.toList()), HttpStatus.OK);
+			return new ResponseEntity<>(roomService.getRoomsAvailableAtDateTime(locationId, date, startTime, endTime)
+					.stream().map(room -> roomMapper.toRoomDTO(room,
+							room.getCapacity() - room.countReservedWorkspaces(date, startTime, endTime)))
+					.collect(Collectors.toList()), HttpStatus.OK);
+		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+	}
+
+	@GetMapping("/availability/workplaces")
+	public ResponseEntity<?> getWorkplacesAvailability(@RequestParam("locationId") Long locationId,
+	                                              @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+	                                              @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+	                                              @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+		try {
+			return new ResponseEntity<>(roomService.getRoomsWithWorkplacesAvailableAtDateTime(locationId, date, startTime, endTime)
+					.stream().map(room -> roomMapper.toRoomDTO(room,
+							room.getCapacity() - room.countReservedWorkspaces(date, startTime, endTime)))
+					.collect(Collectors.toList()), HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
