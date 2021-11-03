@@ -54,8 +54,7 @@ public class ReservationService {
 
 		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(),
 				employee, room, reservationDTO.getWorkplaceAmount(),
-				new Recurrence(reservationDTO.getRecurrence().isActive(),
-						reservationDTO.getRecurrence().getRecurrencePattern()));
+				reservationDTO.getRecurrence());
 	}
 
 	/**
