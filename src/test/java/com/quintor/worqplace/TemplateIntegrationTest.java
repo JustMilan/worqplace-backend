@@ -22,7 +22,7 @@ class TemplateIntegrationTest {
     private TestRestTemplate restTemplate;
 
     @Test
-    void contextLoads() throws Exception {
+    void contextLoads() {
         assertNotNull(this.restTemplate.getForObject("http://localhost:" + port + "/locations",
                 String.class));
     }
