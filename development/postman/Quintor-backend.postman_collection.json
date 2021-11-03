@@ -14,7 +14,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{BaseURL}}/rooms/availability/workplaces?locationId=5&date=2021-12-10&start=11:00&end=12:00",
+							"raw": "{{BaseURL}}/rooms/availability/workplaces?locationId=5&date=2021-11-26&start=11:00&end=12:00",
 							"host": [
 								"{{BaseURL}}"
 							],
@@ -30,7 +30,7 @@
 								},
 								{
 									"key": "date",
-									"value": "2021-12-10"
+									"value": "2021-11-26"
 								},
 								{
 									"key": "start",

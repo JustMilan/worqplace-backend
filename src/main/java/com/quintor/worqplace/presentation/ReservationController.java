@@ -39,7 +39,7 @@ public class ReservationController {
 		try {
 			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveWorkplaces(reservationDTO)), HttpStatus.CREATED);
 		} catch (WorkplacesNotAvailableException | InvalidStartAndEndTimeException |
-				InvalidDayException | NoRecurrencePatternSetException e) {
+				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
@@ -50,7 +50,7 @@ public class ReservationController {
 		try {
 			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)), HttpStatus.CREATED);
 		} catch (WorkplacesNotAvailableException | InvalidStartAndEndTimeException |
-				InvalidDayException | NoRecurrencePatternSetException e) {
+				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}

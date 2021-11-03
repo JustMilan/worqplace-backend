@@ -1,7 +1,6 @@
 package com.quintor.worqplace.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.quintor.worqplace.application.exceptions.NoRecurrencePatternSetException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,9 +36,8 @@ public class Recurrence {
 	}
 
 	/**
-	 * Update if the reservation is recurring. Throws an
-	 * {@link NoRecurrencePatternSetException exception} when no
-	 * {@link RecurrencePattern recurrence pattern} has been set.
+	 * Update if the reservation is recurring. Will be false if the
+	 * {@link RecurrencePattern recurrence pattern} is null
 	 *
 	 * @param active whether the recurrence is active.
 	 */
