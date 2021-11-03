@@ -60,7 +60,8 @@ public class RoomService {
 	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		DateTimeUtils.checkReservationDateTime(date, startTime, endTime);
 		return room.getReservations().stream().noneMatch((reservation -> DateTimeUtils.timeslotsOverlap(
-				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime(),
+				reservation.getDate(), reservation.getStartTime(),
+				reservation.getEndTime(), reservation.getRecurrence(),
 				date, startTime, endTime)));
 	}
 

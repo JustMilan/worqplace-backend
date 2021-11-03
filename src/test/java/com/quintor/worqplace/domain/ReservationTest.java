@@ -29,26 +29,26 @@ class ReservationTest {
 
 	@Test
 	void shouldCreateReservationCorrectlyWithRoomNull() {
-		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, null, 15, false));
+		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, null, 15, null));
 	}
 
 	@Test
 	void shouldCreateReservationCorrectlyWithWorkplaceNull() {
-		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, room, 15, false));
+		assertDoesNotThrow(() -> new Reservation(date, startTime, endTime, employee, room, 15, null));
 	}
 
 	@Test
 	void shouldCreateReservationCorrectlyWithCustomId() {
-		assertDoesNotThrow(() -> new Reservation(1L, date, startTime, endTime, employee, room, 15, false));
+		assertDoesNotThrow(() -> new Reservation(1L, date, startTime, endTime, employee, room, 15, null));
 	}
 
 	@Test
 	void ShouldThrowWhenDateIsBeforeToday() {
-		assertThrows(InvalidDayException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, 15, false));
+		assertThrows(InvalidDayException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, 15, null));
 	}
 
 	@Test
 	void shouldThrowIfEndTimeIsBeforeStartTime() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(date, startTime, startTime.minusMinutes(1), employee, null, 15, false));
+		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(date, startTime, startTime.minusMinutes(1), employee, null, 15, null));
 	}
 }

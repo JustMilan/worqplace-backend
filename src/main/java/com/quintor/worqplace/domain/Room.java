@@ -12,6 +12,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Room class, contains information regarding capacity and location
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -33,12 +36,27 @@ public class Room {
 	@OneToMany(mappedBy = "room")
 	private List<Reservation> reservations;
 
+	/**
+	 * Function that counts the amount of reserved workplaces during a specific timeslot.
+	 *
+	 * @param date      date to check the reserved workplaces on.
+	 * @param startTime start time of the timeslot of which to check the reserved workplaces on.
+	 * @param endTime   end time of the timeslot of which to check the reserved workplaces on.
+	 * @return an int representing the amount of reserved workplaces.
+	 */
 	public int countReservedWorkspaces(LocalDate date, LocalTime startTime, LocalTime endTime) {
-		return this.getReservations().stream().filter(reservation -> DateTimeUtils.timeslotsOverlap(
-				reservation.getDate(), reservation.getStartTime(), reservation.getEndTime(),
-				date, startTime, endTime)).mapToInt(Reservation::getWorkplaceAmount).sum();
+		return this.getReservations().stream().filter(reservation ->
+				(date.isAfter(reservation.getDate()) || date.isEqual(reservation.getDate()))
+						&& DateTimeUtils.timeslotsOverlap(reservation.getDate(),
+						reservation.getStartTime(), reservation.getEndTime(), reservation.getRecurrence(),
+						date, startTime, endTime)).mapToInt(Reservation::getWorkplaceAmount).sum();
 	}
 
+	/**
+	 * Function that adds a reservation to the list of reservations.
+	 *
+	 * @param reservation the reservation that is to be added.
+	 */
 	public void addReservation(Reservation reservation) {
 		ArrayList<Reservation> reservations = new ArrayList<>(this.reservations);
 		reservations.add(reservation);

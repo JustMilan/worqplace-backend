@@ -1,5 +1,6 @@
 package com.quintor.worqplace.presentation.dto.reservation;
 
+import com.quintor.worqplace.domain.Recurrence;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,5 +17,5 @@ public class ReservationDTO {
 	private Long employeeId;
 	private Long roomId;
 	private int workplaceAmount;
-	private boolean recurring;
+	private Recurrence recurrence;
 }
