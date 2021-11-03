@@ -61,8 +61,8 @@ public class RoomService {
 		DateTimeUtils.checkReservationDateTime(date, startTime, endTime);
 		return room.getReservations().stream().noneMatch((reservation -> DateTimeUtils.timeslotsOverlap(
 				reservation.getDate(), reservation.getStartTime(),
-				reservation.getEndTime(), reservation.getRecurrence(), date,
-				startTime, endTime)));
+				reservation.getEndTime(), reservation.getRecurrence(),
+				date, startTime, endTime)));
 	}
 
 	public List<Room> findRoomsByLocationId(Long locationId) {

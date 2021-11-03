@@ -1,6 +1,7 @@
 @startuml
 !define DEFAULT
 !includeurl https://raw.githubusercontent.com/JustMilan/plantuml-styles/main/style.puml
+hide methods
 
 title Domain Class Diagram
 
@@ -24,15 +25,25 @@ class Location {
 
 class Room {
 - floor
-}
-
-class Workplace {
+- capacity
 }
 
 class Reservation {
 - date
-- starTime
+- startTime
 - endTime
+- workplaceAmount
+}
+
+class Recurrence <<embeddable>> {
+- active
+}
+
+enum RecurrencePattern <<enumeration>> {
+DAILY
+WEEKLY
+BIWEEKLY
+MONTHLY
 }
 
 class Employee {
@@ -43,9 +54,9 @@ class Employee {
 'Relations
 Address "1" -down- Location
 Location -right- "1..*" Room
-Room "1" -right- Workplace
-Room "0..1" -- Reservation
-Workplace "0..1" -- Reservation
+Room "1" -- Reservation
 Reservation -- "1" Employee
+Reservation --"1" Recurrence
+Recurrence .. RecurrencePattern:<<use>>
 
 @enduml

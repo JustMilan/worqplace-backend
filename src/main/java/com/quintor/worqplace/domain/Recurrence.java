@@ -4,9 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 /**
  * The recurrence of the {@link Reservation reservation}, manages if it is
@@ -15,34 +16,29 @@ import javax.persistence.Embeddable;
  * @see Reservation
  */
 @Embeddable
-@Setter
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Recurrence {
 	private boolean active;
+	@Enumerated(EnumType.STRING)
 	private RecurrencePattern recurrencePattern;
 
 	/**
 	 * Constructor of the {@link Recurrence recurrence} class.
 	 *
-	 * @param active            whether the reservation is recurring.
-	 * @param recurrencePattern {@link RecurrencePattern} the pattern of the recurrence.
+	 * @param active            whether the reservation is recurring, is false if no recurrence pattern is provided.
+	 * @param recurrencePattern the pattern of the recurrence, is null when recurrence is inactive.
 	 */
 	@JsonCreator
 	public Recurrence(boolean active, RecurrencePattern recurrencePattern) {
-		this.setRecurrencePattern(recurrencePattern);
-		this.setActive(active);
-	}
+		if (active && recurrencePattern != null) {
+			this.active = true;
+			this.recurrencePattern = recurrencePattern;
+		} else {
+			this.active = false;
+			this.recurrencePattern = null;
+		}
 
-	/**
-	 * Update if the reservation is recurring. Will be false if the
-	 * {@link RecurrencePattern recurrence pattern} is null
-	 *
-	 * @param active whether the recurrence is active.
-	 */
-	public void setActive(boolean active) {
-		this.active = active && this.recurrencePattern != null;
-		if (!this.active) this.recurrencePattern = null;
 	}
 }

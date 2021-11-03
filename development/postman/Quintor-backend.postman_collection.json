@@ -110,7 +110,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"date\": \"2021-11-26\",\n        \"startTime\": \"10:00:00\",\n        \"endTime\": \"11:00:00\",\n        \"employeeId\": 1,\n        \"roomId\": 1,\n        \"workplaceAmount\": 1,\n        \"recurrence\": {\n            \"active\": true,\n            \"recurrencePattern\": null\n        }\n}",
+							"raw": " {\n        \"date\": \"2021-11-26\",\n        \"startTime\": \"10:00:00\",\n        \"endTime\": \"11:00:00\",\n        \"employeeId\": 1,\n        \"roomId\": 1,\n        \"workplaceAmount\": 1,\n        \"recurrence\": {\n            \"active\": true,\n            \"recurrencePattern\": \"DAILY\"\n        }\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -137,7 +137,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"date\": \"2021-11-26\",\n        \"startTime\": \"10:00:00\",\n        \"endTime\": \"11:00:00\",\n        \"employeeId\": 1,\n        \"roomId\": 2,\n        \"recurring\": false\n}",
+							"raw": " {\n        \"date\": \"2021-11-26\",\n        \"startTime\": \"10:00:00\",\n        \"endTime\": \"11:00:00\",\n        \"employeeId\": 1,\n        \"roomId\": 1,\n        \"recurrence\": {\n            \"active\": false,\n            \"recurrencePattern\": null\n        }\n}",
 							"options": {
 								"raw": {
 									"language": "json"

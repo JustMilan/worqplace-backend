@@ -49,7 +49,7 @@ public class ReservationController {
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			return new ResponseEntity<>(reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)), HttpStatus.CREATED);
-		} catch (WorkplacesNotAvailableException | InvalidStartAndEndTimeException |
+		} catch (RoomNotAvailableException | InvalidStartAndEndTimeException |
 				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}

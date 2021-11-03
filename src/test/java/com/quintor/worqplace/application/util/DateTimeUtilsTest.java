@@ -5,6 +5,7 @@ import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeExcept
 import com.quintor.worqplace.domain.Recurrence;
 import com.quintor.worqplace.domain.RecurrencePattern;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -44,30 +45,36 @@ class DateTimeUtilsTest {
     }
 
     @Test
+    @DisplayName("an exception should be thrown if the start time is after the end time.")
     void checkReservationDateTimeShouldThrowIfStartTimeIsAfterBeginTime() {
         assertThrows(InvalidStartAndEndTimeException.class, () ->
                 DateTimeUtils.checkReservationDateTime(this.today, this.twelve, this.nine));
     }
 
     @Test
+    @DisplayName("an exception should be thrown if the date is before today")
     void checkReservationDateTimeShouldThrowIfDateIsBeforeToday() {
         assertThrows(InvalidDayException.class, () ->
                 DateTimeUtils.checkReservationDateTime(this.yesterday, this.nine, this.twelve));
     }
 
     @Test
+    @DisplayName("no exception should be thrown if the dates and times are okay")
     void checkReservationDateTimeShouldNotThrowIfDateAndTimeAreOkay() {
         assertDoesNotThrow(() ->
                 DateTimeUtils.checkReservationDateTime(this.today, this.nine, this.twelve));
     }
 
     @Test
+    @DisplayName("when there are different input days, the function should return false")
     void timeslotsDontOverlapIfTheyAreOnDifferentDays() {
         assertFalse(DateTimeUtils.timeslotsOverlap(this.today, this.nine,
                 this.twelve, this.noRecurrence, this.tomorrow, this.nine, this.twelve));
     }
 
     @Test
+    @DisplayName("when there is recurrence, but the check is for a different time on that day, " +
+            "the function should return false")
     void timeslotsDontOverlapIfTheyRecurOnDifferentTimes() {
         assertFalse(DateTimeUtils.timeslotsOverlap(this.today, this.nine,
                 this.twelve, this.dailyRecurrence, this.tomorrow, this.one, this.four));
