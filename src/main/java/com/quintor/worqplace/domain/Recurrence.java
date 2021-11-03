@@ -1,5 +1,6 @@
 package com.quintor.worqplace.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.quintor.worqplace.application.exceptions.NoRecurrencePatternSetException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,6 +30,7 @@ public class Recurrence {
 	 * @param active            whether the reservation is recurring.
 	 * @param recurrencePattern {@link RecurrencePattern} the pattern of the recurrence.
 	 */
+	@JsonCreator
 	public Recurrence(boolean active, RecurrencePattern recurrencePattern) {
 		this.setRecurrencePattern(recurrencePattern);
 		this.setActive(active);
@@ -42,8 +44,7 @@ public class Recurrence {
 	 * @param active whether the recurrence is active.
 	 */
 	public void setActive(boolean active) {
-		if (active && this.getRecurrencePattern() == null)
-			throw new NoRecurrencePatternSetException();
-		this.active = active;
+		this.active = active && this.recurrencePattern != null;
+		if (!this.active) this.recurrencePattern = null;
 	}
 }

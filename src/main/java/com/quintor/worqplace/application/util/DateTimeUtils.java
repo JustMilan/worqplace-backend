@@ -22,7 +22,7 @@ public class DateTimeUtils {
 	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
 	                                       LocalTime existingEndTime, Recurrence recurrence, LocalDate newDate,
 	                                       LocalTime newStartTime, LocalTime newEndTime) {
-		if (!existingDate.equals(newDate)) return false;
+		if (!existingDate.equals(newDate) && !recurrence.isActive()) return false;
 		if (recurrence.isActive()) {
 			switch (recurrence.getRecurrencePattern()) {
 				case WEEKLY -> {
@@ -32,9 +32,9 @@ public class DateTimeUtils {
 				case BIWEEKLY -> {
 					WeekFields weekFields = WeekFields.of(Locale.getDefault());
 					int oldWeekNumber = existingDate.get
-							(weekFields.weekBasedYear());
+							(weekFields.weekOfWeekBasedYear());
 					int newWeekNumber = newDate.get
-							(weekFields.weekBasedYear());
+							(weekFields.weekOfWeekBasedYear());
 					if ((newWeekNumber - oldWeekNumber) % 2 > 0) return false;
 					if (!existingDate.getDayOfWeek().equals(newDate.getDayOfWeek())) return false;
 				}

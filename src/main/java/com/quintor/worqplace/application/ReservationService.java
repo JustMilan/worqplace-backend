@@ -5,6 +5,7 @@ import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
+import com.quintor.worqplace.domain.Recurrence;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
@@ -52,7 +53,9 @@ public class ReservationService {
 		System.out.println();
 
 		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(),
-				employee, room, reservationDTO.getWorkplaceAmount(), reservationDTO.getRecurrence());
+				employee, room, reservationDTO.getWorkplaceAmount(),
+				new Recurrence(reservationDTO.getRecurrence().isActive(),
+						reservationDTO.getRecurrence().getRecurrencePattern()));
 	}
 
 	/**
