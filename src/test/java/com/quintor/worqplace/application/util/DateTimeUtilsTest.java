@@ -90,6 +90,10 @@ class DateTimeUtilsTest {
         assertFalse(DateTimeUtils.timeslotsOverlap(this.today, this.nine,
                 this.twelve, this.biweeklyRecurrence, twoWeeks, this.one, this.four));
 
+        twoWeeks = LocalDate.now().plusWeeks(2).plusDays(1);
+        assertFalse(DateTimeUtils.timeslotsOverlap(this.today, this.nine,
+                this.twelve, this.biweeklyRecurrence, twoWeeks, this.one, this.four));
+
         LocalDate month = LocalDate.now().plusMonths(1);
         assertFalse(DateTimeUtils.timeslotsOverlap(this.today, this.nine,
                 this.twelve, this.monthlyRecurrence, month, this.one, this.four));
