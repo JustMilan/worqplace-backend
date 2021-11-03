@@ -49,9 +49,10 @@ public class ReservationService {
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
 		Room room = roomService.getRoomById(reservationDTO.getRoomId());
+		System.out.println();
 
 		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(),
-				employee, room, reservationDTO.getWorkplaceAmount(), reservationDTO.isRecurring());
+				employee, room, reservationDTO.getWorkplaceAmount(), reservationDTO.getRecurrence());
 	}
 
 	/**

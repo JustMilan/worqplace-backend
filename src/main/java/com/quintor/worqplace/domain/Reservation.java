@@ -2,7 +2,6 @@ package com.quintor.worqplace.domain;
 
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,7 +34,8 @@ public class Reservation {
 
 	private int workplaceAmount;
 
-	private boolean recurring;
+	@Embedded
+	private Recurrence recurrence;
 
 	/**
 	 * @param id        used by Spring | don't use this manually
@@ -44,15 +44,15 @@ public class Reservation {
 	 * @param endTime   end time of reservation
 	 * @param employee  employee that reserves
 	 * @param room      room that is being reserved | null if it is a workplace reservation
-	 * @param recurring Is the reservation recurring
+	 * @param recurrence handles the {@link Recurrence recurrence} of the reservation
 	 * @implNote Is being used by Spring for retrieving reservations
 	 */
-	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, int amount, boolean recurring) {
-		this(date, startTime, endTime, employee, room, amount, recurring);
+	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, int amount, Recurrence recurrence) {
+		this(date, startTime, endTime, employee, room, amount, recurrence);
 		this.id = id;
 	}
 
-	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, int amount, boolean recurring) {
+	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime, Employee employee, Room room, int amount, Recurrence recurrence) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -62,7 +62,7 @@ public class Reservation {
 		this.employee = employee;
 		this.room = room;
 		this.workplaceAmount = amount;
-		this.recurring = recurring;
+		this.recurrence = recurrence;
 	}
 
 	public void setDate(LocalDate date) {
@@ -82,7 +82,7 @@ public class Reservation {
 				", employee=" + employee.getId() +
 				", room=" + room.getId() +
 				", workplaceAmount=" + workplaceAmount +
-				", recurring=" + recurring +
+				", recurring=" + recurrence +
 				'}';
 	}
 }
