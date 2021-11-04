@@ -15,16 +15,16 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(CiTestConfiguration.class)
 class TemplateIntegrationTest {
 
-    @LocalServerPort
-    private int port;
+	@LocalServerPort
+	private int port;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+	@Autowired
+	private TestRestTemplate restTemplate;
 
-    @Test
-    void contextLoads() {
-        assertNotNull(this.restTemplate.getForObject("http://localhost:" + port + "/locations",
-                String.class));
-    }
+	@Test
+	void contextLoads() {
+		assertNotNull(this.restTemplate.getForObject("http://localhost:" + port + "/locations",
+				String.class));
+	}
 
 }

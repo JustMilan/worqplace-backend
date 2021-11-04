@@ -92,4 +92,9 @@ public class Address {
 
 		this.city = city;
 	}
+
+	// For testing purposes
+	public String toTestString() {
+		return String.format("{\"id\":%s,\"houseNumber\":%s,\"addition\":\"%s\",\"street\":\"%s\",\"postalCode\":\"%s\",\"city\":\"%s\"}", id, houseNumber, addition, street, postalCode, city);
+	}
 }
