@@ -9,6 +9,15 @@ import java.time.LocalTime;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 
+/**
+ * Utility class containing functions to verify input dates and times and
+ * to calculate if two timeslots are overlapping.
+ *
+ * @see InvalidStartAndEndTimeException
+ * @see InvalidDayException
+ * @see com.quintor.worqplace.domain.Room Room
+ * @see com.quintor.worqplace.application.RoomService RoomService
+ */
 public class DateTimeUtils {
 
 	public static void checkReservationDateTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
