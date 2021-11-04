@@ -46,10 +46,8 @@ class ReservationServiceTest {
 
 		EmployeeService employeeService = new EmployeeService(employeeRepository);
 		LocationService locationService = new LocationService(locationRepository);
-		RoomService roomService = new RoomService(roomRepository, locationService, reservationService);
+		RoomService roomService = new RoomService(roomRepository, locationService);
 		this.reservationService = new ReservationService(employeeService, roomService, reservationRepository);
-
-		roomService.setReservationService(reservationService);
 
 		this.employee = new Employee(1L, "QFirstname", "QLastname");
 		Address address = new Address(12, "", "TestStreet", "2098GS", "QuintorCity");

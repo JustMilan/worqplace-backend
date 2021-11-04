@@ -29,7 +29,13 @@ public class DateTimeUtils {
 	}
 
 	/**
-	 * Function that calculates if two timeslots overlap. Also check with recurring timeslots.
+	 * Function that calculates if two timeslots overlap,
+	 * also checks for {@link Recurrence}. It starts by checking
+	 * to see if the input dates are on different days, then it checks the
+	 * {@link com.quintor.worqplace.domain.RecurrencePattern recurrence patterns}
+	 * for overlap and if no different day results from those checks it to see
+	 * if the timeslots overlap.
+	 *
 	 *
 	 * @param existingDate      date that is already reserved.
 	 * @param existingStartTime time from which the existing reservation lasts.
