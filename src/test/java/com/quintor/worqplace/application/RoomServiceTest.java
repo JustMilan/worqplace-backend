@@ -37,9 +37,8 @@ class RoomServiceTest {
 
 		LocationService locationService = new LocationService(locationRepository);
 		EmployeeService employeeService = new EmployeeService(employeeRepository);
-		this.roomService = new RoomService(roomRepository, locationService, reservationService);
+		this.roomService = new RoomService(roomRepository, locationService);
 		this.reservationService = new ReservationService(employeeService, roomService, reservationRepository);
-		this.roomService.setReservationService(reservationService);
 
 		this.room = new Room(1L, 1, null, 15, Collections.emptyList());
 		Address address = new Address(1L, 12, "", "QuintorStreet", "1454LJ", "QuintorCity");
