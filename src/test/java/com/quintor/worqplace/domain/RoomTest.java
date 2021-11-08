@@ -1,6 +1,7 @@
 package com.quintor.worqplace.domain;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,6 +21,7 @@ class RoomTest {
 	}
 
 	@Test
+	@DisplayName("should create a room correctly")
 	void shouldCreateRoomCorrectly() {
 		assertDoesNotThrow(() -> new Room(id, floor, location, 15, null));
 	}
