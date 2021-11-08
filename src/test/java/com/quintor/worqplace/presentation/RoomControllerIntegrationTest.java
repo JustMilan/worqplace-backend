@@ -1,6 +1,7 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,10 +24,8 @@ public class RoomControllerIntegrationTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	/**
-	 * Test if a date in far FAR in the future has any rooms available.
-	 */
 	@Test
+	@DisplayName("Test if a date in far FAR in the future has any rooms available.")
 	void listOfAvailableRoomsNotEmpty() {
 		String urlPart = "/rooms/availability?";
 		urlPart += "locationId=5&";
@@ -41,12 +40,40 @@ public class RoomControllerIntegrationTest {
 		assertNotEquals("[]", result.getBody());
 	}
 
-	/**
-	 * Test if a checking room availability in the past returns an error.
-	 */
 	@Test
+	@DisplayName("Test if a checking room availability in the past returns an error.")
 	void pastRoomsReturnsError() {
 		String urlPart = "/rooms/availability?";
+		urlPart += "locationId=5&";
+		urlPart += "date=2010-01-01&";
+		urlPart += "start=14:00&";
+		urlPart += "end=15:00";
+
+		ResponseEntity<String> result = getRequest(urlPart);
+
+		assertEquals(422, result.getStatusCode().value());
+	}
+
+	@Test
+	@DisplayName("Test if a date in far FAR in the future has any workplaces available.")
+	void listOfAvailableWorkplacessNotEmpty() {
+		String urlPart = "/rooms/availability/workplaces?";
+		urlPart += "locationId=5&";
+		urlPart += "date=6000-01-01&";
+		urlPart += "start=14:00&";
+		urlPart += "end=15:00";
+
+		ResponseEntity<String> result = getRequest(urlPart);
+
+		assertEquals(200, result.getStatusCode().value());
+		assertNotNull(result.getBody());
+		assertNotEquals("[]", result.getBody());
+	}
+
+	@Test
+	@DisplayName("Test if a checking workplace availability in the past returns an error.")
+	void pastWorkplacesReturnsError() {
+		String urlPart = "/rooms/availability/workplaces?";
 		urlPart += "locationId=5&";
 		urlPart += "date=2010-01-01&";
 		urlPart += "start=14:00&";
