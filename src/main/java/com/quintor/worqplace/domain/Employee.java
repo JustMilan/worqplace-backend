@@ -1,5 +1,7 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.domain.exceptions.InvalidNameException;
+import com.quintor.worqplace.domain.exceptions.InvalidNameStartException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,12 +55,12 @@ public class Employee {
 	public void setFirstName(String firstName) {
 		char[] firstNameChars = firstName.toCharArray();
 
-		if (!Character.isUpperCase(firstNameChars[0]))
-			throw new RuntimeException("Name must start with a capital letter");
+		if (! Character.isUpperCase(firstNameChars[0]))
+			throw new InvalidNameStartException();
 
 		for (char c : firstNameChars)
-			if (!Character.isLetter(c))
-				throw new RuntimeException("first name must consist letters only");
+			if (! Character.isLetter(c))
+				throw new InvalidNameException(c);
 
 
 		this.firstName = firstName;
@@ -77,12 +79,12 @@ public class Employee {
 	public void setLastName(String lastName) {
 		char[] lastNameChars = lastName.toCharArray();
 
-		if (!Character.isUpperCase(lastNameChars[0]))
-			throw new RuntimeException("Name must start with a capital letter");
+		if (! Character.isUpperCase(lastNameChars[0]))
+			throw new InvalidNameStartException();
 
 		for (char c : lastNameChars)
-			if (!Character.isLetter(c))
-				throw new RuntimeException("last name must consist letters only");
+			if (! Character.isLetter(c))
+				throw new InvalidNameException(c);
 
 		this.lastName = lastName;
 	}

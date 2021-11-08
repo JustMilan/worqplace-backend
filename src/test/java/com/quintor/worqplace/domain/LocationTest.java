@@ -1,6 +1,6 @@
 package com.quintor.worqplace.domain;
 
-import com.quintor.worqplace.domain.exceptions.InvalidLocationNameException;
+import com.quintor.worqplace.domain.exceptions.InvalidNameStartException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,6 +31,6 @@ class LocationTest {
 	@Test
 	@DisplayName("Should throw InvalidLocationNameException if location name doesn't start with a capital letter")
 	void shouldThrowWhenNameDoesNotStartWithCapital() {
-		assertThrows(InvalidLocationNameException.class, () -> new Location("quintor", address, rooms));
+		assertThrows(InvalidNameStartException.class, () -> new Location("quintor", address, rooms));
 	}
 }
