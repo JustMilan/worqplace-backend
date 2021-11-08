@@ -40,13 +40,13 @@ class EmployeeTest {
 	@Test
 	@DisplayName("Should throw InvalidNameException if first name contains digits")
 	void shouldThrowWhenFirstNameContainsDigits() {
-		assertThrows(InvalidNameException.class, () -> new Employee("test3firstName", lastName));
+		assertThrows(InvalidNameException.class, () -> new Employee("Test3firstName", lastName));
 	}
 
 	@Test
 	@DisplayName("Should throw InvalidNameException if last name contains digits")
 	void shouldThrowWhenLastNameContainsDigits() {
-		assertThrows(InvalidNameException.class, () -> new Employee(firstName, "l0stName"));
+		assertThrows(InvalidNameException.class, () -> new Employee(firstName, "L0stName"));
 	}
 
 	@Test
