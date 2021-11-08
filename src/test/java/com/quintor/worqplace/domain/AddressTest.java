@@ -1,5 +1,6 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.domain.exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,23 +24,23 @@ class AddressTest {
 	}
 
 	@Test
-	void shouldCreateAddressSuccesfully() {
+	void shouldCreateAddressSuccessfully() {
 		assertDoesNotThrow(() -> new Address(houseNumber, addition, street, postalCode, city));
 	}
 
 	@Test
-	void shouldCreateAddressSuccesfullyWithSpaceInStreet() {
+	void shouldCreateAddressSuccessfullyWithSpaceInStreet() {
 		assertDoesNotThrow(() -> new Address(houseNumber, addition, "Test street", postalCode, city));
 	}
 
 	@Test
 	void shouldThrowWhenInvalidHouseNumber() {
-		assertThrows(RuntimeException.class, () -> new Address(-1, addition, street, postalCode, city));
+		assertThrows(InvalidHouseNumberException.class, () -> new Address(- 1, addition, street, postalCode, city));
 	}
 
 	@Test
 	void shouldTrowWhenInvalidAddition() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, "-", street, postalCode, city));
+		assertThrows(InvalidAdditionException.class, () -> new Address(houseNumber, "-", street, postalCode, city));
 	}
 
 	@Test
@@ -54,7 +55,7 @@ class AddressTest {
 
 	@Test
 	void shouldTrowWhenInvalidStreet() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, "Test-Street-", postalCode, city));
+		assertThrows(InvalidStreetException.class, () -> new Address(houseNumber, addition, "Test-Street-", postalCode, city));
 	}
 
 	@Test
@@ -64,32 +65,32 @@ class AddressTest {
 
 	@Test
 	void shouldThrowWhenStreetContainsInvalidCharacter() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, "Test*Street", postalCode, city));
+		assertThrows(InvalidStreetException.class, () -> new Address(houseNumber, addition, "Test*Street", postalCode, city));
 	}
 
 	@Test
 	void shouldTrowWhenPostalcodeHasTooManyNumbers() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, street, "2211AGA", city));
+		assertThrows(InvalidPostalCodeException.class, () -> new Address(houseNumber, addition, street, "2211AGA", city));
 	}
 
 	@Test
 	void shouldTrowWhenPostalcodeHasLettersInDigitPart() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, street, "2A11AA", city));
+		assertThrows(InvalidPostalCodeException.class, () -> new Address(houseNumber, addition, street, "2A11AA", city));
 	}
 
 	@Test
 	void shouldTrowWhenPostalcodeHasTooManyLetters() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, street, "22111A", city));
+		assertThrows(InvalidPostalCodeException.class, () -> new Address(houseNumber, addition, street, "22111A", city));
 	}
 
 	@Test
 	void shouldTrowWhenPostalcodeHasinvalidCharacters() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, street, "2211*A", city));
+		assertThrows(InvalidPostalCodeException.class, () -> new Address(houseNumber, addition, street, "2211*A", city));
 	}
 
 	@Test
 	void shouldTrowWhenCityHasInvalidCharacter() {
-		assertThrows(RuntimeException.class, () -> new Address(houseNumber, addition, street, postalCode, "TestC*ty"));
+		assertThrows(InvalidCityException.class, () -> new Address(houseNumber, addition, street, postalCode, "TestC*ty"));
 	}
 
 	@Test
