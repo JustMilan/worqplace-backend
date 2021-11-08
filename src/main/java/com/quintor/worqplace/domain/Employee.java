@@ -45,12 +45,14 @@ public class Employee {
 	/**
 	 * Function that updates the first name of the {@link Employee}.
 	 * It also checks if the name consists of letters only and starts with a capital
-	 * letter and throws an {@link RuntimeException exception} if not.
+	 * letter and throws an {@link InvalidNameStartException invalidNameStartException}
+	 * or {@link InvalidNameException invalidNameException} if not.
 	 *
 	 * @param firstName the to-be set first name.
-	 * @throws RuntimeException when the input name does not consist of only letters
-	 *                          or the first character is not a capital,
-	 *                          it throws this exception.
+	 * @throws InvalidNameStartException when the input name does not start with a capital letter,
+	 *                                   it throws this exception.
+	 * @throws InvalidNameException      when the input name does not consist of letters only,
+	 *                                   it throws this exception.
 	 */
 	public void setFirstName(String firstName) {
 		char[] firstNameChars = firstName.toCharArray();
@@ -69,12 +71,14 @@ public class Employee {
 	/**
 	 * Function that updates the last name of the {@link Employee}.
 	 * It also checks if the name consists of letters only and starts with a capital
-	 * letter and throws an {@link RuntimeException exception} if not.
+	 * letter and throws an {@link InvalidNameStartException invalidNameStartException}
+	 * or {@link InvalidNameException invalidNameException} if not.
 	 *
 	 * @param lastName the to-be set first name.
-	 * @throws RuntimeException when the input name does not consist of only letters
-	 *                          or the first character is not a capital,
-	 *                          it throws this exception.
+	 * @throws InvalidNameStartException when the input name does not start with a capital letter,
+	 *                                   it throws this exception.
+	 * @throws InvalidNameException      when the input name does not consist of letters only,
+	 *                                   it throws this exception.
 	 */
 	public void setLastName(String lastName) {
 		char[] lastNameChars = lastName.toCharArray();

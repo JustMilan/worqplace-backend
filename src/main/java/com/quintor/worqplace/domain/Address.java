@@ -58,7 +58,7 @@ public class Address {
 	/**
 	 * Function that updates the house number of the {@link Address}.
 	 * It also checks if the number is a digit and throws an
-	 * {@link RuntimeException exception} if not.
+	 * {@link InvalidHouseNumberException exception} if not.
 	 *
 	 * @param number the to-be set house number.
 	 * @throws InvalidHouseNumberException when the input number is not a digit,
@@ -77,7 +77,7 @@ public class Address {
 	/**
 	 * Function that updates the addition of the {@link Address}. It also checks if
 	 * the input characters are letters/digits and if none of them are spaces, if not
-	 * then the function throws an {@link RuntimeException exception}.
+	 * then the function throws an {@link InvalidAdditionException exception}.
 	 *
 	 * @param addition the to-be set addition.
 	 * @throws InvalidAdditionException when the input addition is not a letter/digit
@@ -95,7 +95,7 @@ public class Address {
 	/**
 	 * Function that updates the street of the {@link Address}. It also checks if
 	 * the input characters are letters/digits and if the last character is not a space,
-	 * if not then the function throws an {@link RuntimeException exception}.
+	 * if not then the function throws an {@link InvalidStreetException exception}.
 	 *
 	 * @param street the to-be set addition.
 	 * @throws InvalidStreetException when the input street does not consist of letters/digits
@@ -121,10 +121,10 @@ public class Address {
 	 * Function that updates the postal code of the {@link Address}. It also checks if
 	 * the input is 6 characters long, the first four input characters are digits
 	 * and the last two letters, if not then the function throws an
-	 * {@link RuntimeException exception}.
+	 * {@link InvalidPostalCodeException exception}.
 	 *
 	 * @param postalCode the to-be set postal code.
-	 * @throws RuntimeException when the input postal code is not 6 characters long
+	 * @throws InvalidPostalCodeException when the input postal code is not 6 characters long
 	 *                          and/or does not consist of numbers for the
 	 *                          first four characters and letters for the last two,
 	 *                          this exception is thrown.
@@ -150,10 +150,10 @@ public class Address {
 	/**
 	 * Function that updates the city of the {@link Address}. It also checks if
 	 * the input characters are letters/digits, if not
-	 * then the function throws an {@link RuntimeException exception}.
+	 * then the function throws an {@link InvalidCityException exception}.
 	 *
 	 * @param city the to-be set city.
-	 * @throws RuntimeException when the input city is not letters/digits
+	 * @throws InvalidCityException when the input city is not letters/digits
 	 *                          this exception is thrown.
 	 */
 	public void setCity(String city) {
