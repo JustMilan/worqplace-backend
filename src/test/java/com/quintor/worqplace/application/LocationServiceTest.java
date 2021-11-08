@@ -6,6 +6,7 @@ import com.quintor.worqplace.domain.Address;
 import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Room;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,22 +41,26 @@ class LocationServiceTest {
 	}
 
 	@Test
+	@DisplayName("getAllLocations() should return a list of locations if they exist")
 	void getAllLocationsShouldReturnListOfLocations() {
 		assertEquals(List.of(location, location1), locationService.getAllLocations());
 	}
 
 	@Test
+	@DisplayName("getAllLocations() should return an empty list of locations if none exists")
 	void getAllLocationsShouldReturnEmptyListIfNoneExists() {
 		when(this.locationRepository.findAll()).thenReturn(List.of());
 		assertEquals(List.of(), locationService.getAllLocations());
 	}
 
 	@Test
+	@DisplayName("getLocationById() should return a location if it exists")
 	void getLocationByIdShouldReturnLocation() {
 		assertEquals(location, locationService.getLocationById(location.getId()));
 	}
 
 	@Test
+	@DisplayName("getLocationById() should throw LocationNotFoundException if no location is found")
 	void getLocationByIdShouldThrowIfNotFound() {
 		assertThrows(LocationNotFoundException.class, () -> locationService.getLocationById(3L));
 	}
