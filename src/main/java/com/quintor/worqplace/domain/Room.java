@@ -13,7 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Room class, contains information regarding capacity and location
+ * Room class, contains data regarding capacity and location.
+ *
+ * @see Location
+ * @see Reservation
  */
 @Getter
 @Setter
