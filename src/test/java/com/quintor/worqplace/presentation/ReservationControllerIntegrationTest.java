@@ -1,21 +1,27 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import com.quintor.worqplace.domain.*;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("ci")
 @Import(CiTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ReservationControllerIntegrationTest {
 	@LocalServerPort
 	private int port;
@@ -23,15 +29,67 @@ public class ReservationControllerIntegrationTest {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+	private Employee employee;
+	private Employee employee1;
+
+	private Room room;
+	private Room room1;
+
+	private Address address;
+	private Address address1;
+
+	private Location location;
+	private Location location1;
+
+	private Recurrence recurrence;
+	private Recurrence recurrence1;
+
+	private Reservation reservation;
+	private Reservation reservation1;
+	private Reservation reservation2;
+	private Reservation reservation3;
+	private Reservation reservation4;
+	private Reservation reservation5;
+
 	@BeforeEach
 	void initialize() {
+//		Employee
+		this.employee = new Employee(1L, "Quinten", "Tor");
+		this.employee1 = new Employee(2L, "Quintara", "Tor");
 
+//		Address
+		this.address = new Address(1L, 1, "", "Torro", "4369GH", "Torr");
+		this.address1 = new Address(2L, 12, "A", "Zuidel straat", "1249LJ", "Quintara");
+
+//		Location
+		this.location = new Location(1L, "Quintor - Test", address, null);
+		this.location1 = new Location(2L, "Quintor - Zuid", address1, null);
+
+
+//		Room
+		this.room = new Room(1L, 1, location, 5, null);
+		this.room1 = new Room(2L, 2, location, 8, null);
+
+//		Recurrence
+		this.recurrence = new Recurrence(true, RecurrencePattern.MONTHLY);
+		this.recurrence1 = new Recurrence(false, RecurrencePattern.WEEKLY);
+
+//		Workplace
+		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
+//		this.reservation1 = new Reservation(2L, , , , , , );
+//		this.reservation2 = new Reservation(3L, , , , , , );
+
+//		Room
+		this.reservation3 = new Reservation(4L, LocalDate.now().plusWeeks(2), LocalTime.of(7, 3), LocalTime.of(8, 7), employee1, room1, 8, recurrence1);
+//		this.reservation4 = new Reservation(5L, , , , , , );
+//		this.reservation5 = new Reservation(6L, , , , , , );
 	}
 
 	@Test
+	@Order(1)
 	@DisplayName("getAllReservations() should return 200 OK")
 	void shouldReturn200() {
-
+		assertEquals(HttpStatus.OK, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getStatusCode());
 	}
 
 	@Test
@@ -41,9 +99,10 @@ public class ReservationControllerIntegrationTest {
 	}
 
 	@Test
+	@Order(2)
 	@DisplayName("getAllReservations should return an empty list of reservations if there are none")
 	void shouldReturnEmptyListIfNoReservations() {
-
+		assertEquals(Collections.emptyList().toString(), this.restTemplate.getForObject(String.format("http://localhost:%s/reservations/", port), String.class));
 	}
 
 	@Test
@@ -61,6 +120,7 @@ public class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getReservationById() should return 404 when not found")
 	void getReservationByIdShouldReturn404() {
+		assertEquals(HttpStatus.NOT_FOUND, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/%s", port, "999"), String.class).getStatusCode());
 	}
 
 	@Test
@@ -117,6 +177,7 @@ public class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllMyReservations() should return 200 OK")
 	void getAllMyReservationsShouldReturn200() {
+		assertEquals(HttpStatus.OK, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/1/all", port), String.class).getStatusCode());
 	}
 
 	@Test
@@ -125,7 +186,9 @@ public class ReservationControllerIntegrationTest {
 	}
 
 	@Test
+	@Order(3)
 	@DisplayName("getAllMyReservations() should return empty list if there are none")
 	void getAllMyReservationsShouldReturnEmptyList() {
+		assertEquals(Collections.emptyList().toString(), this.restTemplate.getForObject(String.format("http://localhost:%s/reservations/1/%s", port, "all"), String.class));
 	}
 }
