@@ -2,27 +2,34 @@ package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
 import com.quintor.worqplace.domain.*;
+import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("ci")
 @Import(CiTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ReservationControllerIntegrationTest {
+class ReservationControllerIntegrationTest {
 	@LocalServerPort
 	private int port;
 
@@ -76,7 +83,7 @@ public class ReservationControllerIntegrationTest {
 
 //		Workplace
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
-//		this.reservation1 = new Reservation(2L, , , , , , );
+//		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
 //		this.reservation2 = new Reservation(3L, , , , , , );
 
 //		Room
@@ -126,6 +133,17 @@ public class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("reserveWorkplaces() should return 201 upon reservation")
 	void reserveWorkplacesShouldReturn201() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 0));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence1);
+
+		assertEquals(HttpStatus.CREATED, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
+
 	}
 
 	@Test
@@ -156,22 +174,62 @@ public class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("reserveRoom() should return reservation info if reservation went successful")
 	void reserveRoomShouldReturnReservationInfo() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(8, 59));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence);
+
+		assertNotNull(this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getBody());
 	}
 
 	@Test
 	@DisplayName("reserveRoom() should return 422 if room is not available")
 	void reserveRoomeShouldReturn422IfNotAvailable() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(8, 59));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence);
+
+		this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class);
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
 	@DisplayName("reserveRoom() should return 422 if times are invalid")
 	void reserveRoomShouldReturn422IfTimesAreInvalid() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(8, 59));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence);
 
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
 	@DisplayName("reserveRoom() should return 422 if date is invalid")
 	void reserveRoomShouldReturn422IfDateIsInvalid() {
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().minusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 0));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence);
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
