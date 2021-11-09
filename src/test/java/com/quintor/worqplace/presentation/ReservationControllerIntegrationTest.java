@@ -1,8 +1,10 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
+import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
+import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,8 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("ci")
@@ -35,6 +36,12 @@ class ReservationControllerIntegrationTest {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
+
+	@Autowired
+	private ReservationRepository reservationRepository;
+
+	@Autowired
+	private ReservationMapper reservationMapper;
 
 	private Employee employee;
 	private Employee employee1;
@@ -58,7 +65,7 @@ class ReservationControllerIntegrationTest {
 	private Reservation reservation4;
 	private Reservation reservation5;
 
-	@BeforeEach
+	@BeforeAll
 	void initialize() {
 //		Employee
 		this.employee = new Employee(1L, "Quinten", "Tor");
@@ -83,6 +90,8 @@ class ReservationControllerIntegrationTest {
 
 //		Workplace
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
+		reservationRepository.save(reservation);
+
 //		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
 //		this.reservation2 = new Reservation(3L, , , , , , );
 
@@ -115,13 +124,16 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getReservationById() should return reservation 200 OK there is one")
 	void getReservationByIdShouldReturn200() {
-
+		assertEquals(HttpStatus.OK, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/%s", port, "1"), String.class).getStatusCode());
 	}
 
 	@Test
 	@DisplayName("getReservationById() should return reservation if there is one")
 	void getReservationByIdShouldReturnReservation() {
-
+		String result = this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getBody();
+		assertTrue(
+			result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
+		);
 	}
 
 	@Test
