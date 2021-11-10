@@ -137,7 +137,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"date\": \"2021-11-26\",\n        \"startTime\": \"10:00:00\",\n        \"endTime\": \"11:00:00\",\n        \"employeeId\": 1,\n        \"roomId\": 1,\n        \"recurrence\": {\n            \"active\": false,\n            \"recurrencePattern\": null\n        }\n}",
+							"raw": " {\n        \"date\": \"2021-11-26\",\n        \"startTime\": \"10:00:00\",\n        \"endTime\": \"11:00:00\",\n        \"employeeId\": 1,\n        \"roomId\": 1,\n        \"recurrence\": {\n            \"active\": false,\n            \"recurrencePattern\": \"NONE\"\n        }\n}",
 							"options": {
 								"raw": {
 									"language": "json"

@@ -103,9 +103,10 @@ public class ReservationService {
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
 		Room room = roomService.getRoomById(reservationDTO.getRoomId());
+		int workplaceAmount = Math.max(reservationDTO.getWorkplaceAmount(), 1);
 
 		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(),
-				employee, room, reservationDTO.getWorkplaceAmount(),
+				employee, room, workplaceAmount,
 				reservationDTO.getRecurrence());
 	}
 
