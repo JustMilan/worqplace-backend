@@ -11,17 +11,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,14 +86,15 @@ class ReservationControllerIntegrationTest {
 
 //		Workplace
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
-
-//		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
-//		this.reservation2 = new Reservation(3L, , , , , , );
+		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 2, recurrence);
 
 //		Room
 		this.reservation3 = new Reservation(4L, LocalDate.now().plusWeeks(2), LocalTime.of(7, 3), LocalTime.of(8, 7), employee1, room1, 8, recurrence1);
-//		this.reservation4 = new Reservation(5L, , , , , , );
-//		this.reservation5 = new Reservation(6L, , , , , , );
+	}
+
+	@AfterEach
+	void tearDown() {
+		reservationRepository.deleteAll();
 	}
 
 	@Test
@@ -110,7 +107,15 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllReservations() should return all reservations")
 	void shouldReturnAllReservations() {
+		reservationRepository.save(reservation1);
+		reservationRepository.save(reservation);
 
+		String result = this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getBody();
+
+		System.out.println(result);
+
+		assertTrue(Objects.requireNonNull(result).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}") &&
+				result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}"));
 	}
 
 	@Test
@@ -126,8 +131,6 @@ class ReservationControllerIntegrationTest {
 		reservationRepository.save(reservation);
 
 		assertEquals(HttpStatus.OK, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/%s", port, "1"), String.class).getStatusCode());
-
-		reservationRepository.delete(reservation);
 	}
 
 	@Test
@@ -137,10 +140,8 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getBody();
 		assertTrue(
-			result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
+				result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
 		);
-
-		reservationRepository.delete(reservation);
 	}
 
 	@Test
@@ -162,32 +163,36 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setRecurrence(recurrence1);
 
 		assertEquals(HttpStatus.CREATED, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
-
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return reservation info if reservation went successful")
 	void reserveWorkplacesShouldReturnReservationInfo() {
+		fail();
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if workplace is not available")
 	void reserveWorkplaceShouldReturn422IfNotAvailable() {
+		fail();
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if times are invalid")
 	void reserveWorkplaceShouldReturn422IfTimesAreInvalid() {
+		fail();
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if date is invalid")
 	void reserveWorkplaceShouldReturn422IfDateIsInvalid() {
+		fail();
 	}
 
 	@Test
 	@DisplayName("reserveRoom() should return 201 upon reservation")
 	void reserveRoomShouldReturn201() {
+		fail();
 	}
 
 	@Test
@@ -260,6 +265,7 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllMyReservations() should return reservations if there are any")
 	void getAllMyReservationsShouldReturnListOfReservations() {
+		fail();
 	}
 
 	@Test
