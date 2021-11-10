@@ -1,5 +1,6 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.domain.exceptions.InvalidNameStartException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,17 +54,17 @@ public class Location {
 	/**
 	 * Function that updates the first name of the {@link Location}.
 	 * It also checks if the name starts with a capital letter and throws an
-	 * {@link RuntimeException exception} if not.
+	 * {@link InvalidNameStartException exception} if not.
 	 *
 	 * @param name the to-be set name of the location.
-	 * @throws RuntimeException when the input name does not start with a capital,
-	 *                          it throws this exception.
+	 * @throws InvalidNameStartException when the input name does not start with a capital,
+	 *                                   it throws this exception.
 	 */
 	public void setName(String name) {
 		char[] nameChars = name.strip().toCharArray();
 
-		if (!Character.isUpperCase(nameChars[0]))
-			throw new RuntimeException("Name must start with a capital letter");
+		if (! Character.isUpperCase(nameChars[0]))
+			throw new InvalidNameStartException();
 
 		this.name = name;
 	}

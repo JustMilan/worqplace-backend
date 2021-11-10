@@ -36,7 +36,6 @@ public class DateTimeUtils {
 	 * for overlap and if no different day results from those checks it to see
 	 * if the timeslots overlap.
 	 *
-	 *
 	 * @param existingDate      date that is already reserved.
 	 * @param existingStartTime time from which the existing reservation lasts.
 	 * @param existingEndTime   time to which the existing reservation lasts.
@@ -47,13 +46,13 @@ public class DateTimeUtils {
 	 * @return a boolean indicating whether the existing and the new timeslot overlap.
 	 */
 	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
-	                                       LocalTime existingEndTime, Recurrence recurrence, LocalDate newDate,
-	                                       LocalTime newStartTime, LocalTime newEndTime) {
-		if (!existingDate.equals(newDate) && !recurrence.isActive()) return false;
+										   LocalTime existingEndTime, Recurrence recurrence, LocalDate newDate,
+										   LocalTime newStartTime, LocalTime newEndTime) {
+		if (! existingDate.equals(newDate) && ! recurrence.isActive()) return false;
 		if (recurrence.isActive()) {
 			switch (recurrence.getRecurrencePattern()) {
 				case WEEKLY -> {
-					if (!existingDate.getDayOfWeek()
+					if (! existingDate.getDayOfWeek()
 							.equals(newDate.getDayOfWeek())) return false;
 				}
 				case BIWEEKLY -> {
@@ -63,7 +62,7 @@ public class DateTimeUtils {
 					int newWeekNumber = newDate
 							.get(weekFields.weekOfWeekBasedYear());
 					if ((newWeekNumber - oldWeekNumber) % 2 > 0 ||
-							!existingDate.getDayOfWeek().equals(newDate.getDayOfWeek()))
+							! existingDate.getDayOfWeek().equals(newDate.getDayOfWeek()))
 						return false;
 				}
 				case MONTHLY -> {
@@ -71,6 +70,6 @@ public class DateTimeUtils {
 				}
 			}
 		}
-		return !newStartTime.isAfter(existingEndTime) && !newEndTime.isBefore(existingStartTime);
+		return ! newStartTime.isAfter(existingEndTime) && ! newEndTime.isBefore(existingStartTime);
 	}
 }

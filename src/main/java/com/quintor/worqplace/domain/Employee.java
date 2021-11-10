@@ -1,5 +1,7 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.domain.exceptions.InvalidNameException;
+import com.quintor.worqplace.domain.exceptions.InvalidNameStartException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,22 +45,24 @@ public class Employee {
 	/**
 	 * Function that updates the first name of the {@link Employee}.
 	 * It also checks if the name consists of letters only and starts with a capital
-	 * letter and throws an {@link RuntimeException exception} if not.
+	 * letter and throws an {@link InvalidNameStartException invalidNameStartException}
+	 * or {@link InvalidNameException invalidNameException} if not.
 	 *
 	 * @param firstName the to-be set first name.
-	 * @throws RuntimeException when the input name does not consist of only letters
-	 *                          or the first character is not a capital,
-	 *                          it throws this exception.
+	 * @throws InvalidNameStartException when the input name does not start with a capital letter,
+	 *                                   it throws this exception.
+	 * @throws InvalidNameException      when the input name does not consist of letters only,
+	 *                                   it throws this exception.
 	 */
 	public void setFirstName(String firstName) {
 		char[] firstNameChars = firstName.toCharArray();
 
-		if (!Character.isUpperCase(firstNameChars[0]))
-			throw new RuntimeException("Name must start with a capital letter");
+		if (! Character.isUpperCase(firstNameChars[0]))
+			throw new InvalidNameStartException();
 
 		for (char c : firstNameChars)
-			if (!Character.isLetter(c))
-				throw new RuntimeException("first name must consist letters only");
+			if (! Character.isLetter(c))
+				throw new InvalidNameException(c);
 
 
 		this.firstName = firstName;
@@ -67,22 +71,24 @@ public class Employee {
 	/**
 	 * Function that updates the last name of the {@link Employee}.
 	 * It also checks if the name consists of letters only and starts with a capital
-	 * letter and throws an {@link RuntimeException exception} if not.
+	 * letter and throws an {@link InvalidNameStartException invalidNameStartException}
+	 * or {@link InvalidNameException invalidNameException} if not.
 	 *
 	 * @param lastName the to-be set first name.
-	 * @throws RuntimeException when the input name does not consist of only letters
-	 *                          or the first character is not a capital,
-	 *                          it throws this exception.
+	 * @throws InvalidNameStartException when the input name does not start with a capital letter,
+	 *                                   it throws this exception.
+	 * @throws InvalidNameException      when the input name does not consist of letters only,
+	 *                                   it throws this exception.
 	 */
 	public void setLastName(String lastName) {
 		char[] lastNameChars = lastName.toCharArray();
 
-		if (!Character.isUpperCase(lastNameChars[0]))
-			throw new RuntimeException("Name must start with a capital letter");
+		if (! Character.isUpperCase(lastNameChars[0]))
+			throw new InvalidNameStartException();
 
 		for (char c : lastNameChars)
-			if (!Character.isLetter(c))
-				throw new RuntimeException("last name must consist letters only");
+			if (! Character.isLetter(c))
+				throw new InvalidNameException(c);
 
 		this.lastName = lastName;
 	}

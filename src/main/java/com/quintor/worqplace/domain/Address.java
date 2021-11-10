@@ -1,5 +1,6 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.domain.exceptions.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -57,18 +58,18 @@ public class Address {
 	/**
 	 * Function that updates the house number of the {@link Address}.
 	 * It also checks if the number is a digit and throws an
-	 * {@link RuntimeException exception} if not.
+	 * {@link InvalidHouseNumberException exception} if not.
 	 *
 	 * @param number the to-be set house number.
-	 * @throws RuntimeException when the input number is not a digit,
-	 *                          it throws this exception.
+	 * @throws InvalidHouseNumberException when the input number is not a digit,
+	 *                                     it throws this exception.
 	 */
 	public void setHouseNumber(int number) {
 		char[] numberChars = String.valueOf(number).toCharArray();
-		for (char c : numberChars) {
-			if (!Character.isDigit(c))
-				throw new RuntimeException("HouseNumber must consist of (positive) numbers only");
-		}
+		for (char c : numberChars)
+			if (! Character.isDigit(c))
+				throw new InvalidHouseNumberException();
+
 
 		this.houseNumber = number;
 	}
@@ -76,17 +77,17 @@ public class Address {
 	/**
 	 * Function that updates the addition of the {@link Address}. It also checks if
 	 * the input characters are letters/digits and if none of them are spaces, if not
-	 * then the function throws an {@link RuntimeException exception}.
+	 * then the function throws an {@link InvalidAdditionException exception}.
 	 *
 	 * @param addition the to-be set addition.
-	 * @throws RuntimeException when the input addition is not a letter/digit
-	 *                          or if it's a space, this exception is thrown.
+	 * @throws InvalidAdditionException when the input addition is not a letter/digit
+	 *                                  or if it's a space, this exception is thrown.
 	 */
 	public void setAddition(String addition) {
 		char[] additionChars = addition.toCharArray();
 		for (char c : additionChars)
-			if (!Character.isLetterOrDigit(c) && !Character.isWhitespace(c))
-				throw new RuntimeException("Addition must consist of numbers and letters only");
+			if (! Character.isLetterOrDigit(c) && ! Character.isWhitespace(c))
+				throw new InvalidAdditionException();
 
 		this.addition = addition;
 	}
@@ -94,23 +95,23 @@ public class Address {
 	/**
 	 * Function that updates the street of the {@link Address}. It also checks if
 	 * the input characters are letters/digits and if the last character is not a space,
-	 * if not then the function throws an {@link RuntimeException exception}.
+	 * if not then the function throws an {@link InvalidStreetException exception}.
 	 *
 	 * @param street the to-be set addition.
-	 * @throws RuntimeException when the input street does not consist of letters/digits
-	 *                          or if the last character is a space,
-	 *                          this exception is thrown.
+	 * @throws InvalidStreetException when the input street does not consist of letters/digits
+	 *                                or if the last character is a space,
+	 *                                this exception is thrown.
 	 */
 	public void setStreet(String street) {
 		char[] streetChars = street.toCharArray();
 		int listSize = streetChars.length;
 		for (int i = 0; i < streetChars.length; i++) {
 			char c = streetChars[i];
-			if (i == listSize - 1 && !Character.isLetterOrDigit(c))
-				throw new RuntimeException("Streetname must end with a letter or a number");
+			if (i == listSize - 1 && ! Character.isLetterOrDigit(c))
+				throw new InvalidStreetException("Streetname must end with a letter or a number");
 
-			if (c != '-' && !Character.isLetterOrDigit(c) && !Character.isWhitespace(c))
-				throw new RuntimeException("Streetname must consist of numbers and letters only");
+			if (c != '-' && ! Character.isLetterOrDigit(c) && ! Character.isWhitespace(c))
+				throw new InvalidStreetException("Streetname must consist of numbers, letters and dashes only");
 		}
 
 		this.street = street;
@@ -120,27 +121,27 @@ public class Address {
 	 * Function that updates the postal code of the {@link Address}. It also checks if
 	 * the input is 6 characters long, the first four input characters are digits
 	 * and the last two letters, if not then the function throws an
-	 * {@link RuntimeException exception}.
+	 * {@link InvalidPostalCodeException exception}.
 	 *
 	 * @param postalCode the to-be set postal code.
-	 * @throws RuntimeException when the input postal code is not 6 characters long
-	 *                          and/or does not consist of numbers for the
-	 *                          first four characters and letters for the last two,
-	 *                          this exception is thrown.
+	 * @throws InvalidPostalCodeException when the input postal code is not 6 characters long
+	 *                                    and/or does not consist of numbers for the
+	 *                                    first four characters and letters for the last two,
+	 *                                    this exception is thrown.
 	 */
 	public void setPostalCode(String postalCode) {
 		char[] postalCodeChars = postalCode.toCharArray();
 
 		if (postalCodeChars.length > 6)
-			throw new RuntimeException("Invalid postalcode length");
+			throw new InvalidPostalCodeException("Invalid postalcode length");
 
 		for (int i = 0; i < postalCodeChars.length; i++) {
 			char c = postalCodeChars[i];
 			if (i < 4) {
-				if (!Character.isDigit(c))
-					throw new RuntimeException("First four characters of postalcode must consist of numbers only");
-			} else if (!Character.isLetter(c))
-				throw new RuntimeException("Last two characters of postalcode must consist of letters only");
+				if (! Character.isDigit(c))
+					throw new InvalidPostalCodeException("First four characters of postalcode must consist of numbers only");
+			} else if (! Character.isLetter(c))
+				throw new InvalidPostalCodeException("Last two characters of postalcode must consist of letters only");
 		}
 
 		this.postalCode = postalCode;
@@ -149,17 +150,17 @@ public class Address {
 	/**
 	 * Function that updates the city of the {@link Address}. It also checks if
 	 * the input characters are letters/digits, if not
-	 * then the function throws an {@link RuntimeException exception}.
+	 * then the function throws an {@link InvalidCityException exception}.
 	 *
 	 * @param city the to-be set city.
-	 * @throws RuntimeException when the input city is not letters/digits
-	 *                          this exception is thrown.
+	 * @throws InvalidCityException when the input city is not letters/digits
+	 *                              this exception is thrown.
 	 */
 	public void setCity(String city) {
 		char[] cityChars = city.toCharArray();
 		for (char c : cityChars)
-			if (!Character.isLetterOrDigit(c))
-				throw new RuntimeException("City name must consist of only letters");
+			if (! Character.isLetterOrDigit(c))
+				throw new InvalidCityException();
 
 		this.city = city;
 	}

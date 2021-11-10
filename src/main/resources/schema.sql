@@ -45,15 +45,16 @@ create table room
 DROP TABLE IF EXISTS reservation;
 create table reservation
 (
-    id               bigint auto_increment
+    id                 bigint auto_increment
         primary key,
-    date             date   null,
-    end_time         time   null,
-    recurring        bit    not null,
-    start_time       time   null,
-    workplace_amount int    not null,
-    employee_id      bigint null,
-    room_id          bigint null,
+    date               date         null,
+    end_time           time         null,
+    start_time         time         null,
+    workplace_amount   int          not null,
+    employee_id        bigint       null,
+    room_id            bigint       null,
+    active             bit          not null,
+    recurrence_pattern varchar(255) null,
     constraint FKm8xumi0g23038cw32oiva2ymw
         foreign key (room_id) references room (id),
     constraint FKoq2iacdgt8val8v26jn0iw83q

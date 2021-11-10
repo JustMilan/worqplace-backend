@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class WorqplaceApplicationTests {
 
-    @Test
-    void contextLoads() {
-        assertDoesNotThrow(() -> WorqplaceApplication.main(new String[]{}));
-    }
+	@Test
+	void contextLoads() {
+		assertDoesNotThrow(() -> WorqplaceApplication.main(new String[]{}));
+	}
 }

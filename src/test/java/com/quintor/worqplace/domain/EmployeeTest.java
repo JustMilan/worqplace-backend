@@ -1,6 +1,9 @@
 package com.quintor.worqplace.domain;
 
+import com.quintor.worqplace.domain.exceptions.InvalidNameException;
+import com.quintor.worqplace.domain.exceptions.InvalidNameStartException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -17,37 +20,44 @@ class EmployeeTest {
 	}
 
 	@Test
+	@DisplayName("Should create employee correctly")
 	void shouldNotThrowWhenCorrectEmployee() {
 		assertDoesNotThrow(() -> new Employee(firstName, lastName));
 	}
 
 	@Test
+	@DisplayName("Should throw InvalidNameStartException if first name doesn't start with a capital letter")
 	void shouldThrowWhenFirstNameDoesNotStartWithCapitalLetter() {
-		assertThrows(RuntimeException.class, () -> new Employee("testFirstName", lastName));
+		assertThrows(InvalidNameStartException.class, () -> new Employee("testFirstName", lastName));
 	}
 
 	@Test
+	@DisplayName("Should throw InvalidNameStartException if last name doesn't start with a capital letter")
 	void shouldThrowWhenLastNameDoesNotStartWithCapitalLetter() {
-		assertThrows(RuntimeException.class, () -> new Employee(firstName, "testLastName"));
+		assertThrows(InvalidNameStartException.class, () -> new Employee(firstName, "testLastName"));
 	}
 
 	@Test
+	@DisplayName("Should throw InvalidNameException if first name contains digits")
 	void shouldThrowWhenFirstNameContainsDigits() {
-		assertThrows(RuntimeException.class, () -> new Employee("test3firstName", lastName));
+		assertThrows(InvalidNameException.class, () -> new Employee("Test3firstName", lastName));
 	}
 
 	@Test
+	@DisplayName("Should throw InvalidNameException if last name contains digits")
 	void shouldThrowWhenLastNameContainsDigits() {
-		assertThrows(RuntimeException.class, () -> new Employee(firstName, "l0stName"));
+		assertThrows(InvalidNameException.class, () -> new Employee(firstName, "L0stName"));
 	}
 
 	@Test
+	@DisplayName("Should throw InvalidNameException if first name contains symbols")
 	void shouldThrowWhenFirstNameContainsSymbols() {
-		assertThrows(RuntimeException.class, () -> new Employee("FirstN@me", lastName));
+		assertThrows(InvalidNameException.class, () -> new Employee("FirstN@me", lastName));
 	}
 
 	@Test
+	@DisplayName("Should throw InvalidNameException if last name contains symbols")
 	void shouldThrowWhenLastNameContainsSymbols() {
-		assertThrows(RuntimeException.class, () -> new Employee(firstName, "L^astName"));
+		assertThrows(InvalidNameException.class, () -> new Employee(firstName, "L^astName"));
 	}
 }

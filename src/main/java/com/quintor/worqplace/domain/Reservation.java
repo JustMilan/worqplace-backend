@@ -2,7 +2,6 @@ package com.quintor.worqplace.domain;
 
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
-import com.quintor.worqplace.application.util.DateTimeUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -63,7 +62,7 @@ public class Reservation {
 	 * @implNote is used by Spring for retrieving reservations.
 	 */
 	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime,
-	                   Employee employee, Room room, int amount, Recurrence recurrence) {
+					   Employee employee, Room room, int amount, Recurrence recurrence) {
 		this(date, startTime, endTime, employee, room, amount, recurrence);
 		this.id = id;
 	}
@@ -81,7 +80,7 @@ public class Reservation {
 	 * @param recurrence handles the {@link Recurrence recurrence} of the reservation.
 	 */
 	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime,
-	                   Employee employee, Room room, int amount, Recurrence recurrence) {
+					   Employee employee, Room room, int amount, Recurrence recurrence) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -96,8 +95,10 @@ public class Reservation {
 
 	/**
 	 * Sets the date of the {@link Reservation} but first checks the date to
-	 * make sure it is not before today.
+	 * make sure it is not before today and throws {@link InvalidDayException exception} if not.
+	 *
 	 * @param date date of the reservation.
+	 * @throws InvalidDayException when the day if before today.
 	 */
 	public void setDate(LocalDate date) {
 		if (date.isBefore(LocalDate.now()))
