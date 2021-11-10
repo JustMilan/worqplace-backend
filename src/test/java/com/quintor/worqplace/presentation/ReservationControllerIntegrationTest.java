@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("ci")
 @Import(CiTestConfiguration.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ReservationControllerIntegrationTest {
 	@LocalServerPort
 	private int port;
@@ -49,17 +48,13 @@ class ReservationControllerIntegrationTest {
 	private Address address1;
 
 	private Location location;
-	private Location location1;
 
 	private Recurrence recurrence;
 	private Recurrence recurrence1;
 
 	private Reservation reservation;
 	private Reservation reservation1;
-	private Reservation reservation2;
 	private Reservation reservation3;
-	private Reservation reservation4;
-	private Reservation reservation5;
 
 	@BeforeAll
 	void initialize() {
@@ -73,8 +68,6 @@ class ReservationControllerIntegrationTest {
 
 //		Location
 		this.location = new Location(1L, "Quintor - Test", address, null);
-		this.location1 = new Location(2L, "Quintor - Zuid", address1, null);
-
 
 //		Room
 		this.room = new Room(1L, 1, location, 5, null);
@@ -98,7 +91,6 @@ class ReservationControllerIntegrationTest {
 	}
 
 	@Test
-	@Order(1)
 	@DisplayName("getAllReservations() should return 200 OK")
 	void shouldReturn200() {
 		assertEquals(HttpStatus.OK, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getStatusCode());
@@ -112,14 +104,11 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getBody();
 
-		System.out.println(result);
-
 		assertTrue(Objects.requireNonNull(result).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}") &&
 				result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}"));
 	}
 
 	@Test
-	@Order(2)
 	@DisplayName("getAllReservations should return an empty list of reservations if there are none")
 	void shouldReturnEmptyListIfNoReservations() {
 		assertEquals(Collections.emptyList().toString(), this.restTemplate.getForObject(String.format("http://localhost:%s/reservations/", port), String.class));
@@ -140,7 +129,7 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getBody();
 		assertTrue(
-				result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
+				Objects.requireNonNull(result).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
 		);
 	}
 
@@ -159,40 +148,92 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEndTime(LocalTime.of(19, 0));
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
-		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setWorkplaceAmount(4);
 		reservationDTO.setRecurrence(recurrence1);
 
-		assertEquals(HttpStatus.CREATED, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
+		assertEquals(HttpStatus.CREATED, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return reservation info if reservation went successful")
 	void reserveWorkplacesShouldReturnReservationInfo() {
-		fail();
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 0));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence1);
+
+		String result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getBody();
+
+		assertTrue(Objects.requireNonNull(result).contains(",\"date\":\"2021-11-11\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":false,\"recurrencePattern\":null}}"));
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if workplace is not available")
 	void reserveWorkplaceShouldReturn422IfNotAvailable() {
-		fail();
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 0));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(13);
+		reservationDTO.setRecurrence(recurrence1);
+
+		reservationRepository.save(reservation3);
+
+		String result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getBody();
+
+		assertTrue(Objects.requireNonNull(result).contains(",\"date\":\"2021-11-11\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":13,\"recurrence\":{\"active\":false,\"recurrencePattern\":null}}"));
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if times are invalid")
 	void reserveWorkplaceShouldReturn422IfTimesAreInvalid() {
-		fail();
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(8, 57));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(4);
+		reservationDTO.setRecurrence(recurrence1);
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if date is invalid")
 	void reserveWorkplaceShouldReturn422IfDateIsInvalid() {
-		fail();
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().minusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 0));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setWorkplaceAmount(1);
+		reservationDTO.setRecurrence(recurrence1);
+
+		reservationRepository.save(reservation3);
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
 	@DisplayName("reserveRoom() should return 201 upon reservation")
 	void reserveRoomShouldReturn201() {
-		fail();
+		ReservationDTO reservationDTO = new ReservationDTO();
+		reservationDTO.setDate(LocalDate.now().plusDays(1));
+		reservationDTO.setStartTime(LocalTime.of(9, 0));
+		reservationDTO.setEndTime(LocalTime.of(19, 0));
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(room.getId());
+		reservationDTO.setRecurrence(recurrence1);
+
+		assertEquals(HttpStatus.CREATED, this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getStatusCode());
 	}
 
 	@Test
@@ -265,11 +306,16 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllMyReservations() should return reservations if there are any")
 	void getAllMyReservationsShouldReturnListOfReservations() {
-		fail();
+		reservationRepository.save(reservation);
+		reservationRepository.save(reservation1);
+
+		String result = this.restTemplate.getForObject(String.format("http://localhost:%s/reservations/1/%s", port, "all"), String.class);
+
+		assertTrue(result.contains("\"date\":\"2021-11-11\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},") &&
+				result.contains(",\"date\":\"2021-11-17\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}]"));
 	}
 
 	@Test
-	@Order(3)
 	@DisplayName("getAllMyReservations() should return empty list if there are none")
 	void getAllMyReservationsShouldReturnEmptyList() {
 		assertEquals(Collections.emptyList().toString(), this.restTemplate.getForObject(String.format("http://localhost:%s/reservations/1/%s", port, "all"), String.class));
