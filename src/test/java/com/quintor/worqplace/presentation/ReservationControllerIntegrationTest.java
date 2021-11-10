@@ -90,7 +90,6 @@ class ReservationControllerIntegrationTest {
 
 //		Workplace
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
-		reservationRepository.save(reservation);
 
 //		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
 //		this.reservation2 = new Reservation(3L, , , , , , );
@@ -124,16 +123,24 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getReservationById() should return reservation 200 OK there is one")
 	void getReservationByIdShouldReturn200() {
+		reservationRepository.save(reservation);
+
 		assertEquals(HttpStatus.OK, this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/%s", port, "1"), String.class).getStatusCode());
+
+		reservationRepository.delete(reservation);
 	}
 
 	@Test
 	@DisplayName("getReservationById() should return reservation if there is one")
 	void getReservationByIdShouldReturnReservation() {
+		reservationRepository.save(reservation);
+
 		String result = this.restTemplate.getForEntity(String.format("http://localhost:%s/reservations/", port), String.class).getBody();
 		assertTrue(
 			result.contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
 		);
+
+		reservationRepository.delete(reservation);
 	}
 
 	@Test
