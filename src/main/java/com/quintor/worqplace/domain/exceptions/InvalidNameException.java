@@ -1,4 +1,5 @@
 package com.quintor.worqplace.domain.exceptions;
+
 /**
  * Exception that is thrown if the name contains invalid characters
  *

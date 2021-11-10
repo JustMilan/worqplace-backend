@@ -95,12 +95,12 @@ public class RoomService {
 	 * @see Location
 	 */
 	public List<Room> getRoomsWithWorkplacesAvailableAtDateTime(Long locationId, LocalDate date,
-	                                                            LocalTime startTime, LocalTime endTime) {
+																LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> allRooms = findRoomsByLocationId(locationId);
 
 		return allRooms.stream().filter(room ->
-						room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
+				room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
 				.collect(Collectors.toList());
 	}
 

@@ -129,7 +129,7 @@ public class ReservationService {
 		reservation.setWorkplaceAmount(reservation.getRoom().getCapacity());
 
 		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
-		if (!available) throw new RoomNotAvailableException();
+		if (! available) throw new RoomNotAvailableException();
 
 		return reservationRepository.save(reservation);
 	}

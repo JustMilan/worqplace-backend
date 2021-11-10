@@ -125,9 +125,9 @@ public class Address {
 	 *
 	 * @param postalCode the to-be set postal code.
 	 * @throws InvalidPostalCodeException when the input postal code is not 6 characters long
-	 *                          and/or does not consist of numbers for the
-	 *                          first four characters and letters for the last two,
-	 *                          this exception is thrown.
+	 *                                    and/or does not consist of numbers for the
+	 *                                    first four characters and letters for the last two,
+	 *                                    this exception is thrown.
 	 */
 	public void setPostalCode(String postalCode) {
 		char[] postalCodeChars = postalCode.toCharArray();
@@ -154,7 +154,7 @@ public class Address {
 	 *
 	 * @param city the to-be set city.
 	 * @throws InvalidCityException when the input city is not letters/digits
-	 *                          this exception is thrown.
+	 *                              this exception is thrown.
 	 */
 	public void setCity(String city) {
 		char[] cityChars = city.toCharArray();

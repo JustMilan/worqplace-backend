@@ -58,7 +58,7 @@ public class Location {
 	 *
 	 * @param name the to-be set name of the location.
 	 * @throws InvalidNameStartException when the input name does not start with a capital,
-	 *                                      it throws this exception.
+	 *                                   it throws this exception.
 	 */
 	public void setName(String name) {
 		char[] nameChars = name.strip().toCharArray();

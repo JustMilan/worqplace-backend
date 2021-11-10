@@ -78,8 +78,7 @@ public class ReservationController {
 	 * @see com.quintor.worqplace.domain.Reservation Reservation
 	 */
 	@PostMapping("/workplaces")
-	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO
-			                                           reservationDTO) {
+	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			return new ResponseEntity<>(reservationMapper
 					.toReservationDTO(reservationService
