@@ -54,7 +54,7 @@ class ReservationServiceTest {
 
 		this.room = new Room(1L, 1, null, 15, Collections.emptyList());
 		this.location = new Location(1L, "QuintorTest", address, List.of(room));
-		this.noRecurrence = new Recurrence(false, null);
+		this.noRecurrence = new Recurrence(false, RecurrencePattern.NONE);
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(15, 0), employee, null, 15, noRecurrence);
 		this.reservation1 = new Reservation(2L, LocalDate.now().plusDays(4), LocalTime.of(12, 0), LocalTime.of(13, 0), employee, room, 15, noRecurrence);
 		this.reservation2 = new Reservation(3L, LocalDate.now().plusMonths(3), LocalTime.of(9, 36), LocalTime.of(13, 10), employee, room, 15, noRecurrence);

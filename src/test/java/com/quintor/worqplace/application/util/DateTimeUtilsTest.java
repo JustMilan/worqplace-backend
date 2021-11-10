@@ -37,7 +37,7 @@ class DateTimeUtilsTest {
 		this.twelve = LocalTime.of(12, 0);
 		this.one = LocalTime.of(13, 0);
 		this.four = LocalTime.of(16, 0);
-		this.noRecurrence = new Recurrence(false, null);
+		this.noRecurrence = new Recurrence(false, RecurrencePattern.NONE);
 		this.dailyRecurrence = new Recurrence(true, RecurrencePattern.DAILY);
 		this.weeklyRecurrence = new Recurrence(true, RecurrencePattern.WEEKLY);
 		this.biweeklyRecurrence = new Recurrence(true, RecurrencePattern.BIWEEKLY);
