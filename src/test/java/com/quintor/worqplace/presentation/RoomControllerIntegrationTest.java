@@ -8,10 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("ci")
@@ -35,9 +36,21 @@ public class RoomControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
-		assertEquals(200, result.getStatusCode().value());
-		assertNotNull(result.getBody());
-		assertNotEquals("[]", result.getBody());
+		assertEquals(HttpStatus.OK, result.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("listOfAvailableRoomsNotEmpty() should not return an empty list")
+	void listOfAvailableRoomsContent() {
+		String urlPart = "/rooms/availability?";
+		urlPart += "locationId=5&";
+		urlPart += "date=6000-01-01&";
+		urlPart += "start=14:00&";
+		urlPart += "end=15:00";
+
+		ResponseEntity<String> result = getRequest(urlPart);
+
+		assertEquals(result.getBody(), "[{\"id\":1,\"floor\":3,\"capacity\":24,\"available\":24},{\"id\":2,\"floor\":-1,\"capacity\":6,\"available\":6}]");
 	}
 
 	@Test
@@ -51,7 +64,7 @@ public class RoomControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
-		assertEquals(422, result.getStatusCode().value());
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
 	}
 
 	@Test
@@ -65,9 +78,21 @@ public class RoomControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
-		assertEquals(200, result.getStatusCode().value());
-		assertNotNull(result.getBody());
-		assertNotEquals("[]", result.getBody());
+		assertEquals(HttpStatus.OK, result.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("getWorkplacesAvailability() should not return an empty list")
+	void getWorkplacesAvailabilityShouldNotBeEmpty() {
+		String urlPart = "/rooms/availability/workplaces?";
+		urlPart += "locationId=5&";
+		urlPart += "date=6000-01-01&";
+		urlPart += "start=14:00&";
+		urlPart += "end=15:00";
+
+		ResponseEntity<String> result = getRequest(urlPart);
+
+		assertEquals(result.getBody(), "[{\"id\":1,\"floor\":3,\"capacity\":24,\"available\":24},{\"id\":2,\"floor\":-1,\"capacity\":6,\"available\":6}]");
 	}
 
 	@Test
@@ -81,20 +106,18 @@ public class RoomControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
-		assertEquals(422, result.getStatusCode().value());
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, result.getStatusCode());
 	}
 
 	/**
 	 * Function that uses the {@link TestRestTemplate} to send a GET request
 	 * to the Back-End for testing during Continuous Integration.
 	 *
-	 * @param url	the URL Path after "https://localhost:8080".
-	 *              as a {@link String}
-	 * @return 		a {@link ResponseEntity} for the request.
+	 * @param url the URL Path after "https://localhost:8080".
+	 *            as a {@link String}
+	 * @return a {@link ResponseEntity} for the request.
 	 */
 	ResponseEntity<String> getRequest(String url) {
 		return restTemplate.getForEntity("http://localhost:" + port + url, String.class);
 	}
-
-
 }
