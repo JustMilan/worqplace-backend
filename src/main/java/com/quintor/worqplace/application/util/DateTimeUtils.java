@@ -33,7 +33,7 @@ public class DateTimeUtils {
 	 *                                         this exception is thrown.
 	 */
 	public static void checkReservationDateTime(LocalDate date,
-	                                            LocalTime startTime,
+												LocalTime startTime,
 	                                            LocalTime endTime) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();

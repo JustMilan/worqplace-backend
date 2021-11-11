@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/locations")
 @AllArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200"})
 public class LocationController {
 	private final LocationService locationService;
 	private final LocationMapper locationMapper;
