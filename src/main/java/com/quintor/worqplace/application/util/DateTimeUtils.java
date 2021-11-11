@@ -20,7 +20,21 @@ import java.util.Locale;
  */
 public class DateTimeUtils {
 
-	public static void checkReservationDateTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
+	/**
+	 * Function that checks if the entered date and times uphold the required standard. If the
+	 * start time is after the end time or if the date is before today, an exception is thrown.
+	 *
+	 * @param date      the input date.
+	 * @param startTime the start time on the date.
+	 * @param endTime   the end time on the date.
+	 * @throws InvalidStartAndEndTimeException when the start time is after the end time,
+	 *                                         this exception is thrown.
+	 * @throws InvalidDayException             when the entered day is before today,
+	 *                                         this exception is thrown.
+	 */
+	public static void checkReservationDateTime(LocalDate date,
+	                                            LocalTime startTime,
+	                                            LocalTime endTime) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -46,13 +60,14 @@ public class DateTimeUtils {
 	 * @return a boolean indicating whether the existing and the new timeslot overlap.
 	 */
 	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
-										   LocalTime existingEndTime, Recurrence recurrence, LocalDate newDate,
-										   LocalTime newStartTime, LocalTime newEndTime) {
-		if (! existingDate.equals(newDate) && ! recurrence.isActive()) return false;
+	                                       LocalTime existingEndTime, Recurrence recurrence,
+	                                       LocalDate newDate, LocalTime newStartTime,
+	                                       LocalTime newEndTime) {
+		if (!existingDate.equals(newDate) && !recurrence.isActive()) return false;
 		if (recurrence.isActive()) {
 			switch (recurrence.getRecurrencePattern()) {
 				case WEEKLY -> {
-					if (! existingDate.getDayOfWeek()
+					if (!existingDate.getDayOfWeek()
 							.equals(newDate.getDayOfWeek())) return false;
 				}
 				case BIWEEKLY -> {
@@ -62,7 +77,7 @@ public class DateTimeUtils {
 					int newWeekNumber = newDate
 							.get(weekFields.weekOfWeekBasedYear());
 					if ((newWeekNumber - oldWeekNumber) % 2 > 0 ||
-							! existingDate.getDayOfWeek().equals(newDate.getDayOfWeek()))
+							!existingDate.getDayOfWeek().equals(newDate.getDayOfWeek()))
 						return false;
 				}
 				case MONTHLY -> {
@@ -70,6 +85,6 @@ public class DateTimeUtils {
 				}
 			}
 		}
-		return ! newStartTime.isAfter(existingEndTime) && ! newEndTime.isBefore(existingStartTime);
+		return !newStartTime.isAfter(existingEndTime) && !newEndTime.isBefore(existingStartTime);
 	}
 }
