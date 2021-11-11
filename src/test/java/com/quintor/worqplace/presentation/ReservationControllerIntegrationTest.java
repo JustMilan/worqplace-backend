@@ -168,7 +168,7 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getBody();
 
-		assertTrue(Objects.requireNonNull(result).contains(",\"date\":\"2021-11-11\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}"));
+		assertTrue(Objects.requireNonNull(result).contains(String.format(",\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}", reservationDTO.getDate())));
 	}
 
 	@Test
@@ -187,7 +187,7 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), reservationDTO, String.class).getBody();
 
-		assertTrue(Objects.requireNonNull(result).contains(",\"date\":\"2021-11-11\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":13,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}"));
+		assertTrue(Objects.requireNonNull(result).contains(String.format(",\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":13,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}", reservationDTO.getDate())));
 	}
 
 	@Test
@@ -310,9 +310,9 @@ class ReservationControllerIntegrationTest {
 		reservationRepository.save(reservation1);
 
 		String result = this.restTemplate.getForObject(String.format("http://localhost:%s/reservations/1/%s", port, "all"), String.class);
-
-		assertTrue(result.contains("\"date\":\"2021-11-11\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},") &&
-				result.contains(",\"date\":\"2021-11-17\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}]"));
+		System.out.println(result);
+		assertTrue(result.contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},", reservation.getDate())) &&
+				result.contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}]", reservation1.getDate())));
 	}
 
 	@Test
