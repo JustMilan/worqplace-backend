@@ -1,0 +1,45 @@
+version: "2.4"
+services:
+    backend:
+        build:
+            context: .
+            dockerfile: dockerfile
+        ports:
+            - "8080:8080"
+        networks:
+            app_network:
+                ip4_address: 172.1.0.3
+    
+    frontend:
+        build:
+            context: ../worqplace-frontend-development
+            dockerfile: dockerfile
+        ports:
+            - "80:80"
+            - "4200:4200"
+        networks:
+            app_network:
+                ip4_address: 172.1.0.4
+    
+    db:
+        image: mysql:latest
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: worqplace
+            MYSQL_ROOT_PASSWORD: adminadmin
+        volumes:
+            app_network:
+                ipv4_address: 172.1.0.2
+
+volumes:
+    worqplace-db:
+
+networks:
+    app_network:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.1.0.0/24
+                - gateway: 172.1.0.1
