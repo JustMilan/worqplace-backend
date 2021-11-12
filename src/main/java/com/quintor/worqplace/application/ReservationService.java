@@ -105,7 +105,8 @@ public class ReservationService {
 		Room room = roomService.getRoomById(reservationDTO.getRoomId());
 		int workplaceAmount = Math.max(reservationDTO.getWorkplaceAmount(), 1);
 
-		return new Reservation(reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime(),
+		return new Reservation(reservationDTO.getDate(),
+				reservationDTO.getStartTime(), reservationDTO.getEndTime(),
 				employee, room, workplaceAmount,
 				reservationDTO.getRecurrence());
 	}
@@ -128,7 +129,9 @@ public class ReservationService {
 		Reservation reservation = toReservation(reservationDTO);
 		reservation.setWorkplaceAmount(reservation.getRoom().getCapacity());
 
-		boolean available = roomService.isRoomAvailable(reservation.getRoom(), reservationDTO.getDate(), reservationDTO.getStartTime(), reservationDTO.getEndTime());
+		boolean available = roomService.isRoomAvailable(reservation.getRoom(),
+				reservationDTO.getDate(), reservationDTO.getStartTime(),
+				reservationDTO.getEndTime());
 		if (! available) throw new RoomNotAvailableException();
 
 		return reservationRepository.save(reservation);

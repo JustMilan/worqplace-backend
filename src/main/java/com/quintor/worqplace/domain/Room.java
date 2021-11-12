@@ -49,10 +49,12 @@ public class Room {
 	 */
 	public int countReservedWorkspaces(LocalDate date, LocalTime startTime, LocalTime endTime) {
 		return this.getReservations().stream().filter(reservation ->
-				(date.isAfter(reservation.getDate()) || date.isEqual(reservation.getDate()))
-						&& DateTimeUtils.timeslotsOverlap(reservation.getDate(),
-						reservation.getStartTime(), reservation.getEndTime(), reservation.getRecurrence(),
-						date, startTime, endTime)).mapToInt(Reservation::getWorkplaceAmount).sum();
+						(date.isAfter(reservation.getDate()) ||
+								date.isEqual(reservation.getDate())) &&
+								DateTimeUtils.timeslotsOverlap(reservation.getDate(),
+										reservation.getStartTime(), reservation.getEndTime(),
+										reservation.getRecurrence(), date, startTime, endTime))
+				.mapToInt(Reservation::getWorkplaceAmount).sum();
 	}
 
 	/**

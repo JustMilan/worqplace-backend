@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/rooms")
 @AllArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200"})
 public class RoomController {
 	private final RoomService roomService;
 	private final RoomMapper roomMapper;
