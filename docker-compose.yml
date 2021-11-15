@@ -29,6 +29,8 @@ services:
             MYSQL_DATABASE: worqplace
             MYSQL_ROOT_PASSWORD: adminadmin
         volumes:
+            - worqplace-db:/var/lib/mysql
+        networks:
             app_network:
                 ipv4_address: 172.1.0.2
 
@@ -42,4 +44,4 @@ networks:
             driver: default
             config:
                 - subnet: 172.1.0.0/24
-                - gateway: 172.1.0.1
+                  gateway: 172.1.0.1
