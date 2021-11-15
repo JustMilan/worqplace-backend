@@ -3,7 +3,7 @@ FROM openjdk:17
 WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
-RUN chmod 777 mvw
+RUN chmod 776 mvnw
 RUN ./mvnw dependency:go-offline
 
 COPY src ./src
