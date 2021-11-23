@@ -31,7 +31,7 @@ class RoomTest {
 
 	@Test
 	@DisplayName("function should return true if there are no reservations")
-	void isWorkplaceRecurrentlyAvailableShouldBeTrueWhen() {
+	void isWorkplaceRecurrentlyAvailableShouldBeTrueWhenThereAreNoReservations() {
 		Room room = new Room(id, floor, location, 15, new ArrayList<>());
 		Reservation reservation = new Reservation(LocalDate.now(),
 				LocalTime.of(11,11), LocalTime.of(12,12), null, room, 1,
