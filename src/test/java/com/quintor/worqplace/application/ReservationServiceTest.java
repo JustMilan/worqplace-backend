@@ -173,7 +173,7 @@ class ReservationServiceTest {
 	}
 
 	@Test
-	@DisplayName("reserveRoom() should throw RoomNotFoundException if room is not available")
+	@DisplayName("reserveRoom() should throw WorkplacesNotAvailable if room is not available")
 	void reserveRoomShouldThrowIfItNotAvailable() {
 		ReservationDTO reservationDTO = new ReservationDTO();
 		reservationDTO.setId(8L);
@@ -184,7 +184,7 @@ class ReservationServiceTest {
 		reservationDTO.setRoomId(reservation1.getRoom().getId());
 		reservationDTO.setRecurrence(this.noRecurrence);
 
-		assertThrows(RoomNotAvailableException.class, () -> reservationService.reserveRoom(reservationDTO));
+		assertThrows(WorkplacesNotAvailableException.class, () -> reservationService.reserveRoom(reservationDTO));
 	}
 
 	@Test
