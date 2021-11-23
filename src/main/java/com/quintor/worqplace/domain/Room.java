@@ -60,6 +60,11 @@ public class Room {
 				.mapToInt(Reservation::getWorkplaceAmount).sum();
 	}
 
+	/**
+	 * Function that checks if the requested amount of workplaces is available.
+	 * @param reservation Reservation for which to check the availability.
+	 * @return a boolean indicating the availability.
+	 */
 	public boolean isWorkplaceRecurrentlyAvailable(Reservation reservation) {
 		if (reservation.getRecurrence().isActive()) {
 			int total = 0;
@@ -73,7 +78,7 @@ public class Room {
 							reservation1.getStartTime(), reservation1.getEndTime())
 							? reservation1.getWorkplaceAmount() : 0;
 				}
-				if ((total + reservation.getWorkplaceAmount()) >= this.capacity) {
+				if ((total + reservation.getWorkplaceAmount()) > this.capacity) {
 					return false;
 				}
 				total = 0;
