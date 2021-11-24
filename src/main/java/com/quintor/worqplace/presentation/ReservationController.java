@@ -82,7 +82,7 @@ public class ReservationController {
 			return new ResponseEntity<>(reservationMapper
 					.toReservationDTO(reservationService
 							.reserveWorkplaces(reservationDTO)), HttpStatus.CREATED);
-		} catch (WorkplacesNotAvailableException | InvalidStartAndEndTimeException |
+		} catch (WorkplacesNotAvailableException | RoomNotAvailableException | InvalidStartAndEndTimeException |
 				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -106,8 +106,8 @@ public class ReservationController {
 			return new ResponseEntity<>(reservationMapper
 					.toReservationDTO(reservationService.reserveRoom(reservationDTO)),
 					HttpStatus.CREATED);
-		} catch (RoomNotAvailableException | InvalidStartAndEndTimeException |
-				InvalidDayException e) {
+		} catch (RoomNotAvailableException | WorkplacesNotAvailableException |
+				InvalidStartAndEndTimeException | InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}

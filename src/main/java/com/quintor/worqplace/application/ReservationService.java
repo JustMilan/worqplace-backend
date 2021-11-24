@@ -79,15 +79,9 @@ public class ReservationService {
 	public Reservation reserveWorkplaces(ReservationDTO reservationDTO) {
 		Reservation reservation = this.toReservation(reservationDTO);
 		Room room = reservation.getRoom();
-		int available = room.getCapacity() - room.countReservedWorkspaces(reservation.getDate(),
-				reservation.getStartTime(), reservation.getEndTime());
-		int wanted = reservation.getWorkplaceAmount();
-
-		if (available >= wanted) {
-			room.addReservation(reservation);
-			reservationRepository.save(reservation);
-			return reservation;
-		} else throw new WorkplacesNotAvailableException(wanted, available);
+		room.addReservation(reservation);
+		reservationRepository.save(reservation);
+		return reservation;
 	}
 
 	/**
@@ -126,15 +120,11 @@ public class ReservationService {
 	 * @see RoomNotAvailableException
 	 */
 	public Reservation reserveRoom(ReservationDTO reservationDTO) {
-		Reservation reservation = toReservation(reservationDTO);
-		reservation.setWorkplaceAmount(reservation.getRoom().getCapacity());
-
-		boolean available = roomService.isRoomAvailable(reservation.getRoom(),
-				reservationDTO.getDate(), reservationDTO.getStartTime(),
-				reservationDTO.getEndTime());
-		if (! available) throw new RoomNotAvailableException();
-
-		return reservationRepository.save(reservation);
+		Reservation reservation = this.toReservation(reservationDTO);
+		Room room = reservation.getRoom();
+		reservation.setWorkplaceAmount(room.getCapacity());
+		room.addReservation(reservation);
+		return 	reservationRepository.save(reservation);
 	}
 
 	/**
