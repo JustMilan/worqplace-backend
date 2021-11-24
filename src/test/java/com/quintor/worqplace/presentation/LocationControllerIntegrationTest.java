@@ -6,6 +6,7 @@ import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.presentation.dto.location.LocationDTO;
 import com.quintor.worqplace.presentation.dto.location.LocationMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,8 @@ class LocationControllerIntegrationTest {
 	}
 
 	@Test
-	void contextLoads() {
+	@DisplayName("GetLocations() should return all locations")
+	void getLocationShouldReturnLocations() {
 		ResponseEntity<List<LocationDTO>> responseEntity =
 				new ResponseEntity<>(Stream.of(amersfoort, denBosch, deventer, denHaag, groningen)
 						.map(LocationMapper.INSTANCE::toLocationDTO)
