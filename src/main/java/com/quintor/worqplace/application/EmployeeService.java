@@ -36,4 +36,8 @@ public class EmployeeService {
 				.findById(id)
 				.orElseThrow(() -> new EmployeeNotFoundException(id));
 	}
+
+	public Employee saveEmployee(String firstname, String lastname) {
+		return employeeRepository.save(new Employee(firstname, lastname));
+	}
 }

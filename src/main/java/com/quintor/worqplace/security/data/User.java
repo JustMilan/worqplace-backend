@@ -1,5 +1,6 @@
 package com.quintor.worqplace.security.data;
 
+import com.quintor.worqplace.domain.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,15 +39,20 @@ public class User implements UserDetails {
 	private String password;
 	private UserRoles role = UserRoles.USER;
 
+	@OneToOne
+	@JoinColumn(name = "employee_id")
+	private Employee employee;
 
-	public User(String username, String password) {
+	public User(String username, String password, Employee employee) {
 		this.username = username;
 		this.password = password;
+		this.employee = employee;
 	}
 
-	public User(String username, String password, UserRoles role) {
+	public User(String username, String password, UserRoles role, Employee employee) {
 		this.username = username;
 		this.password = password;
+		this.employee = employee;
 		this.role = role;
 	}
 

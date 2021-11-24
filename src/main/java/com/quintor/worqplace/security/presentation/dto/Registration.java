@@ -9,4 +9,10 @@ public class Registration {
 
 	@Size(min = 5)
 	public String password;
+
+	@NotBlank
+	public String firstname;
+
+	@NotBlank
+	public String lastname;
 }

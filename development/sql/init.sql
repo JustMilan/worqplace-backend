@@ -54,13 +54,3 @@ VALUES ('Quintor Groningen', 5);
 INSERT INTO room(floor, location_id, capacity)
 VALUES (3, 5, 24),
        (-1, 5, 6);
-
-/* Queries for employee */
-INSERT INTO employee (last_name, first_name)
-VALUES ('Avedisyan', 'Arutun'),
-       ('Docters van Leeuwen', 'Daan'),
-       ('Dol', 'Milan'),
-       ('Mak', 'Gerson'),
-       ('van der Moolen', 'Jan-paul'),
-       ('Shirre', 'Said'),
-       ('Wieman', 'Mees');

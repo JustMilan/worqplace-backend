@@ -1,5 +1,7 @@
 package com.quintor.worqplace.security.application;
 
+import com.quintor.worqplace.application.EmployeeService;
+import com.quintor.worqplace.domain.Employee;
 import com.quintor.worqplace.security.data.SpringUserRepository;
 import com.quintor.worqplace.security.data.User;
 import lombok.AllArgsConstructor;
@@ -21,12 +23,16 @@ import javax.transaction.Transactional;
 public class UserService implements UserDetailsService {
 	private final SpringUserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private EmployeeService employeeService;
 
-	public void register(String username, String password) {
+	public void register(String username, String password, String firstname, String lastname) {
 		String encodedPassword = this.passwordEncoder.encode(password);
 
-		User user = new User(username, encodedPassword);
+		Employee employee = employeeService.saveEmployee(firstname, lastname);
+		if (employee == null)
+			return;
 
+		User user = new User(username, encodedPassword, employee);
 		this.userRepository.save(user);
 	}
 
