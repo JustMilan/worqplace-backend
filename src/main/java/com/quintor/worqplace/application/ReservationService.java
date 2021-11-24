@@ -124,8 +124,7 @@ public class ReservationService {
 		Room room = reservation.getRoom();
 		reservation.setWorkplaceAmount(room.getCapacity());
 		room.addReservation(reservation);
-		reservationRepository.save(reservation);
-		return reservation;
+		return 	reservationRepository.save(reservation);
 	}
 
 	/**
