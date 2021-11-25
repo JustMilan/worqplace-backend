@@ -97,6 +97,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				.compact();
 
 		response.addHeader("Authorization", "Bearer " + token);
-		response.addHeader("EmployeeId", user.getEmployee().getId().toString());
+		response.addHeader("access-control-expose-headers", "Authorization");
 	}
 }
