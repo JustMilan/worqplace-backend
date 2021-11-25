@@ -88,12 +88,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 		String token = Jwts.builder()
 				.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
-				.setHeaderParam("typ", "JWT")
+				.setHeaderParam("type", "JWT")
 				.setIssuer("quintor-worqplace-api")
 				.setAudience("quintor-worqplace")
 				.setSubject(user.getUsername())
 				.setExpiration(new Date(System.currentTimeMillis() + this.expirationInMs))
-				.claim("rol", roles)
+				.claim("role", roles)
 				.compact();
 
 		response.addHeader("Authorization", "Bearer " + token);
