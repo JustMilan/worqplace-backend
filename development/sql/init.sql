@@ -43,7 +43,6 @@ INSERT INTO room(floor, location_id, capacity)
 VALUES (1, 4, 10),
        (2, 4, 12);
 
-
 /* Queries for Quintor Groningen */
 INSERT INTO address (street, house_number, postal_code, city, addition)
 VALUES ('Ubbo Emmiussingel', '112', '9711 BK', 'Groningen', '');
