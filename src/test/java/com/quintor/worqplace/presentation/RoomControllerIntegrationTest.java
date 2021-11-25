@@ -1,29 +1,70 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("ci")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(CiTestConfiguration.class)
 public class RoomControllerIntegrationTest {
 
 	@LocalServerPort
 	private int port;
-
 	@Autowired
 	private TestRestTemplate restTemplate;
+
+	private String bearer;
+
+	@BeforeEach
+	private void init() {
+		try {
+			Map<String, String> map1 = new HashMap<>();
+			map1.put("username", "mdol@quintor.nl");
+			map1.put("password", "Kaasje");
+
+			this.bearer = (restTemplate.postForEntity("http://localhost:" + port + "/login", map1, String.class))
+					.getHeaders().get("Authorization")
+					.toString()
+					.replace("[", "")
+					.replace("]", "");
+		} catch (Exception e) {
+			String url = "http://localhost:" + port + "/register";
+
+			Map<String, String> map = new HashMap<>();
+			map.put("firstname", "Milan");
+			map.put("lastname", "Dol");
+			map.put("username", "mdol@quintor.nl");
+			map.put("password", "Kaasje");
+
+			restTemplate.postForEntity(url, map, Void.class);
+
+			Map<String, String> map1 = new HashMap<>();
+			map1.put("username", "mdol@quintor.nl");
+			map1.put("password", "Kaasje");
+
+			this.bearer = (restTemplate.postForEntity("http://localhost:" + port + "/login", map1, String.class))
+					.getHeaders().get("Authorization")
+					.toString()
+					.replace("[", "")
+					.replace("]", "");
+		}
+	}
 
 	@Test
 	@DisplayName("Test if a date in far FAR in the future has any rooms available.")
@@ -50,7 +91,7 @@ public class RoomControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
-		assertEquals(result.getBody(), "[{\"id\":1,\"floor\":3,\"capacity\":24,\"available\":24},{\"id\":2,\"floor\":-1,\"capacity\":6,\"available\":6}]");
+		assertEquals("[{\"id\":1,\"floor\":3,\"capacity\":24,\"available\":24},{\"id\":2,\"floor\":-1,\"capacity\":6,\"available\":6}]", result.getBody());
 	}
 
 	@Test
@@ -92,7 +133,7 @@ public class RoomControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
-		assertEquals(result.getBody(), "[{\"id\":1,\"floor\":3,\"capacity\":24,\"available\":24},{\"id\":2,\"floor\":-1,\"capacity\":6,\"available\":6}]");
+		assertEquals("[{\"id\":1,\"floor\":3,\"capacity\":24,\"available\":24},{\"id\":2,\"floor\":-1,\"capacity\":6,\"available\":6}]", result.getBody());
 	}
 
 	@Test
@@ -118,6 +159,10 @@ public class RoomControllerIntegrationTest {
 	 * @return a {@link ResponseEntity} for the request.
 	 */
 	ResponseEntity<String> getRequest(String url) {
-		return restTemplate.getForEntity("http://localhost:" + port + url, String.class);
+		var request = RequestEntity.get(URI.create(url))
+				.header("Authorization", this.bearer)
+				.build();
+
+		return restTemplate.exchange(request, String.class);
 	}
 }
