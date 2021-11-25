@@ -1,21 +1,26 @@
-package com.quintor.worqplace;
+package com.quintor.worqplace.security;
 
-import java.io.IOException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * {@link SimpleCORSFilter} class that extends {@link Filter}.
+ * Sets the required response headers for this application.
+ */
 @Component
 public class SimpleCORSFilter implements Filter {
 
+	/**
+	 * Constructor of the class {@link SimpleCORSFilter}.
+	 * <p>
+	 * Will create the class and instantiate a logger with it.
+	 */
 	public SimpleCORSFilter() {
 		Logger log = LoggerFactory.getLogger(SimpleCORSFilter.class);
 		log.info("SimpleCORSFilter init");

@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS address;
 create table address
 (
     id           bigint auto_increment
@@ -10,7 +9,6 @@ create table address
     street       varchar(255) null
 );
 
-DROP TABLE IF EXISTS employee;
 create table employee
 (
     id         bigint auto_increment
@@ -19,7 +17,11 @@ create table employee
     last_name  varchar(255) null
 );
 
-DROP TABLE IF EXISTS location;
+create table hibernate_sequence
+(
+    next_val bigint null
+);
+
 create table location
 (
     id         bigint auto_increment
@@ -30,7 +32,6 @@ create table location
         foreign key (address_id) references address (id)
 );
 
-DROP TABLE IF EXISTS room;
 create table room
 (
     id          bigint auto_increment
@@ -42,21 +43,34 @@ create table room
         foreign key (location_id) references location (id)
 );
 
-DROP TABLE IF EXISTS reservation;
 create table reservation
 (
     id                 bigint auto_increment
         primary key,
     date               date         null,
     end_time           time         null,
+    active             bit          not null,
+    recurrence_pattern varchar(255) not null,
     start_time         time         null,
     workplace_amount   int          not null,
     employee_id        bigint       null,
     room_id            bigint       null,
-    active             bit          not null,
-    recurrence_pattern varchar(255) null,
     constraint FKm8xumi0g23038cw32oiva2ymw
         foreign key (room_id) references room (id),
     constraint FKoq2iacdgt8val8v26jn0iw83q
+        foreign key (employee_id) references employee (id)
+);
+
+create table users
+(
+    id          bigint       not null
+        primary key,
+    password    varchar(255) null,
+    role        int          null,
+    username    varchar(255) not null,
+    employee_id bigint       null,
+    constraint UK_r43af9ap4edm43mmtq01oddj6
+        unique (username),
+    constraint FKfndbe67uw6silwqnlyudtwqmo
         foreign key (employee_id) references employee (id)
 );
