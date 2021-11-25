@@ -28,6 +28,12 @@ import java.util.stream.Collectors;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	private final String secret;
 
+	/**
+	 * Constructor of the {@link JwtAuthorizationFilter} class that extends {@link BasicAuthenticationFilter}.
+	 *
+	 * @param secret                Secret.
+	 * @param authenticationManager {@link AuthenticationManager} object.
+	 */
 	public JwtAuthorizationFilter(String secret, AuthenticationManager authenticationManager) {
 		super(authenticationManager);
 		this.secret = secret;
@@ -45,13 +51,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		filterChain.doFilter(request, response);
 	}
 
+	/**
+	 * Authentication getter that verifies the token, creates a key and parses the JWT.
+	 * Then creates an {@link UsernamePasswordAuthenticationToken} with the verified and given credentials.
+	 *
+	 * @param request {@link HttpServletRequest}.
+	 * @return {@link Authentication} object.
+	 */
 	private Authentication getAuthentication(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 
-		if (token == null || token.isEmpty())
-			return null;
-
-		if (! token.startsWith("Bearer "))
+		if (token == null || token.isEmpty() || ! token.startsWith("Bearer "))
 			return null;
 
 		byte[] signingKey = this.secret.getBytes();
@@ -72,9 +82,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 				.map(authority -> new SimpleGrantedAuthority((String) authority))
 				.collect(Collectors.toList());
 
-		if (username.isEmpty()) {
+		if (username.isEmpty())
 			return null;
-		}
 
 		UserProfile principal = new UserProfile(username);
 

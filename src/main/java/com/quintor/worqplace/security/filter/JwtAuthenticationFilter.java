@@ -38,6 +38,15 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	private final AuthenticationManager authenticationManager;
 
+	/**
+	 * Constructor of the class {@link JwtAuthenticationFilter} that extends
+	 * {@link AbstractAuthenticationProcessingFilter}.
+	 *
+	 * @param path                  Path.
+	 * @param secret                Secret.
+	 * @param expirationInMs        Expiration in milliseconds.
+	 * @param authenticationManager {@link AuthenticationManager} object.
+	 */
 	public JwtAuthenticationFilter(
 			String path,
 			String secret,

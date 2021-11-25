@@ -43,12 +43,27 @@ public class User implements UserDetails {
 	@JoinColumn(name = "employee_id")
 	private Employee employee;
 
+	/**
+	 * Constructor of the {@link User} class.
+	 *
+	 * @param username Email
+	 * @param password Password
+	 * @param employee {@link Employee}
+	 */
 	public User(String username, String password, Employee employee) {
 		this.username = username;
 		this.password = password;
 		this.employee = employee;
 	}
 
+	/**
+	 * Constructor of the {@link User} class.
+	 *
+	 * @param username Email
+	 * @param password Password
+	 * @param role     Role {@link UserRoles}
+	 * @param employee {@link Employee}
+	 */
 	public User(String username, String password, UserRoles role, Employee employee) {
 		this.username = username;
 		this.password = password;

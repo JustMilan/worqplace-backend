@@ -9,9 +9,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * {@link SimpleCORSFilter} class that extends {@link Filter}.
+ * Sets the required response headers for this application.
+ */
 @Component
 public class SimpleCORSFilter implements Filter {
 
+	/**
+	 * Constructor of the class {@link SimpleCORSFilter}.
+	 * <p>
+	 * Will create the class and instantiate a logger with it.
+	 */
 	public SimpleCORSFilter() {
 		Logger log = LoggerFactory.getLogger(SimpleCORSFilter.class);
 		log.info("SimpleCORSFilter init");

@@ -43,6 +43,12 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Value("${security.jwt.expiration-in-ms}")
 	private Integer jwtExpirationInMs;
 
+	/**
+	 * Configure authorization for endpoints.
+	 *
+	 * @param http {@link HttpSecurity}.
+	 * @throws Exception when config is invalid.
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and()
@@ -68,11 +74,18 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	}
 
+	/**
+	 * @return {@link BCryptPasswordEncoder} used to encode passwords.
+	 */
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
+	/**
+	 * This method needs instantiation in order for Spring Boot to generate a correct security chain.
+	 * If this method isn't instantiated, CORS will fail due to incorrect chaining order.
+	 */
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
