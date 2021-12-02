@@ -1,7 +1,9 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
+import com.quintor.worqplace.data.LocationRepository;
 import com.quintor.worqplace.data.ReservationRepository;
+import com.quintor.worqplace.data.RoomRepository;
 import com.quintor.worqplace.domain.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
@@ -37,6 +39,12 @@ class ReservationControllerIntegrationTest {
 
 	@Autowired
 	private ReservationRepository reservationRepository;
+
+	@Autowired
+	private RoomRepository roomRepository;
+
+	@Autowired
+	private LocationRepository locationRepository;
 
 	@Autowired
 	private ReservationMapper reservationMapper;
@@ -95,6 +103,8 @@ class ReservationControllerIntegrationTest {
 	@AfterEach
 	void tearDown() {
 		reservationRepository.deleteAll();
+		roomRepository.deleteAll();
+		locationRepository.deleteAll();
 	}
 
 	@Test
@@ -138,6 +148,20 @@ class ReservationControllerIntegrationTest {
 	void getReservationByIdShouldReturnReservation() {
 		reservationRepository.save(reservation);
 		ResponseEntity<String> result = getRequest("/reservations");
+
+		assertTrue(
+				requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
+		);
+	}
+
+
+	@Test
+	@DisplayName("getAllReservationsByLocation() should return a reservation if there is one")
+	void getAllReservationsByLocationShouldReturnAReservation() {
+		locationRepository.save(location);
+		roomRepository.save(room);
+		reservationRepository.save(reservation);
+		var result = getRequest("/reservations/location/1");
 
 		assertTrue(
 				requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
@@ -371,10 +395,15 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllMyReservations() should return empty list if there are none")
 	void getAllMyReservationsShouldReturnEmptyList() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", this.bearer);
-
 		var result = getRequest("/reservations/1/all");
+
+		assertEquals(Collections.emptyList().toString(), result.getBody());
+	}
+
+	@Test
+	@DisplayName("getAllReservationsByLocation() should return empty list if there are none")
+	void getAllReservationsByLocationShouldReturnEmptyList() {
+		var result = getRequest("/reservations/location/1");
 
 		assertEquals(Collections.emptyList().toString(), result.getBody());
 	}

@@ -5,10 +5,13 @@ import com.quintor.worqplace.application.exceptions.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import java.util.stream.Collectors;
 
 /**
@@ -126,6 +129,14 @@ public class ReservationController {
 	@GetMapping("/{id}/all")
 	public ResponseEntity<?> getAllMyReservations(@PathVariable long id) {
 		return new ResponseEntity<>(reservationService.getAllMyReservations(id)
+				.stream().map(reservationMapper::toReservationDTO)
+				.collect(Collectors.toList()), HttpStatus.OK);
+	}
+
+	@RolesAllowed("ROLE_ADMIN")
+	@GetMapping("/location/{id}")
+	public ResponseEntity<?> getAllByLocation(@PathVariable long id) {
+		return new ResponseEntity<>(reservationService.getAllByLocation(id)
 				.stream().map(reservationMapper::toReservationDTO)
 				.collect(Collectors.toList()), HttpStatus.OK);
 	}

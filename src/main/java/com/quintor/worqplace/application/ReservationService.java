@@ -5,6 +5,7 @@ import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
+import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Reservation;
 import com.quintor.worqplace.domain.Room;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -141,4 +143,29 @@ public class ReservationService {
 	public List<Reservation> getAllMyReservations(Long id) {
 		return reservationRepository.findAllByEmployeeId(id);
 	}
+
+	/**
+	 * Function that gets all {@link Reservation reservations} made by
+	 * the entered {@link Location}.
+	 *
+	 * @param id id of the wanted {@link Employee}.
+	 * @return a list of {@link Reservation reservations} made by
+	 * the selected {@link Employee}
+	 * @see Employee
+	 * @see Reservation
+	 * @see ReservationRepository
+	 */
+	public List<Reservation> getAllByLocation(Long id) {
+		List<Reservation> reservations = new ArrayList<>();
+
+		List<Room> rooms = roomService.findRoomsByLocationId(id);
+
+		rooms.forEach(room -> {
+			reservations.addAll(room.getReservations());
+		});
+
+		return reservations;
+	}
+
+
 }
