@@ -50,7 +50,7 @@ public class AuthenticationController {
 			);
 
 			return new ResponseEntity<>(
-					"User with email \"%s\" has been created successfully".formatted(user.getUsername()),
+					"User with username \"%s\" has been created successfully".formatted(user.getUsername()),
 					HttpStatus.CREATED
 			);
 		} catch (InvalidNameStartException | InvalidNameException e) {
@@ -73,7 +73,7 @@ public class AuthenticationController {
 
 		if (userService.findByUsername(registration.username).isPresent())
 			return new ResponseEntity<>(
-					"User with email %s already exists".formatted(registration.username),
+					"User with username %s already exists".formatted(registration.username),
 					HttpStatus.BAD_REQUEST
 			);
 
