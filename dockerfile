@@ -1,7 +1,7 @@
 FROM openjdk:17
 
 WORKDIR /app
-COPY ./mvn/ ./mvn
+COPY ./mvn ./mvn
 COPY mvnw pom.xml ./
 RUN chmod 776 mvnw
 RUN ./mvnw dependency:go-offline
