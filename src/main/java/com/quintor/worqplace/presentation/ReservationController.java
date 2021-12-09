@@ -5,6 +5,7 @@ import com.quintor.worqplace.application.exceptions.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -171,6 +174,14 @@ public class ReservationController {
 				.getRequest().getHeader("Authorization");
 
 		return new ResponseEntity<>(reservationService.getAllMyReservations(extractIdFromToken(jwt))
+				.stream().map(reservationMapper::toReservationDTO)
+				.collect(Collectors.toList()), HttpStatus.OK);
+	}
+
+	@RolesAllowed("ROLE_ADMIN")
+	@GetMapping("/location/{id}")
+	public ResponseEntity<?> getAllByLocation(@PathVariable long id) {
+		return new ResponseEntity<>(reservationService.getAllByLocation(id)
 				.stream().map(reservationMapper::toReservationDTO)
 				.collect(Collectors.toList()), HttpStatus.OK);
 	}
