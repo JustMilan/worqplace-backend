@@ -1,4 +1,4 @@
-version: "2.4"
+version: "3"
 services:
     backend:
         build:
@@ -9,7 +9,9 @@ services:
         networks:
             app_network:
                 ipv4_address: 172.1.0.3
-    
+        depends_on:
+            - db
+
     frontend:
         build:
             context: ../worqplace-frontend-development
@@ -20,7 +22,9 @@ services:
         networks:
             app_network:
                 ipv4_address: 172.1.0.4
-    
+        depends_on:
+            - backend
+
     db:
         image: mysql:latest
         ports:

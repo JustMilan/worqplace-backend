@@ -126,7 +126,7 @@ public class ReservationService {
 		Room room = reservation.getRoom();
 		reservation.setWorkplaceAmount(room.getCapacity());
 		room.addReservation(reservation);
-		return 	reservationRepository.save(reservation);
+		return reservationRepository.save(reservation);
 	}
 
 	/**
@@ -167,5 +167,18 @@ public class ReservationService {
 		return reservations;
 	}
 
-
+	/**
+	 * Function that deletes a single {@link Reservation reservation} made by
+	 * the entered {@link Employee}.
+	 *
+	 * @param id id of the wanted {@link Employee}.
+	 * @void does not return, only deletes an existing reservation {@link Reservation reservation} made by
+	 * the selected {@link Employee}
+	 * @see Employee
+	 * @see Reservation
+	 * @see ReservationRepository
+	 */
+	public void deleteReservation(Long id) {
+		reservationRepository.deleteById(id);
+	}
 }
