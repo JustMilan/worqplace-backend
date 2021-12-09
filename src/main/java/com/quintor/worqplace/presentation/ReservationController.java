@@ -7,9 +7,18 @@ import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Base64;
 import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Controller for {@link com.quintor.worqplace.domain.Reservation reservations}, contains
@@ -26,6 +35,27 @@ import java.util.stream.Collectors;
 public class ReservationController {
 	private final ReservationService reservationService;
 	private final ReservationMapper reservationMapper;
+
+	/**
+	 * Fucntion that takes the subject from the jw token.
+	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 *
+	 * @param token JW token with "Bearer " still in front of it.
+	 * @return Employee ID of that is embedded in the token.
+	 */
+	private static long extractIdFromToken(String token) {
+		//Strip the "Bearer "
+		String[] bearToken = token.split(" ")[1].split("\\.");
+
+		Base64.Decoder decoder = Base64.getDecoder();
+
+		//header would be:  new String(decoder.decode(jwChunks[0]));
+		String payload = new String(decoder.decode(bearToken[1]));
+
+		String employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
+
+		return Long.decode(employeeId);
+	}
 
 	/**
 	 * Function that calls to the {@link ReservationService} to get all
@@ -49,6 +79,7 @@ public class ReservationController {
 	 * it to a {@link com.quintor.worqplace.presentation.dto.reservation.ReservationDTO
 	 * ReservationDTO}.
 	 *
+	 * @param id Id of the reservation.
 	 * @return a ResponseEntity containing a {@link ReservationDTO}.
 	 * @see ReservationService
 	 * @see com.quintor.worqplace.domain.Reservation Reservation
@@ -79,9 +110,15 @@ public class ReservationController {
 	@PostMapping("/workplaces")
 	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO reservationDTO) {
 		try {
-			return new ResponseEntity<>(reservationMapper
-					.toReservationDTO(reservationService
-							.reserveWorkplaces(reservationDTO)), HttpStatus.CREATED);
+			String jwt = ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
+					.getRequest().getHeader("Authorization");
+
+			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
+
+			return new ResponseEntity<>(
+					reservationMapper.toReservationDTO(reservationService.reserveWorkplaces(reservationDTO)),
+					HttpStatus.CREATED
+			);
 		} catch (WorkplacesNotAvailableException | RoomNotAvailableException | InvalidStartAndEndTimeException |
 				InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
@@ -103,6 +140,11 @@ public class ReservationController {
 	@PostMapping("/rooms")
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
+			String jwt = ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
+					.getRequest().getHeader("Authorization");
+
+			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
+
 			return new ResponseEntity<>(reservationMapper
 					.toReservationDTO(reservationService.reserveRoom(reservationDTO)),
 					HttpStatus.CREATED);
@@ -123,9 +165,12 @@ public class ReservationController {
 	 * {@link com.quintor.worqplace.presentation.dto.reservation.ReservationDTO
 	 * ReservationDTOs}.
 	 */
-	@GetMapping("/{id}/all")
-	public ResponseEntity<?> getAllMyReservations(@PathVariable long id) {
-		return new ResponseEntity<>(reservationService.getAllMyReservations(id)
+	@GetMapping("/all")
+	public ResponseEntity<?> getAllMyReservations() {
+		String jwt = ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
+				.getRequest().getHeader("Authorization");
+
+		return new ResponseEntity<>(reservationService.getAllMyReservations(extractIdFromToken(jwt))
 				.stream().map(reservationMapper::toReservationDTO)
 				.collect(Collectors.toList()), HttpStatus.OK);
 	}

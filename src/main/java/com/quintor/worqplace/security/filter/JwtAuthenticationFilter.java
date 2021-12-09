@@ -91,7 +91,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				.setHeaderParam("type", "JWT")
 				.setIssuer("quintor-worqplace-api")
 				.setAudience("quintor-worqplace")
-				.setSubject(user.getUsername())
+				.setSubject(user.getEmployee().getId().toString())
 				.setExpiration(new Date(System.currentTimeMillis() + this.expirationInMs))
 				.claim("role", roles)
 				.compact();
