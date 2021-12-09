@@ -1,7 +1,9 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
+import com.quintor.worqplace.data.LocationRepository;
 import com.quintor.worqplace.data.ReservationRepository;
+import com.quintor.worqplace.data.RoomRepository;
 import com.quintor.worqplace.domain.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
