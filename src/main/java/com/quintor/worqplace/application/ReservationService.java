@@ -124,7 +124,7 @@ public class ReservationService {
 		Room room = reservation.getRoom();
 		reservation.setWorkplaceAmount(room.getCapacity());
 		room.addReservation(reservation);
-		return 	reservationRepository.save(reservation);
+		return reservationRepository.save(reservation);
 	}
 
 	/**
@@ -153,5 +153,7 @@ public class ReservationService {
 	 * @see Reservation
 	 * @see ReservationRepository
 	 */
-	public void deleteReservation(Long id) { reservationRepository.deleteById(id);}
+	public void deleteReservation(Long id) {
+		reservationRepository.deleteById(id);
+	}
 }

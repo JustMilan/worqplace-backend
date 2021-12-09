@@ -138,7 +138,7 @@ public class ReservationController {
 	 * {@link com.quintor.worqplace.domain.Reservation reservation}
 	 */
 	@PostMapping("/delete/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable long id){
+	public ResponseEntity<?> deleteById(@PathVariable long id) {
 		reservationService.deleteReservation(id);
 		return new ResponseEntity<>(id, HttpStatus.OK);
 	}
