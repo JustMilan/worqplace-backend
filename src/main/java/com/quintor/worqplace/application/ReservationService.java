@@ -145,13 +145,13 @@ public class ReservationService {
 	}
 
 	/**
-	 * Function that gets all {@link Reservation reservations} made by
+	 * Function that gets all {@link Reservation reservations} made for
 	 * the entered {@link Location}.
 	 *
 	 * @param id id of the wanted {@link Employee}.
-	 * @return a list of {@link Reservation reservations} made by
-	 * the selected {@link Employee}
-	 * @see Employee
+	 * @return a list of {@link Reservation reservations} made for
+	 * the selected {@link Location}
+	 * @see Location
 	 * @see Reservation
 	 * @see ReservationRepository
 	 */
