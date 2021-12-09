@@ -44,7 +44,7 @@ public class UserService implements UserDetailsService {
 		if (employee == null)
 			return null;
 
-		var user = new User(username, encodedPassword, employee);
+		var user = new User(employee.getId(), username, encodedPassword, employee);
 		return this.userRepository.save(user);
 	}
 

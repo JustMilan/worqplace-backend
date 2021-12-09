@@ -351,7 +351,7 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllMyReservations() should return 200 OK")
 	void getAllMyReservationsShouldReturn200() {
-		var result = getRequest("/reservations/1/all");
+		var result = getRequest("/reservations/all");
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
@@ -362,7 +362,7 @@ class ReservationControllerIntegrationTest {
 		reservationRepository.save(reservation);
 		reservationRepository.save(reservation1);
 
-		var result = getRequest("/reservations/1/all");
+		var result = getRequest("/reservations/all");
 
 		assertTrue(result.getBody().contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},", reservation.getDate())) &&
 				result.getBody().contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}]", reservation1.getDate())));
@@ -374,7 +374,7 @@ class ReservationControllerIntegrationTest {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
 
-		var result = getRequest("/reservations/1/all");
+		var result = getRequest("/reservations/all");
 
 		assertEquals(Collections.emptyList().toString(), result.getBody());
 	}

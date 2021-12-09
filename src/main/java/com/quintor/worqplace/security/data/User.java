@@ -1,7 +1,6 @@
 package com.quintor.worqplace.security.data;
 
 import com.quintor.worqplace.domain.Employee;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,11 +26,10 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User implements UserDetails {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+//	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
 	@Column(nullable = false, unique = true)
@@ -50,7 +48,8 @@ public class User implements UserDetails {
 	 * @param password Password
 	 * @param employee {@link Employee}
 	 */
-	public User(String username, String password, Employee employee) {
+	public User(Long id, String username, String password, Employee employee) {
+		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.employee = employee;
@@ -64,7 +63,8 @@ public class User implements UserDetails {
 	 * @param role     Role {@link UserRoles}
 	 * @param employee {@link Employee}
 	 */
-	public User(String username, String password, UserRoles role, Employee employee) {
+	public User(Long id, String username, String password, UserRoles role, Employee employee) {
+		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.employee = employee;
