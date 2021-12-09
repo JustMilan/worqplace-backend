@@ -129,4 +129,17 @@ public class ReservationController {
 				.stream().map(reservationMapper::toReservationDTO)
 				.collect(Collectors.toList()), HttpStatus.OK);
 	}
+
+	/**
+	 * Function that deletes a singular reservation by calling to the {@link ReservationService} to delete
+	 * {@link com.quintor.worqplace.domain.Reservation reservation} by id
+	 *
+	 * @return a ResponseEntity containing the id of the deleted
+	 * {@link com.quintor.worqplace.domain.Reservation reservation}
+	 */
+	@PostMapping("/delete/{id}")
+	public ResponseEntity<?> deleteById(@PathVariable long id) {
+		reservationService.deleteReservation(id);
+		return new ResponseEntity<>(id, HttpStatus.OK);
+	}
 }
