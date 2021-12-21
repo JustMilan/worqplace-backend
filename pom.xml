@@ -16,7 +16,11 @@
 	<properties>
 		<java.version>17</java.version>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-		<sonar.exclusions>**/WorqplaceApplication.java</sonar.exclusions>
+		<sonar.exclusions>
+			**/WorqplaceApplication.java,
+			**/MavenWrapperDownloader.java,
+			**/security/**
+		</sonar.exclusions>
 	</properties>
 
 	<!--Spring Boot-->
@@ -166,7 +170,11 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>**/CustomerApplication.**</exclude>
+								<exclude>**/security/**</exclude>
+								<exclude>**/*Mapper.*</exclude>
+								<exclude>**/*Impl.*</exclude>
+								<exclude>**/WorqplaceApplication.*</exclude>
+								<exclude>**/MavenWrapperDownloader.*</exclude>
 							</excludes>
 						</configuration>
 					</execution>
@@ -177,8 +185,11 @@
 						</goals>
 						<configuration>
 							<excludes>
-								<exclude>**/WorqplaceApplication.**</exclude>
 								<exclude>**/security/**</exclude>
+								<exclude>**/*Mapper.*</exclude>
+								<exclude>**/*Impl.*</exclude>
+								<exclude>**/WorqplaceApplication.**</exclude>
+								<exclude>**/MavenWrapperDownloader.*</exclude>
 							</excludes>
 							<rules>
 								<rule>

@@ -79,8 +79,9 @@ public class ReservationService {
 	 * @see Room
 	 */
 	public Reservation reserveWorkplaces(ReservationDTO reservationDTO) {
-		Reservation reservation = this.toReservation(reservationDTO);
-		Room room = reservation.getRoom();
+		var reservation = this.toReservation(reservationDTO);
+		var room = reservation.getRoom();
+
 		room.addReservation(reservation);
 		reservationRepository.save(reservation);
 		return reservation;
@@ -97,9 +98,9 @@ public class ReservationService {
 	 * @see Room
 	 */
 	public Reservation toReservation(ReservationDTO reservationDTO) {
-		Employee employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-		Room room = roomService.getRoomById(reservationDTO.getRoomId());
-		int workplaceAmount = Math.max(reservationDTO.getWorkplaceAmount(), 1);
+		var employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
+		var room = roomService.getRoomById(reservationDTO.getRoomId());
+		var workplaceAmount = Math.max(reservationDTO.getWorkplaceAmount(), 1);
 
 		return new Reservation(reservationDTO.getDate(),
 				reservationDTO.getStartTime(), reservationDTO.getEndTime(),
@@ -122,8 +123,9 @@ public class ReservationService {
 	 * @see RoomNotAvailableException
 	 */
 	public Reservation reserveRoom(ReservationDTO reservationDTO) {
-		Reservation reservation = this.toReservation(reservationDTO);
-		Room room = reservation.getRoom();
+		var reservation = this.toReservation(reservationDTO);
+		var room = reservation.getRoom();
+
 		reservation.setWorkplaceAmount(room.getCapacity());
 		room.addReservation(reservation);
 		return reservationRepository.save(reservation);
@@ -156,13 +158,10 @@ public class ReservationService {
 	 * @see ReservationRepository
 	 */
 	public List<Reservation> getAllByLocation(Long id) {
-		List<Reservation> reservations = new ArrayList<>();
+		var reservations = new ArrayList<Reservation>();
+		var rooms = roomService.findRoomsByLocationId(id);
 
-		List<Room> rooms = roomService.findRoomsByLocationId(id);
-
-		rooms.forEach(room -> {
-			reservations.addAll(room.getReservations());
-		});
+		rooms.forEach(room -> reservations.addAll(room.getReservations()));
 
 		return reservations;
 	}

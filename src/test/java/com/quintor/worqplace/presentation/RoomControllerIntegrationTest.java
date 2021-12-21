@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ActiveProfiles("ci")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Import(CiTestConfiguration.class)
-public class RoomControllerIntegrationTest {
+class RoomControllerIntegrationTest {
 
 	@LocalServerPort
 	private int port;

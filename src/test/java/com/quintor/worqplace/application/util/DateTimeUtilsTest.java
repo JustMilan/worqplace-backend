@@ -97,5 +97,10 @@ class DateTimeUtilsTest {
 		LocalDate month = LocalDate.now().plusMonths(1);
 		assertFalse(DateTimeUtils.timeslotsOverlap(this.today, this.nine,
 				this.twelve, this.monthlyRecurrence, month, this.one, this.four));
+
+		assertTrue(DateTimeUtils.timeslotsOverlap(LocalDate.now().plusDays(1),
+				LocalTime.of(11, 11), LocalTime.of(12, 12),
+				new Recurrence(true, RecurrencePattern.DAILY),
+				LocalDate.now().plusDays(0), LocalTime.of(11, 11), LocalTime.of(12, 12)));
 	}
 }

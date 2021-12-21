@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * Class containing {@link Employee} data like first name
@@ -21,7 +22,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "employee")
-public class Employee {
+public class Employee implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

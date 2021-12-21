@@ -43,9 +43,11 @@ public class SimpleCORSFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) {
+		// Can stay empty
 	}
 
 	@Override
 	public void destroy() {
+		// Can stay empty
 	}
 }

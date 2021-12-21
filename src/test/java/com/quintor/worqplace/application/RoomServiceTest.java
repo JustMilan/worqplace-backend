@@ -2,6 +2,7 @@ package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
+import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
 import com.quintor.worqplace.data.EmployeeRepository;
 import com.quintor.worqplace.data.LocationRepository;
@@ -29,7 +30,6 @@ class RoomServiceTest {
 	private LocationRepository locationRepository;
 
 	private RoomService roomService;
-	private ReservationService reservationService;
 
 	private Room room;
 	private Location location;
@@ -45,7 +45,6 @@ class RoomServiceTest {
 		LocationService locationService = new LocationService(locationRepository);
 		EmployeeService employeeService = new EmployeeService(employeeRepository);
 		this.roomService = new RoomService(roomRepository, locationService);
-		this.reservationService = new ReservationService(employeeService, roomService, reservationRepository);
 
 		this.room = new Room(1L, 1, null, 15, Collections.emptyList());
 		Address address = new Address(1L, 12, "", "QuintorStreet", "1454LJ", "QuintorCity");
@@ -77,19 +76,36 @@ class RoomServiceTest {
 	@Test
 	@DisplayName("getAvailableRoomsForDateAndTime() should throw InvalidStartAndEndTimeException if times are invalid")
 	void getAvailableRoomsForDateAndTimeShouldThrowIfTimesAreInvalid() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.getRoomsAvailableAtDateTime(location.getId(), LocalDate.now().plusDays(4), LocalTime.of(5, 9), LocalTime.of(5, 8)));
+		var locationId = location.getId();
+		var reservationDate = LocalDate.now().plusDays(4);
+		var startTime = LocalTime.of(5, 9);
+		var endTime = LocalTime.of(5, 8);
+
+		assertThrows(InvalidStartAndEndTimeException.class,
+				() -> roomService.getRoomsAvailableAtDateTime(locationId, reservationDate, startTime, endTime));
 	}
 
 	@Test
 	@DisplayName("getAvailableRoomsForDateAndTime() should throw if date is invalid")
 	void getAvailableRoomsForDateAndTimeShouldThrowIfDateIsInvalid() {
-		assertThrows(InvalidDayException.class, () -> roomService.getRoomsAvailableAtDateTime(location.getId(), LocalDate.now().minusDays(4), LocalTime.of(5, 9), LocalTime.of(5, 10)));
+		var locationId = location.getId();
+		var reservationDate = LocalDate.now().minusDays(4);
+		var startTime = LocalTime.of(5, 9);
+		var endTime = LocalTime.of(5, 10);
+
+		assertThrows(InvalidDayException.class,
+				() -> roomService.getRoomsAvailableAtDateTime(locationId, reservationDate, startTime, endTime));
 	}
 
 	@Test
 	@DisplayName("isRoomAvailable() should throw InvalidStartAndEndTimeException if time is invalid")
 	void isRoomAvailableShouldThrowIfTimeIsInvalid() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> roomService.isRoomAvailable(room, LocalDate.now().plusDays(3), LocalTime.of(18, 1), LocalTime.of(16, 1)));
+		var reservationDate = LocalDate.now().plusDays(3);
+		var startTime = LocalTime.of(18, 1);
+		var endTime = LocalTime.of(16, 1);
+
+		assertThrows(InvalidStartAndEndTimeException.class,
+				() -> roomService.isRoomAvailable(room, reservationDate, startTime, endTime));
 	}
 
 	@Test
@@ -101,7 +117,13 @@ class RoomServiceTest {
 	@Test
 	@DisplayName("getRoomsWithWorkplacesAvailableAtDateTime() should throw InvalidDayException if time is invalid")
 	void getRoomsWithWorkplacesAvailableAtDateTimeShouldThrowOnInvalidTime() {
-		assertThrows(InvalidDayException.class, () -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L, LocalDate.now().minusDays(1), LocalTime.now(), LocalTime.now()));
+		var locationId = 1L;
+		var reservationDate = LocalDate.now().minusDays(1);
+		var reservationTime = LocalTime.now();
+
+
+		assertThrows(InvalidDayException.class,
+				() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(locationId, reservationDate, reservationTime, reservationTime));
 	}
 
 	@Test
@@ -109,6 +131,15 @@ class RoomServiceTest {
 	void getRoomsWithWorkplacesAvailableAtDateTimeShouldExecute() {
 		assertDoesNotThrow(() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L,
 				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON));
+	}
+
+	@Test
+	@DisplayName("Placeholder for roomNotFoundEceptions")
+	void roomNotFoundException() {
+		//TODO: create real test
+		assertThrows(RoomNotAvailableException.class, () -> {
+			throw new RoomNotAvailableException();
+		});
 	}
 
 	/**

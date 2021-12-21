@@ -44,11 +44,13 @@ class ReservationTest {
 
 	@Test
 	void ShouldThrowWhenDateIsBeforeToday() {
-		assertThrows(InvalidDayException.class, () -> new Reservation(LocalDate.now().minusDays(1), startTime, endTime, employee, null, 15, null));
+		var yesterday = LocalDate.now().minusDays(1);
+		assertThrows(InvalidDayException.class, () -> new Reservation(yesterday, startTime, endTime, employee, null, 15, null));
 	}
 
 	@Test
 	void shouldThrowIfEndTimeIsBeforeStartTime() {
-		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(date, startTime, startTime.minusMinutes(1), employee, null, 15, null));
+		var endTime = this.startTime.minusMinutes(1);
+		assertThrows(InvalidStartAndEndTimeException.class, () -> new Reservation(date, startTime, endTime, employee, null, 15, null));
 	}
 }

@@ -37,16 +37,16 @@ public class AuthenticationController {
 	 * @return {@link ResponseEntity} with info about how the request has been handled.
 	 */
 	@PostMapping
-	public ResponseEntity<?> register(@RequestBody Registration registration) {
+	public ResponseEntity<String> register(@RequestBody Registration registration) {
 		try {
 			if (validateRegistration(registration) != null)
 				return validateRegistration(registration);
 
 			var user = this.userService.register(
-					registration.username,
-					registration.password,
-					registration.firstname,
-					registration.lastname
+					registration.username(),
+					registration.password(),
+					registration.firstname(),
+					registration.lastname()
 			);
 
 			return new ResponseEntity<>(
@@ -64,16 +64,16 @@ public class AuthenticationController {
 	 * @param registration {@link Registration} DTO.
 	 * @return {@link ResponseEntity} if an invalid entry has been given, returns null if everything is correct.
 	 */
-	private ResponseEntity<?> validateRegistration(Registration registration) {
-		if (registration.password.length() < 5)
+	private ResponseEntity<String> validateRegistration(Registration registration) {
+		if (registration.password().length() < 5)
 			return new ResponseEntity<>(
 					"InvalidPassword length %s, minimum is 5".formatted(5),
 					HttpStatus.BAD_REQUEST
 			);
 
-		if (userService.findByUsername(registration.username).isPresent())
+		if (userService.findByUsername(registration.username()).isPresent())
 			return new ResponseEntity<>(
-					"User with username %s already exists".formatted(registration.username),
+					"User with username %s already exists".formatted(registration.username()),
 					HttpStatus.BAD_REQUEST
 			);
 

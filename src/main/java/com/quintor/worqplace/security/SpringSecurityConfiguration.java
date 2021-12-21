@@ -34,8 +34,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
-	public final static String LOGIN_PATH = "/login";
-	public final static String REGISTER_PATH = "/register";
+	@Value("${uri.login-path}")
+	public String loginPath;
+	@Value("${uri.register-path}")
+	public String registerPath;
 
 	@Value("${security.jwt.secret}")
 	private String jwtSecret;
@@ -55,13 +57,13 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.csrf().disable()
 				.authorizeRequests()
 				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.antMatchers(HttpMethod.POST, REGISTER_PATH).permitAll()
-				.antMatchers(HttpMethod.POST, LOGIN_PATH).permitAll()
+				.antMatchers(HttpMethod.POST, registerPath).permitAll()
+				.antMatchers(HttpMethod.POST, loginPath).permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(
 						new JwtAuthenticationFilter(
-								LOGIN_PATH,
+								loginPath,
 								this.jwtSecret,
 								this.jwtExpirationInMs,
 								this.authenticationManager()

@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/rooms")
 @AllArgsConstructor
+// methods with a catch clause need generic wildcard return type as it can be the DTO or en error message e.g.
+@SuppressWarnings("java:S1452")
 public class RoomController {
 	private final RoomService roomService;
 	private final RoomMapper roomMapper;
@@ -55,7 +60,7 @@ public class RoomController {
 					.getRoomsAvailableAtDateTime(locationId, date, startTime, endTime)
 					.stream().map(room -> roomMapper.toRoomDTO(room, room.getCapacity()
 							- room.countReservedWorkspaces(date, startTime, endTime)))
-					.collect(Collectors.toList()), HttpStatus.OK);
+					.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -89,7 +94,7 @@ public class RoomController {
 					.stream().map(room -> roomMapper.toRoomDTO(room,
 							room.getCapacity() - room
 									.countReservedWorkspaces(date, startTime, endTime)))
-					.collect(Collectors.toList()), HttpStatus.OK);
+					.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}

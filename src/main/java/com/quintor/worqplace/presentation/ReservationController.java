@@ -5,7 +5,6 @@ import com.quintor.worqplace.application.exceptions.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -35,30 +34,11 @@ import static java.util.Objects.requireNonNull;
 @RestController
 @RequestMapping("/reservations")
 @AllArgsConstructor
+// methods with a catch clause need generic wildcard return type as it can be the DTO or en error message e.g.
+@SuppressWarnings("java:S1452")
 public class ReservationController {
 	private final ReservationService reservationService;
 	private final ReservationMapper reservationMapper;
-
-	/**
-	 * Fucntion that takes the subject from the jw token.
-	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
-	 *
-	 * @param token JW token with "Bearer " still in front of it.
-	 * @return Employee ID of that is embedded in the token.
-	 */
-	private static long extractIdFromToken(String token) {
-		//Strip the "Bearer "
-		String[] bearToken = token.split(" ")[1].split("\\.");
-
-		Base64.Decoder decoder = Base64.getDecoder();
-
-		//header would be:  new String(decoder.decode(jwChunks[0]));
-		String payload = new String(decoder.decode(bearToken[1]));
-
-		String employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
-
-		return Long.decode(employeeId);
-	}
 
 	/**
 	 * Function that calls to the {@link ReservationService} to get all
@@ -71,9 +51,9 @@ public class ReservationController {
 	 * {@link com.quintor.worqplace.presentation.dto.reservation.ReservationDTO ReservationDTOs}.
 	 */
 	@GetMapping
-	public ResponseEntity<?> getAllReservations() {
+	public ResponseEntity<List<ReservationDTO>> getAllReservations() {
 		return new ResponseEntity<>(reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toList()), HttpStatus.OK);
+				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
 	}
 
 	/**
@@ -113,8 +93,7 @@ public class ReservationController {
 	@PostMapping("/workplaces")
 	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO reservationDTO) {
 		try {
-			String jwt = ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
-					.getRequest().getHeader("Authorization");
+			String jwt = getAuthorization();
 
 			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
 
@@ -143,8 +122,7 @@ public class ReservationController {
 	@PostMapping("/rooms")
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
-			String jwt = ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
-					.getRequest().getHeader("Authorization");
+			String jwt = getAuthorization();
 
 			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
 
@@ -169,21 +147,19 @@ public class ReservationController {
 	 * ReservationDTOs}.
 	 */
 	@GetMapping("/all")
-	public ResponseEntity<?> getAllMyReservations() {
-		String jwt = ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
-				.getRequest().getHeader("Authorization");
-
+	public ResponseEntity<List<ReservationDTO>> getAllMyReservations() {
+		String jwt = getAuthorization();
 		return new ResponseEntity<>(reservationService.getAllMyReservations(extractIdFromToken(jwt))
-				.stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toList()), HttpStatus.OK);
+				.stream().map(reservationMapper::toReservationDTO).collect(Collectors.toUnmodifiableList()),
+				HttpStatus.OK);
 	}
 
 	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/location/{id}")
-	public ResponseEntity<?> getAllByLocation(@PathVariable long id) {
+	public ResponseEntity<List<ReservationDTO>> getAllByLocation(@PathVariable long id) {
 		return new ResponseEntity<>(reservationService.getAllByLocation(id)
 				.stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toList()), HttpStatus.OK);
+				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
 	}
 
 	/**
@@ -194,8 +170,34 @@ public class ReservationController {
 	 * {@link com.quintor.worqplace.domain.Reservation reservation}
 	 */
 	@PostMapping("/delete/{id}")
-	public ResponseEntity<?> deleteById(@PathVariable long id) {
+	public ResponseEntity<Long> deleteById(@PathVariable long id) {
 		reservationService.deleteReservation(id);
 		return new ResponseEntity<>(id, HttpStatus.OK);
+	}
+
+	/**
+	 * Fucntion that takes the subject from the jw token.
+	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 *
+	 * @param token JW token with "Bearer " still in front of it.
+	 * @return Employee ID of that is embedded in the token.
+	 */
+	private static long extractIdFromToken(String token) {
+		//Strip the "Bearer "
+		var bearToken = token.split(" ")[1].split("\\.");
+
+		var decoder = Base64.getDecoder();
+
+		//header would be: jwChunks[0]
+		var payload = new String(decoder.decode(bearToken[1]));
+
+		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
+
+		return Long.decode(employeeId);
+	}
+
+	private String getAuthorization() {
+		return ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
+				.getRequest().getHeader("Authorization");
 	}
 }

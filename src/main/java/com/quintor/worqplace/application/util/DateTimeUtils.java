@@ -20,6 +20,9 @@ import java.util.Locale;
  */
 public class DateTimeUtils {
 
+	private DateTimeUtils() {
+	}
+
 	/**
 	 * Function that checks if the entered date and times uphold the required standard. If the
 	 * start time is after the end time or if the date is before today, an exception is thrown.
@@ -34,7 +37,7 @@ public class DateTimeUtils {
 	 */
 	public static void checkReservationDateTime(LocalDate date,
 												LocalTime startTime,
-	                                            LocalTime endTime) {
+												LocalTime endTime) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -60,31 +63,44 @@ public class DateTimeUtils {
 	 * @return a boolean indicating whether the existing and the new timeslot overlap.
 	 */
 	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
-	                                       LocalTime existingEndTime, Recurrence recurrence,
-	                                       LocalDate newDate, LocalTime newStartTime,
-	                                       LocalTime newEndTime) {
-		if (!existingDate.equals(newDate) && !recurrence.isActive()) return false;
-		if (recurrence.isActive()) {
-			switch (recurrence.getRecurrencePattern()) {
-				case WEEKLY -> {
-					if (!existingDate.getDayOfWeek()
-							.equals(newDate.getDayOfWeek())) return false;
-				}
-				case BIWEEKLY -> {
-					WeekFields weekFields = WeekFields.of(Locale.getDefault());
-					int oldWeekNumber = existingDate
-							.get(weekFields.weekOfWeekBasedYear());
-					int newWeekNumber = newDate
-							.get(weekFields.weekOfWeekBasedYear());
-					if ((newWeekNumber - oldWeekNumber) % 2 > 0 ||
-							!existingDate.getDayOfWeek().equals(newDate.getDayOfWeek()))
-						return false;
-				}
-				case MONTHLY -> {
-					if (existingDate.getDayOfMonth() != newDate.getDayOfMonth()) return false;
-				}
-			}
+										   LocalTime existingEndTime, Recurrence recurrence,
+										   LocalDate newDate, LocalTime newStartTime,
+										   LocalTime newEndTime) {
+		var weekFields = WeekFields.of(Locale.getDefault());
+		int oldWeekNumber = existingDate.get(weekFields.weekOfWeekBasedYear());
+		int newWeekNumber = newDate.get(weekFields.weekOfWeekBasedYear());
+
+		if (! existingDate.equals(newDate) && ! recurrence.isActive()) return false;
+
+		if (recurrence.isActive()) switch (recurrence.getRecurrencePattern()) {
+			case WEEKLY:
+				if (checkSameDate(existingDate, newDate))
+					return false;
+				break;
+			case BIWEEKLY:
+				if (checkIfBiWeekly(oldWeekNumber, newWeekNumber) ||
+						checkSameDate(existingDate, newDate))
+					return false;
+				break;
+			case MONTHLY:
+				if (existingDate.getDayOfMonth() != newDate.getDayOfMonth())
+					return false;
+				break;
+			default:
+				break;
 		}
-		return !newStartTime.isAfter(existingEndTime) && !newEndTime.isBefore(existingStartTime);
+		return checkStartAndEntimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
+	}
+
+	private static boolean checkStartAndEntimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime, LocalTime newStartTime, LocalTime newEndTime) {
+		return ! newStartTime.isAfter(existingEndTime) && ! newEndTime.isBefore(existingStartTime);
+	}
+
+	private static boolean checkIfBiWeekly(int oldWeekNumber, int newWeekNumber) {
+		return (newWeekNumber - oldWeekNumber) % 2 > 0;
+	}
+
+	private static boolean checkSameDate(LocalDate existingDate, LocalDate newDate) {
+		return ! existingDate.getDayOfWeek().equals(newDate.getDayOfWeek());
 	}
 }

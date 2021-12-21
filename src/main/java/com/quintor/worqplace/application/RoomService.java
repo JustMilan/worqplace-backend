@@ -73,12 +73,12 @@ public class RoomService {
 	public List<Room> getRoomsAvailableAtDateTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 
-		List<Room> rooms = findRoomsByLocationId(locationId);
+		var rooms = findRoomsByLocationId(locationId);
 
 		return rooms
 				.stream()
 				.filter(room -> isRoomAvailable(room, date, startTime, endTime))
-				.collect(Collectors.toList());
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	/**
@@ -99,9 +99,9 @@ public class RoomService {
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> allRooms = findRoomsByLocationId(locationId);
 
-		return allRooms.stream().filter(room ->
-				room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
-				.collect(Collectors.toList());
+		return allRooms.stream()
+				.filter(room -> room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
+				.collect(Collectors.toUnmodifiableList());
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class RoomService {
 	 * @see LocationService
 	 */
 	public List<Room> findRoomsByLocationId(Long locationId) {
-		Location location = locationService.getLocationById(locationId);
+		var location = locationService.getLocationById(locationId);
 		return new ArrayList<>(location.getRooms());
 	}
 }
