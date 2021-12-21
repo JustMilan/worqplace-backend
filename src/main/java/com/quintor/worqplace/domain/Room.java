@@ -62,16 +62,17 @@ public class Room {
 
 	/**
 	 * Function that checks if the requested amount of workplaces is available.
+	 *
 	 * @param reservation Reservation for which to check the availability.
 	 * @return a boolean indicating the availability.
 	 */
 	public boolean isWorkplaceRecurrentlyAvailable(Reservation reservation) {
 		if (reservation.getRecurrence().isActive()) {
-			int total = 0;
+			var total = 0;
 			for (Reservation existingReservation : this.getReservations()) {
 				for (Reservation reservation1 : this.getReservationsThatOverlap(
 						existingReservation.getDate(), existingReservation.getStartTime(),
-								existingReservation.getEndTime())) {
+						existingReservation.getEndTime())) {
 					total += DateTimeUtils.timeslotsOverlap(reservation.getDate(),
 							reservation.getStartTime(), reservation.getEndTime(),
 							reservation.getRecurrence(), reservation1.getDate(),
@@ -98,19 +99,21 @@ public class Room {
 				reservation.getStartTime(), reservation.getEndTime());
 		if (wanted <= available) {
 			if (isWorkplaceRecurrentlyAvailable(reservation)) {
-				ArrayList<Reservation> reservations = new ArrayList<>(this.reservations);
-				reservations.add(reservation);
-				this.setReservations(reservations);
+				var reservationsClone = new ArrayList<>(this.reservations);
+				reservationsClone.add(reservation);
+				this.setReservations(reservationsClone);
 			} else throw new RoomNotAvailableException();
 		} else throw new WorkplacesNotAvailableException(wanted, available);
 	}
 
 	public List<Reservation> getReservationsThatOverlap(LocalDate date,
-	                                                    LocalTime startTime, LocalTime endTime) {
-		return this.reservations.stream().filter(reservation ->
-				DateTimeUtils.timeslotsOverlap(reservation.getDate(),
-						reservation.getStartTime(),reservation.getEndTime(),
-						reservation.getRecurrence(),date,
-						startTime, endTime)).collect(Collectors.toList());
+														LocalTime startTime, LocalTime endTime) {
+		return this.reservations.stream()
+				.filter(reservation ->
+						DateTimeUtils.timeslotsOverlap(reservation.getDate(),
+								reservation.getStartTime(), reservation.getEndTime(),
+								reservation.getRecurrence(), date,
+								startTime, endTime))
+				.collect(Collectors.toUnmodifiableList());
 	}
 }

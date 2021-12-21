@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Tries to authenticate a user, based on the incoming request.
@@ -68,7 +67,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				.readValue(request.getInputStream(), Login.class);
 
 		return authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(login.username, login.password)
+				new UsernamePasswordAuthenticationToken(login.username(), login.password())
 		);
 	}
 
@@ -82,7 +81,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				.getAuthorities()
 				.stream()
 				.map(GrantedAuthority::getAuthority)
-				.collect(Collectors.toList());
+				.toList();
 
 		byte[] signingKey = this.secret.getBytes();
 

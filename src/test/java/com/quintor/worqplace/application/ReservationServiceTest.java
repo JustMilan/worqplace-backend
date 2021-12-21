@@ -30,13 +30,16 @@ class ReservationServiceTest {
 	private ReservationRepository reservationRepository;
 
 	private Room room;
+	private Room room1;
 	private Employee employee;
 	private Location location;
+	private Location location1;
 	private Recurrence noRecurrence;
 	private Reservation reservation;
 	private Reservation reservation1;
 	private Reservation reservation2;
 	private Reservation reservation3;
+	private Reservation reservation4;
 
 	@BeforeEach
 	void initialize() {
@@ -52,16 +55,22 @@ class ReservationServiceTest {
 
 		this.employee = new Employee(1L, "QFirstname", "QLastname");
 		Address address = new Address(12, "", "TestStreet", "2098GS", "QuintorCity");
+		Address address1 = new Address(13, "", "TestStreeto", "2038GS", "QuintorCita");
 
 		this.room = new Room(1L, 1, null, 15, Collections.emptyList());
+		this.room1 = new Room(2L, 1, null, 15, Collections.emptyList());
 		this.location = new Location(1L, "QuintorTest", address, List.of(room));
+		this.location1 = new Location(2L, "Quintor2", address1, List.of(room1));
 		this.noRecurrence = new Recurrence(false, RecurrencePattern.NONE);
 		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(15, 0), employee, null, 15, noRecurrence);
 		this.reservation1 = new Reservation(2L, LocalDate.now().plusDays(4), LocalTime.of(12, 0), LocalTime.of(13, 0), employee, room, 15, noRecurrence);
 		this.reservation2 = new Reservation(3L, LocalDate.now().plusMonths(3), LocalTime.of(9, 36), LocalTime.of(13, 10), employee, room, 15, noRecurrence);
 		this.reservation3 = new Reservation(4L, LocalDate.now().plusDays(1), LocalTime.of(18, 0), LocalTime.of(19, 0), employee, room, 15, noRecurrence);
+		this.reservation4 = new Reservation(5L, LocalDate.now().plusDays(1), LocalTime.of(18, 0), LocalTime.of(19, 0), employee, room1, 15, noRecurrence);
 		this.room.setLocation(location);
-		room.setReservations(List.of(reservation1));
+		this.room1.setLocation(location1);
+		this.room.setReservations(List.of(reservation1));
+		this.room1.setReservations(List.of(reservation2, reservation3));
 
 		setRepositoryBehaviour();
 	}
@@ -208,6 +217,20 @@ class ReservationServiceTest {
 		assertEquals(3, reservationService.getAllMyReservations(this.employee.getId()).size());
 	}
 
+	@Test
+	@DisplayName("getAllByLocation should return all reservations for a location")
+	void getAllByLocation() {
+		assertEquals(2, reservationService.getAllByLocation(location1.getId()).size());
+	}
+
+	@Test
+	@DisplayName("deleteReservation should delete reservation")
+	void deleteReservation() {
+		var reservationId = reservation4.getId();
+		reservationService.deleteReservation(reservationId);
+		assertThrows(ReservationNotFoundException.class,
+				() -> reservationService.getReservationById(reservationId));
+	}
 
 	/**
 	 * Sets mock behaviour for repositories used in this test file
@@ -220,14 +243,17 @@ class ReservationServiceTest {
 		when(reservationRepository.findById(reservation.getId())).thenReturn(java.util.Optional.ofNullable(reservation));
 		when(reservationRepository.findAllByEmployeeId(employee.getId()))
 				.thenReturn(List.of(reservation, reservation1, reservation2));
+		when(reservationRepository.findById(reservation4.getId())).thenReturn(Optional.empty());
 
 //		Employee repository
 		when(employeeRepository.findById(1L)).thenReturn(Optional.ofNullable(employee));
 
 //		Room repository
 		when(roomRepository.findById(room.getId())).thenReturn(Optional.ofNullable(room));
+		when(roomRepository.findById(room1.getId())).thenReturn(Optional.ofNullable(room1));
 
 //		Location repository
 		when(locationRepository.findById(location.getId())).thenReturn(Optional.ofNullable(location));
+		when(locationRepository.findById(location1.getId())).thenReturn(Optional.ofNullable(location1));
 	}
 }

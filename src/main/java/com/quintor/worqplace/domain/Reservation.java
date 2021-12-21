@@ -61,6 +61,7 @@ public class Reservation {
 	 * @param recurrence handles the {@link Recurrence recurrence} of the reservation.
 	 * @implNote is used by Spring for retrieving reservations.
 	 */
+	@SuppressWarnings("squid:S00107") // Suppresses the too many parameters warning as the id is used for testing.
 	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime,
 					   Employee employee, Room room, int amount, Recurrence recurrence) {
 		this(date, startTime, endTime, employee, room, amount, recurrence);

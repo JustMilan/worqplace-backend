@@ -70,7 +70,6 @@ public class Address {
 			if (! Character.isDigit(c))
 				throw new InvalidHouseNumberException();
 
-
 		this.houseNumber = number;
 	}
 
@@ -105,7 +104,7 @@ public class Address {
 	public void setStreet(String street) {
 		char[] streetChars = street.toCharArray();
 		int listSize = streetChars.length;
-		for (int i = 0; i < streetChars.length; i++) {
+		for (var i = 0; i < streetChars.length; i++) {
 			char c = streetChars[i];
 			if (i == listSize - 1 && ! Character.isLetterOrDigit(c))
 				throw new InvalidStreetException("Streetname must end with a letter or a number");
@@ -135,7 +134,7 @@ public class Address {
 		if (postalCodeChars.length > 6)
 			throw new InvalidPostalCodeException("Invalid postalcode length");
 
-		for (int i = 0; i < postalCodeChars.length; i++) {
+		for (var i = 0; i < postalCodeChars.length; i++) {
 			char c = postalCodeChars[i];
 			if (i < 4) {
 				if (! Character.isDigit(c))
