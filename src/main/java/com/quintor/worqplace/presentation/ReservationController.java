@@ -169,14 +169,25 @@ public class ReservationController {
 	 * @return a ResponseEntity containing the id of the deleted
 	 * {@link com.quintor.worqplace.domain.Reservation reservation}
 	 */
-	@PostMapping("/delete/{id}")
-	public ResponseEntity<Long> deleteById(@PathVariable long id) {
-		reservationService.deleteReservation(id);
-		return new ResponseEntity<>(id, HttpStatus.OK);
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> deleteById(@PathVariable long id) {
+		try {
+			String jwt = getAuthorization();
+			long employeeId = extractIdFromToken(jwt);
+
+			if (!reservationService.reservationFromEmployee(id, employeeId)) {
+				return new ResponseEntity<>("Reservation was not made by this employee", HttpStatus.FORBIDDEN);
+			}
+
+			reservationService.deleteReservation(id);
+			return new ResponseEntity<>(id, HttpStatus.OK);
+		} catch (ReservationNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
 	}
 
 	/**
-	 * Fucntion that takes the subject from the jw token.
+	 * Function that takes the subject from the jwt token.
 	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
 	 *
 	 * @param token JW token with "Bearer " still in front of it.

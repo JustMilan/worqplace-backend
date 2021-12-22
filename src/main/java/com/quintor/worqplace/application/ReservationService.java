@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Service class that handles communication between the
@@ -67,7 +68,7 @@ public class ReservationService {
 
 	/**
 	 * Function that reserves workplaces by calculating the reserved workplaces
-	 * and seeing if the {@link Room room's} capacaty allows for more
+	 * and seeing if the {@link Room room's} capacity allows for more
 	 * {@link Reservation reservations}.
 	 *
 	 * @param reservationDTO the input reservation.
@@ -179,5 +180,24 @@ public class ReservationService {
 	 */
 	public void deleteReservation(Long id) {
 		reservationRepository.deleteById(id);
+	}
+
+	/**
+	 * Function that checks if a {@link Reservation} is
+	 * made by the entered {@link Employee}.
+	 *
+	 * @param reservationId id of the wanted {@link Reservation}.
+	 * @param employeeId id of the wanted {@link Employee}.
+	 * @return a {@link Boolean} which is <code>true</code> if the {@link Reservation}
+	 * is made by the specified {@link Employee}
+	 * If not, <code>false</code>
+	 * @see Employee
+	 * @see Reservation
+	 * @see ReservationRepository
+	 */
+	public boolean reservationFromEmployee(long reservationId, long employeeId) {
+		var reservation = getReservationById(reservationId);
+
+		return Objects.equals(reservation.getEmployee().getId(), employeeId);
 	}
 }
