@@ -1,9 +1,7 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
-import com.quintor.worqplace.data.LocationRepository;
 import com.quintor.worqplace.data.ReservationRepository;
-import com.quintor.worqplace.data.RoomRepository;
 import com.quintor.worqplace.domain.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
@@ -22,6 +20,8 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,6 +92,7 @@ class ReservationControllerIntegrationTest {
 		this.reservation3 = new Reservation(4L, LocalDate.now().plusWeeks(2), LocalTime.of(7, 3), LocalTime.of(8, 7), employee1, room1, 8, recurrence1);
 
 		setupBearerToken();
+		createNewEmployee();
 	}
 
 	@AfterEach
@@ -197,8 +198,6 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("reserveWorkplaces() should return 422 if workplace is not available")
 	void reserveWorkplaceShouldReturn422IfNotAvailable() {
-		createNewEmployee();
-
 		ReservationDTO reservationDTO = new ReservationDTO();
 		reservationDTO.setDate(LocalDate.now().plusDays(1));
 		reservationDTO.setStartTime(LocalTime.of(9, 0));
@@ -373,12 +372,39 @@ class ReservationControllerIntegrationTest {
 	@Test
 	@DisplayName("getAllMyReservations() should return empty list if there are none")
 	void getAllMyReservationsShouldReturnEmptyList() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Authorization", this.bearer);
-
 		var result = getRequest("/reservations/all");
 
 		assertEquals(Collections.emptyList().toString(), result.getBody());
+	}
+
+	@Test
+	@DisplayName("deleteReservation() should return 200 OK")
+	void deleteOwnReservation() {
+		reservationRepository.save(reservation);
+		var result = getRequest("/reservations/");
+		Matcher m = Pattern.compile("id\":(.*?),").matcher(result.getBody());
+		boolean found = m.find();
+
+		assertTrue(found);
+
+		result = deleteRequest("/reservations/" + m.group(1));
+
+		assertEquals(HttpStatus.OK, result.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("deleteReservation() should return 403 when not own")
+	void deleteOtherReservation() {
+		reservationRepository.save(reservation3);
+		var result = getRequest("/reservations/");
+		Matcher m = Pattern.compile("id\":(.*?),").matcher(result.getBody());
+		boolean found = m.find();
+
+		assertTrue(found);
+
+		result = deleteRequest("/reservations/" +  m.group(1));
+
+		assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode());
 	}
 
 	/**
@@ -407,6 +433,22 @@ class ReservationControllerIntegrationTest {
 	 */
 	ResponseEntity<String> postRequest(String url) {
 		var request = RequestEntity.post(URI.create(url))
+				.header("Authorization", this.bearer)
+				.build();
+
+		return restTemplate.exchange(request, String.class);
+	}
+
+	/**
+	 * Function that uses the {@link TestRestTemplate} to send a DELETE request
+	 * to the Back-End for testing during Continuous Integration.
+	 *
+	 * @param url the URL Path after "https://localhost:8080".
+	 *            as a {@link String}
+	 * @return a {@link ResponseEntity} for the request.
+	 */
+	ResponseEntity<String> deleteRequest(String url) {
+		var request = RequestEntity.delete(URI.create(url))
 				.header("Authorization", this.bearer)
 				.build();
 
@@ -457,15 +499,5 @@ class ReservationControllerIntegrationTest {
 		map.put("password", "Biertje");
 
 		restTemplate.postForEntity(url, map, Void.class);
-
-		Map<String, String> map1 = new HashMap<>();
-		map1.put("username", "mdol@quintor.nl");
-		map1.put("password", "Kaasje");
-
-		this.bearer = (restTemplate.postForEntity("http://localhost:" + port + "/login", map1, String.class))
-				.getHeaders().get("Authorization")
-				.toString()
-				.replace("[", "")
-				.replace("]", "");
 	}
 }
