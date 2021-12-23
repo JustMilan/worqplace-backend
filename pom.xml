@@ -19,7 +19,8 @@
 		<sonar.exclusions>
 			**/WorqplaceApplication.java,
 			**/MavenWrapperDownloader.java,
-			**/security/**
+			**/security/**,
+			*.java
 		</sonar.exclusions>
 	</properties>
 
