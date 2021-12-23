@@ -387,7 +387,7 @@ class ReservationControllerIntegrationTest {
 
 		assertTrue(found);
 
-		result = deleteRequest("/reservations/" + m.group(1));
+		result = postRequest("/reservations/delete/" + m.group(1));
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
@@ -402,7 +402,7 @@ class ReservationControllerIntegrationTest {
 
 		assertTrue(found);
 
-		result = deleteRequest("/reservations/" +  m.group(1));
+		result = postRequest("/reservations/delete/" + m.group(1));
 
 		assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode());
 	}
