@@ -53,7 +53,7 @@ public class RoomService {
 	 * @see RoomAvailability
 	 */
 	public List<RoomAvailability> getRoomsAvailabilityAtDateTime(Long locationId, LocalDate date,
-																 LocalTime startTime, LocalTime endTime) {
+	                                                             LocalTime startTime, LocalTime endTime) {
 		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime);
 		return mapToRoomAvailability(date, startTime, endTime, rooms);
 	}
@@ -70,7 +70,7 @@ public class RoomService {
 	 * @see RoomAvailability
 	 */
 	public List<RoomAvailability> getWorkplaceAvailabilityAtDateTime(Long locationId, LocalDate date,
-																	 LocalTime startTime, LocalTime endTime) {
+	                                                                 LocalTime startTime, LocalTime endTime) {
 		var rooms = getRoomsWithWorkplacesAvailableAtDateTime(locationId, date, startTime, endTime);
 		return mapToRoomAvailability(date, startTime, endTime, rooms);
 	}
@@ -89,7 +89,7 @@ public class RoomService {
 	 * @see Location
 	 */
 	public List<Room> getRoomsAvailableAtDateTime(Long locationId, LocalDate date,
-												  LocalTime startTime, LocalTime endTime) {
+	                                              LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 
 		var rooms = findRoomsByLocationId(locationId);
@@ -127,7 +127,7 @@ public class RoomService {
 	 * @see Location
 	 */
 	public List<Room> getRoomsWithWorkplacesAvailableAtDateTime(Long locationId, LocalDate date,
-																LocalTime startTime, LocalTime endTime) {
+	                                                            LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> allRooms = findRoomsByLocationId(locationId);
 
@@ -176,7 +176,7 @@ public class RoomService {
 	 * @return a {@link List} of {@link RoomAvailability}
 	 */
 	private List<RoomAvailability> mapToRoomAvailability(LocalDate date, LocalTime startTime,
-														 LocalTime endTime, List<Room> rooms) {
+	                                                     LocalTime endTime, List<Room> rooms) {
 		return rooms.stream()
 				.map(room ->
 						new RoomAvailability(

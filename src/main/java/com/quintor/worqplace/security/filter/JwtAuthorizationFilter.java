@@ -40,7 +40,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-									FilterChain filterChain) throws IOException, ServletException {
+	                                FilterChain filterChain) throws IOException, ServletException {
 
 		Authentication authentication = this.getAuthentication(request);
 
@@ -60,7 +60,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	private Authentication getAuthentication(HttpServletRequest request) {
 		String token = request.getHeader("Authorization");
 
-		if (token == null || token.isEmpty() || ! token.startsWith("Bearer "))
+		if (token == null || token.isEmpty() || !token.startsWith("Bearer "))
 			return null;
 
 		byte[] signingKey = this.secret.getBytes();

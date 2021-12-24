@@ -36,8 +36,8 @@ public class DateTimeUtils {
 	 *                                         this exception is thrown.
 	 */
 	public static void checkReservationDateTime(LocalDate date,
-												LocalTime startTime,
-												LocalTime endTime) {
+	                                            LocalTime startTime,
+	                                            LocalTime endTime) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -63,14 +63,14 @@ public class DateTimeUtils {
 	 * @return a boolean indicating whether the existing and the new timeslot overlap.
 	 */
 	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
-										   LocalTime existingEndTime, Recurrence recurrence,
-										   LocalDate newDate, LocalTime newStartTime,
-										   LocalTime newEndTime) {
+	                                       LocalTime existingEndTime, Recurrence recurrence,
+	                                       LocalDate newDate, LocalTime newStartTime,
+	                                       LocalTime newEndTime) {
 		var weekFields = WeekFields.of(Locale.getDefault());
 		int oldWeekNumber = existingDate.get(weekFields.weekOfWeekBasedYear());
 		int newWeekNumber = newDate.get(weekFields.weekOfWeekBasedYear());
 
-		if (! existingDate.equals(newDate) && ! recurrence.isActive()) return false;
+		if (!existingDate.equals(newDate) && !recurrence.isActive()) return false;
 
 		if (recurrence.isActive()) switch (recurrence.getRecurrencePattern()) {
 			case WEEKLY:
@@ -93,7 +93,7 @@ public class DateTimeUtils {
 	}
 
 	private static boolean checkStartAndEntimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime, LocalTime newStartTime, LocalTime newEndTime) {
-		return ! newStartTime.isAfter(existingEndTime) && ! newEndTime.isBefore(existingStartTime);
+		return !newStartTime.isAfter(existingEndTime) && !newEndTime.isBefore(existingStartTime);
 	}
 
 	private static boolean checkIfBiWeekly(int oldWeekNumber, int newWeekNumber) {
@@ -101,6 +101,6 @@ public class DateTimeUtils {
 	}
 
 	private static boolean checkSameDate(LocalDate existingDate, LocalDate newDate) {
-		return ! existingDate.getDayOfWeek().equals(newDate.getDayOfWeek());
+		return !existingDate.getDayOfWeek().equals(newDate.getDayOfWeek());
 	}
 }

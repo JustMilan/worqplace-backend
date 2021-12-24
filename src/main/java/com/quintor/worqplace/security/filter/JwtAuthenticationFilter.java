@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-											FilterChain filterChain, Authentication authentication) {
+	                                        FilterChain filterChain, Authentication authentication) {
 
 		User user = (User) authentication.getPrincipal();
 

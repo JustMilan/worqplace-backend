@@ -187,7 +187,7 @@ public class ReservationService {
 	 * made by the entered {@link Employee}.
 	 *
 	 * @param reservationId id of the wanted {@link Reservation}.
-	 * @param employeeId id of the wanted {@link Employee}.
+	 * @param employeeId    id of the wanted {@link Employee}.
 	 * @return a {@link Boolean} which is <code>true</code> if the {@link Reservation}
 	 * is made by the specified {@link Employee}
 	 * If not, <code>false</code>

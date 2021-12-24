@@ -40,6 +40,27 @@ public class ReservationController {
 	private final ReservationMapper reservationMapper;
 
 	/**
+	 * Function that takes the subject from the jwt token.
+	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 *
+	 * @param token JW token with "Bearer " still in front of it.
+	 * @return Employee ID of that is embedded in the token.
+	 */
+	private static long extractIdFromToken(String token) {
+		//Strip the "Bearer "
+		var bearToken = token.split(" ")[1].split("\\.");
+
+		var decoder = Base64.getDecoder();
+
+		//header would be: jwChunks[0]
+		var payload = new String(decoder.decode(bearToken[1]));
+
+		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
+
+		return Long.decode(employeeId);
+	}
+
+	/**
 	 * Function that calls to the {@link ReservationService} to get all
 	 * {@link com.quintor.worqplace.domain.Reservation reservations} and then maps
 	 * them to a list of
@@ -178,7 +199,7 @@ public class ReservationController {
 			var jwt = getAuthorization();
 			var employeeId = extractIdFromToken(jwt);
 
-			if (! reservationService.reservationFromEmployee(id, employeeId))
+			if (!reservationService.reservationFromEmployee(id, employeeId))
 				return new ResponseEntity<>("Reservation was not made by this employee", HttpStatus.FORBIDDEN);
 
 			reservationService.deleteReservation(id);
@@ -186,27 +207,6 @@ public class ReservationController {
 		} catch (ReservationNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
-	}
-
-	/**
-	 * Function that takes the subject from the jwt token.
-	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
-	 *
-	 * @param token JW token with "Bearer " still in front of it.
-	 * @return Employee ID of that is embedded in the token.
-	 */
-	private static long extractIdFromToken(String token) {
-		//Strip the "Bearer "
-		var bearToken = token.split(" ")[1].split("\\.");
-
-		var decoder = Base64.getDecoder();
-
-		//header would be: jwChunks[0]
-		var payload = new String(decoder.decode(bearToken[1]));
-
-		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
-
-		return Long.decode(employeeId);
 	}
 
 	private String getAuthorization() {
