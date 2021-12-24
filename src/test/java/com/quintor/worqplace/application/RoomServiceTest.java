@@ -58,13 +58,13 @@ class RoomServiceTest {
 	@Test
 	@DisplayName("getRoomById() should return a room if it exists")
 	void getRoomByIdShouldReturnRoom() {
-		assertEquals(room, roomService.getRoomById(room.getId()));
+		assertEquals(room, roomService.findRoomById(room.getId()));
 	}
 
 	@Test
 	@DisplayName("getRoomById() should throw RoomNotFoundException if it hasn't been found")
 	void getRoomByIdShouldThrowIfNotFound() {
-		assertThrows(RoomNotFoundException.class, () -> roomService.getRoomById(2L));
+		assertThrows(RoomNotFoundException.class, () -> roomService.findRoomById(2L));
 	}
 
 	@Test

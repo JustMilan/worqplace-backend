@@ -100,7 +100,7 @@ public class ReservationService {
 	 */
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		var employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-		var room = roomService.getRoomById(reservationDTO.getRoomId());
+		var room = roomService.findRoomById(reservationDTO.getRoomId());
 		var workplaceAmount = Math.max(reservationDTO.getWorkplaceAmount(), 1);
 
 		return new Reservation(reservationDTO.getDate(),

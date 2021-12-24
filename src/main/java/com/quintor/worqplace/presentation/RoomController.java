@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.stream.Collectors;
 
 /**
  * Controller for {@link com.quintor.worqplace.domain.Room rooms}, contains
@@ -38,8 +37,7 @@ public class RoomController {
 	 * Function that calls to the {@link RoomService} to get the rooms that are fully
 	 * available at a given location during a given timeslot.
 	 *
-	 * @param locationId id of the
-	 *                   {@link com.quintor.worqplace.domain.Location Location}.
+	 * @param locationId id of the {@link com.quintor.worqplace.domain.Location Location}.
 	 * @param date       date of which to get the availability.
 	 * @param startTime  start time on the chosen date.
 	 * @param endTime    end time on the chosen date.
@@ -49,18 +47,13 @@ public class RoomController {
 	@GetMapping("/availability")
 	public ResponseEntity<?> getRoomsAvailability(
 			@RequestParam("locationId") Long locationId,
-			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-					LocalDate date,
-			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-					LocalTime startTime,
-			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-					LocalTime endTime) {
+			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 		try {
-			return new ResponseEntity<>(roomService
-					.getRoomsAvailableAtDateTime(locationId, date, startTime, endTime)
-					.stream().map(room -> roomMapper.toRoomDTO(room, room.getCapacity()
-							- room.countReservedWorkspaces(date, startTime, endTime)))
-					.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+			return new ResponseEntity<>(
+					roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime),
+					HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -70,8 +63,7 @@ public class RoomController {
 	 * Function that calls to the {@link RoomService} to get the rooms that have
 	 * at least one workplace available during the given timeslot.
 	 *
-	 * @param locationId id of the
-	 *                   {@link com.quintor.worqplace.domain.Location Location}.
+	 * @param locationId id of the {@link com.quintor.worqplace.domain.Location Location}.
 	 * @param date       date of which to get the availability.
 	 * @param startTime  start time on the chosen date.
 	 * @param endTime    end time on the chosen date.
@@ -81,20 +73,14 @@ public class RoomController {
 	@GetMapping("/availability/workplaces")
 	public ResponseEntity<?> getWorkplacesAvailability(
 			@RequestParam("locationId") Long locationId,
-			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-					LocalDate date,
-			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-					LocalTime startTime,
-			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
-					LocalTime endTime) {
+			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
+			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
 		try {
-			return new ResponseEntity<>(roomService
-					.getRoomsWithWorkplacesAvailableAtDateTime(locationId, date,
-							startTime, endTime)
-					.stream().map(room -> roomMapper.toRoomDTO(room,
-							room.getCapacity() - room
-									.countReservedWorkspaces(date, startTime, endTime)))
-					.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+			return new ResponseEntity<>(
+					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime),
+					HttpStatus.OK
+			);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}

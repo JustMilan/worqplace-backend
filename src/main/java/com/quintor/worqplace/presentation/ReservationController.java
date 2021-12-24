@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -52,8 +51,10 @@ public class ReservationController {
 	 */
 	@GetMapping
 	public ResponseEntity<List<ReservationDTO>> getAllReservations() {
-		return new ResponseEntity<>(reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+		return new ResponseEntity<>(
+				reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO).toList(),
+				HttpStatus.OK
+		);
 	}
 
 	/**
@@ -70,12 +71,12 @@ public class ReservationController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getReservationById(@PathVariable long id) {
 		try {
-			return new ResponseEntity<>(reservationMapper
-					.toReservationDTO(reservationService.getReservationById(id)),
-					HttpStatus.OK);
-		} catch (ReservationNotFoundException reservationNotFoundException) {
-			return new ResponseEntity<>(reservationNotFoundException.getMessage(),
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(
+					reservationMapper.toReservationDTO(reservationService.getReservationById(id)),
+					HttpStatus.OK
+			);
+		} catch (ReservationNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -94,15 +95,14 @@ public class ReservationController {
 	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			String jwt = getAuthorization();
-
 			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
 
 			return new ResponseEntity<>(
 					reservationMapper.toReservationDTO(reservationService.reserveWorkplaces(reservationDTO)),
 					HttpStatus.CREATED
 			);
-		} catch (WorkplacesNotAvailableException | RoomNotAvailableException | InvalidStartAndEndTimeException |
-				InvalidDayException e) {
+		} catch (WorkplacesNotAvailableException | RoomNotAvailableException |
+				InvalidStartAndEndTimeException | InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
@@ -123,12 +123,12 @@ public class ReservationController {
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			String jwt = getAuthorization();
-
 			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
 
-			return new ResponseEntity<>(reservationMapper
-					.toReservationDTO(reservationService.reserveRoom(reservationDTO)),
-					HttpStatus.CREATED);
+			return new ResponseEntity<>(
+					reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)),
+					HttpStatus.CREATED
+			);
 		} catch (RoomNotAvailableException | WorkplacesNotAvailableException |
 				InvalidStartAndEndTimeException | InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
@@ -149,17 +149,20 @@ public class ReservationController {
 	@GetMapping("/all")
 	public ResponseEntity<List<ReservationDTO>> getAllMyReservations() {
 		String jwt = getAuthorization();
-		return new ResponseEntity<>(reservationService.getAllMyReservations(extractIdFromToken(jwt))
-				.stream().map(reservationMapper::toReservationDTO).collect(Collectors.toUnmodifiableList()),
-				HttpStatus.OK);
+		var id = extractIdFromToken(jwt);
+		return new ResponseEntity<>(
+				reservationService.getAllMyReservations(id).stream().map(reservationMapper::toReservationDTO).toList(),
+				HttpStatus.OK
+		);
 	}
 
 	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/location/{id}")
 	public ResponseEntity<List<ReservationDTO>> getAllByLocation(@PathVariable long id) {
-		return new ResponseEntity<>(reservationService.getAllByLocation(id)
-				.stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+		return new ResponseEntity<>(
+				reservationService.getAllByLocation(id).stream().map(reservationMapper::toReservationDTO).toList(),
+				HttpStatus.OK
+		);
 	}
 
 	/**
@@ -172,12 +175,11 @@ public class ReservationController {
 	@PostMapping("/delete/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable long id) {
 		try {
-			String jwt = getAuthorization();
-			long employeeId = extractIdFromToken(jwt);
+			var jwt = getAuthorization();
+			var employeeId = extractIdFromToken(jwt);
 
-			if (!reservationService.reservationFromEmployee(id, employeeId)) {
+			if (! reservationService.reservationFromEmployee(id, employeeId))
 				return new ResponseEntity<>("Reservation was not made by this employee", HttpStatus.FORBIDDEN);
-			}
 
 			reservationService.deleteReservation(id);
 			return new ResponseEntity<>(id, HttpStatus.OK);

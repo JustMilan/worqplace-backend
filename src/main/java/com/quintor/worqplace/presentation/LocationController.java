@@ -38,7 +38,9 @@ public class LocationController {
 	 */
 	@GetMapping
 	public ResponseEntity<List<LocationDTO>> getAllLocations() {
-		return new ResponseEntity<>(locationService.getAllLocations().stream().map(locationMapper::toLocationDTO)
-				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+		return new ResponseEntity<>(
+				locationService.getAllLocations().stream().map(locationMapper::toLocationDTO).toList(),
+				HttpStatus.OK
+		);
 	}
 }
