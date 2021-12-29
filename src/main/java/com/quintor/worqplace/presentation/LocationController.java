@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for {@link com.quintor.worqplace.domain.Location locations}, contains logic
@@ -38,7 +39,11 @@ public class LocationController {
 	@GetMapping
 	public ResponseEntity<List<LocationDTO>> getAllLocations() {
 		return new ResponseEntity<>(
-				locationService.getAllLocations().stream().map(locationMapper::toLocationDTO).toList(),
+				locationService
+						.getAllLocations()
+						.stream()
+						.map(locationMapper::toLocationDTO)
+						.collect(Collectors.toList()),
 				HttpStatus.OK
 		);
 	}

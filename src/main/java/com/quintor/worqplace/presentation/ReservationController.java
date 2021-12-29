@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -73,7 +74,11 @@ public class ReservationController {
 	@GetMapping
 	public ResponseEntity<List<ReservationDTO>> getAllReservations() {
 		return new ResponseEntity<>(
-				reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO).toList(),
+				reservationService
+						.getAllReservations()
+						.stream()
+						.map(reservationMapper::toReservationDTO)
+						.collect(Collectors.toList()),
 				HttpStatus.OK
 		);
 	}
@@ -172,7 +177,11 @@ public class ReservationController {
 		String jwt = getAuthorization();
 		var id = extractIdFromToken(jwt);
 		return new ResponseEntity<>(
-				reservationService.getAllMyReservations(id).stream().map(reservationMapper::toReservationDTO).toList(),
+				reservationService
+						.getAllMyReservations(id)
+						.stream()
+						.map(reservationMapper::toReservationDTO)
+						.collect(Collectors.toList()),
 				HttpStatus.OK
 		);
 	}
@@ -181,7 +190,11 @@ public class ReservationController {
 	@GetMapping("/location/{id}")
 	public ResponseEntity<List<ReservationDTO>> getAllByLocation(@PathVariable long id) {
 		return new ResponseEntity<>(
-				reservationService.getAllByLocation(id).stream().map(reservationMapper::toReservationDTO).toList(),
+				reservationService
+						.getAllByLocation(id)
+						.stream()
+						.map(reservationMapper::toReservationDTO)
+						.collect(Collectors.toList()),
 				HttpStatus.OK
 		);
 	}
@@ -199,7 +212,7 @@ public class ReservationController {
 			var jwt = getAuthorization();
 			var employeeId = extractIdFromToken(jwt);
 
-			if (!reservationService.reservationFromEmployee(id, employeeId))
+			if (! reservationService.reservationFromEmployee(id, employeeId))
 				return new ResponseEntity<>("Reservation was not made by this employee", HttpStatus.FORBIDDEN);
 
 			reservationService.deleteReservation(id);

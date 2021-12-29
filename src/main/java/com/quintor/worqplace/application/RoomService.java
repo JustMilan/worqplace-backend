@@ -186,7 +186,7 @@ public class RoomService {
 								calculateAvailable(date, startTime, endTime, room)
 						)
 				)
-				.toList();
+				.collect(Collectors.toList());
 	}
 
 	/**
