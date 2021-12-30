@@ -55,30 +55,69 @@ class DateTimeUtilsTest {
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, NO_RECURRENCE, TOMORROW, NINE, TWELVE));
 	}
 
-	//TODO: split up into multiple tests
 	@Test
-	@DisplayName("when there is recurrence, but the check is for a different time on that day, " +
-			"the function should return false")
-	void timeslotsDontOverlapIfTheyRecurOnDifferentTimes() {
+	@DisplayName("should return when recurring at same date but different time")
+	void shouldReturnFalseWhenRecurringAtDifferentTimesDaily() {
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, DAILY_RECURRENCE, TOMORROW, ONE, FOUR));
+	}
 
-		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, DAILY_RECURRENCE, TOMORROW, ONE, FOUR));
-
-		LocalDate nextWeek = LocalDate.now().plusWeeks(1);
+	@Test
+	@DisplayName("should return false when times don't overlap with weekly recurrence")
+	void shouldReturnFalseWhenTimesDontOverlapWeeklyRecurrence() {
+		var nextWeek = LocalDate.now().plusWeeks(1);
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, WEEKLY_RECURRENCE, nextWeek, ONE, FOUR));
+	}
 
-		LocalDate twoWeeks = LocalDate.now().plusWeeks(2);
+	@Test
+	@DisplayName("should return false when times don't overlap with bi weekly recurrence")
+	void shouldReturnFalseWhenTimesDontOverlapBiWeeklyRecurrence() {
+		var twoWeeks = LocalDate.now().plusWeeks(2);
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, BIWEEKLY_RECURRENCE, twoWeeks, ONE, FOUR));
+	}
 
-		twoWeeks = LocalDate.now().plusWeeks(2).plusDays(1);
-		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, BIWEEKLY_RECURRENCE, twoWeeks, ONE, FOUR));
-
-		LocalDate month = LocalDate.now().plusMonths(1);
+	@Test
+	@DisplayName("should return false when times don't overlap with monthly recurrence")
+	void shouldReturnFalseWhenTimesDontOverlapMonthlyRecurrence() {
+		var month = LocalDate.now().plusMonths(1);
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, MONTHLY_RECURRENCE, month, ONE, FOUR));
+	}
 
-		assertTrue(timeslotsOverlap(LocalDate.now().plusDays(1),
-				LocalTime.of(11, 11), LocalTime.of(12, 12),
-				new Recurrence(true, RecurrencePattern.DAILY),
-				LocalDate.now().plusDays(0), LocalTime.of(11, 11), LocalTime.of(12, 12)));
+	@Test
+	@DisplayName("should return true when times overlap with daily recurrence")
+	void shouldReturnTrueWhenTimesOverlapDailyRecurrence() {
+		var eleven = LocalTime.of(11, 11);
+		var twelve = LocalTime.of(12, 12);
+
+		assertTrue(timeslotsOverlap(TOMORROW, eleven, twelve, DAILY_RECURRENCE, TODAY, eleven, twelve));
+	}
+
+	@Test
+	@DisplayName("should return true when times overlap with weekly recurrence")
+	void shouldReturnTrueWhenTimesOverlapWeeklyRecurrence() {
+		var eleven = LocalTime.of(11, 11);
+		var twelve = LocalTime.of(12, 12);
+		var nextWeek = TOMORROW.plusWeeks(1);
+
+		assertTrue(timeslotsOverlap(TOMORROW, eleven, twelve, WEEKLY_RECURRENCE, nextWeek, eleven, twelve));
+	}
+
+	@Test
+	@DisplayName("should return true when times overlap with bi weekly recurrence")
+	void shouldReturnTrueWhenTimesOverlapBiWeeklyRecurrence() {
+		var eleven = LocalTime.of(11, 11);
+		var twelve = LocalTime.of(12, 12);
+		var nextBiWeek = TOMORROW.plusWeeks(2);
+
+		assertTrue(timeslotsOverlap(TOMORROW, eleven, twelve, BIWEEKLY_RECURRENCE, nextBiWeek, eleven, twelve));
+	}
+
+	@Test
+	@DisplayName("should return true when times overlap with monthly recurrence")
+	void shouldReturnTrueWhenTimesOverlapMonthlyRecurrence() {
+		var eleven = LocalTime.of(11, 11);
+		var twelve = LocalTime.of(12, 12);
+		var nextMonth = TOMORROW.plusMonths(1);
+
+		assertTrue(timeslotsOverlap(TOMORROW, eleven, twelve, MONTHLY_RECURRENCE, nextMonth, eleven, twelve));
 	}
 }
