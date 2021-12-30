@@ -124,21 +124,26 @@ class DateTimeUtilsTest {
 	@Test
 	@DisplayName("should return false when both dates equals with weekly recurrence")
 	void shouldReturnFalseWhenSameDatesWithWeeklyRecurrence() {
-
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, WEEKLY_RECURRENCE, TODAY, ONE, FOUR));
 	}
 
 	@Test
 	@DisplayName("should return false when both dates equals with bi weekly recurrence")
 	void shouldReturnFalseWhenSameDatesWithBiWeeklyRecurrence() {
-
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, BIWEEKLY_RECURRENCE, TODAY, ONE, FOUR));
 	}
 
 	@Test
 	@DisplayName("should return false when both dates equals with monthly recurrence")
 	void shouldReturnFalseWhenSameDatesWithMontylyRecurrence() {
-
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, MONTHLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
+
+	@Test
+	@DisplayName("should return false when new end time is before existing start time")
+	void shouldReturnFalseWhenNewEndTimeIsBeforeExistingStartTime() {
+		var seven = LocalTime.of(7, 0);
+		var eight = LocalTime.of(8, 0);
+		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, MONTHLY_RECURRENCE, TODAY, seven, eight));
 	}
 }

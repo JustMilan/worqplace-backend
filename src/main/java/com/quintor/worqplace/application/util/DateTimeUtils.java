@@ -66,10 +66,12 @@ public class DateTimeUtils {
 										   LocalTime newEndTime) {
 
 		return (existingDate.equals(newDate) || recurrence.isActive())
-				&& checkStartAndEntimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
+				&& checkStartAndEndTimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
 	}
 
-	private static boolean checkStartAndEntimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime, LocalTime newStartTime, LocalTime newEndTime) {
-		return ! newStartTime.isAfter(existingEndTime) && ! newEndTime.isBefore(existingStartTime);
+	private static boolean checkStartAndEndTimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime,
+													   LocalTime newStartTime, LocalTime newEndTime) {
+		return ! newStartTime.isAfter(existingEndTime) &&
+				! newEndTime.isBefore(existingStartTime);
 	}
 }
