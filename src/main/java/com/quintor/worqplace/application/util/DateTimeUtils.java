@@ -6,8 +6,6 @@ import com.quintor.worqplace.domain.Recurrence;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.WeekFields;
-import java.util.Locale;
 
 /**
  * Utility class containing functions to verify input dates and times and

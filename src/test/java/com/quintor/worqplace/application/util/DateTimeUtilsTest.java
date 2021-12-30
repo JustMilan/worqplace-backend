@@ -120,4 +120,25 @@ class DateTimeUtilsTest {
 
 		assertTrue(timeslotsOverlap(TOMORROW, eleven, twelve, MONTHLY_RECURRENCE, nextMonth, eleven, twelve));
 	}
+
+	@Test
+	@DisplayName("should return false when both dates equals with weekly recurrence")
+	void shouldReturnFalseWhenSameDatesWithWeeklyRecurrence() {
+
+		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, WEEKLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
+
+	@Test
+	@DisplayName("should return false when both dates equals with bi weekly recurrence")
+	void shouldReturnFalseWhenSameDatesWithBiWeeklyRecurrence() {
+
+		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, BIWEEKLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
+
+	@Test
+	@DisplayName("should return false when both dates equals with monthly recurrence")
+	void shouldReturnFalseWhenSameDatesWithMontylyRecurrence() {
+
+		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, MONTHLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
 }
