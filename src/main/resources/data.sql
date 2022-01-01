@@ -36,3 +36,5 @@ VALUES ('Quintor Groningen', 5);
 INSERT INTO room(floor, location_id, capacity)
 VALUES (3, 5, 24),
        (-1, 5, 6);
+
+-- TODO: create admin account

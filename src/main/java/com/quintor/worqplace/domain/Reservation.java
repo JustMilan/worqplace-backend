@@ -63,7 +63,7 @@ public class Reservation {
 	 */
 	@SuppressWarnings("squid:S00107") // Suppresses the too many parameters warning as the id is used for testing.
 	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime,
-	                   Employee employee, Room room, int amount, Recurrence recurrence) {
+					   Employee employee, Room room, int amount, Recurrence recurrence) {
 		this(date, startTime, endTime, employee, room, amount, recurrence);
 		this.id = id;
 	}
@@ -81,7 +81,7 @@ public class Reservation {
 	 * @param recurrence handles the {@link Recurrence recurrence} of the reservation.
 	 */
 	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime,
-	                   Employee employee, Room room, int amount, Recurrence recurrence) {
+					   Employee employee, Room room, int amount, Recurrence recurrence) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -106,19 +106,5 @@ public class Reservation {
 			throw new InvalidDayException();
 
 		this.date = date;
-	}
-
-	@Override
-	public String toString() {
-		return "Reservation{" +
-				"id=" + id +
-				", date=" + date +
-				", startTime=" + startTime +
-				", endTime=" + endTime +
-				", employee=" + employee.getId() +
-				", room=" + room.getId() +
-				", workplaceAmount=" + workplaceAmount +
-				", recurring=" + recurrence +
-				'}';
 	}
 }

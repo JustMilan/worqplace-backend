@@ -1,7 +1,6 @@
 package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
-import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
@@ -115,13 +114,10 @@ public class ReservationService {
 	 *
 	 * @param reservationDTO DTO input for creating a reservation.
 	 * @return the generated {@link Reservation} object.
-	 * @throws RoomNotAvailableException when the selected {@link Room} is not available,
-	 *                                   this exception is thrown.
 	 * @see ReservationDTO
 	 * @see Reservation
 	 * @see ReservationRepository
 	 * @see RoomService
-	 * @see RoomNotAvailableException
 	 */
 	public Reservation reserveRoom(ReservationDTO reservationDTO) {
 		var reservation = this.toReservation(reservationDTO);

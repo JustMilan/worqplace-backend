@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -143,6 +144,29 @@ class RoomServiceTest {
 	void getRoomsWithWorkplacesAvailableAtDateTimeShouldExecute() {
 		assertDoesNotThrow(() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L,
 				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON));
+	}
+
+	@Test
+	@DisplayName("getRoomsWithWorkplacesAvailableAtDateTime should filter unavailable rooms")
+	void getRoomsWithWorkplacesAvailableAtDateTimeShouldFilterUnavailableRooms() {
+		when(locationRepository.findById(2L)).thenReturn(Optional.of(location));
+
+		var room1 = new Room(1L, 1, location, 14, Collections.emptyList());
+		var room2 = new Room(2L, 2, location, 5, Collections.emptyList());
+		var room3 = new Room(3L, 0, location, 3, Collections.emptyList());
+		var rooms = List.of(room1, room2, room3);
+
+		var today = LocalDate.now();
+		var startTime = LocalTime.of(11, 0);
+		var endTime = LocalTime.of(12, 0);
+		var recurrence = new Recurrence(false, RecurrencePattern.NONE);
+
+		var reservation = new Reservation(1L, today, startTime, endTime, null, room1, room1.getCapacity(), recurrence);
+		room1.addReservation(reservation);
+		location.setRooms(rooms);
+
+		assertEquals(2,
+				roomService.getRoomsWithWorkplacesAvailableAtDateTime(2L, today, startTime, endTime).size());
 	}
 
 	@Test

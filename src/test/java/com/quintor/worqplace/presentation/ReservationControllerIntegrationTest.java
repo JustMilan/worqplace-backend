@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,7 +132,7 @@ class ReservationControllerIntegrationTest {
 	@DisplayName("getReservationById() should return reservation 200 OK there is one")
 	void getReservationByIdShouldReturn200() {
 		reservationRepository.save(reservation);
-		ResponseEntity<String> result = getRequest("/reservations/1");
+		ResponseEntity<String> result = getRequest("/reservations/" + employee1.getId());
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
@@ -407,6 +408,16 @@ class ReservationControllerIntegrationTest {
 		assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode());
 	}
 
+	@Test
+	@DisplayName("getAllByLocation should all reservations by location")
+	void getAllByLocationShouldReturnAllReservationsByLocation() {
+		var address = new Address(12, "", "Stratos", "2554GB", "QuintorCitty");
+		var location = new Location("Testlocationn", address, Collections.emptyList());
+		var room2 = new Room(1L, 1, location, 34, Collections.emptyList());
+		location.setRooms(List.of(room2));
+		//TODO authenticate with admin, for this test only.
+	}
+
 	/**
 	 * Function that uses the {@link TestRestTemplate} to send a GET request
 	 * to the Back-End for testing during Continuous Integration.
@@ -455,7 +466,7 @@ class ReservationControllerIntegrationTest {
 		return restTemplate.exchange(request, String.class);
 	}
 
-	private void setupBearerToken() {
+	private void setupBearerToken() { //TODO: create overload method to be able to authenticate with admin role.
 		try {
 			Map<String, String> map1 = new HashMap<>();
 			map1.put("username", "mdol@quintor.nl");

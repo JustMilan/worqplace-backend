@@ -1,6 +1,6 @@
 package com.quintor.worqplace.domain;
 
-import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
+import com.quintor.worqplace.domain.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.application.util.DateTimeUtils;
 import lombok.AllArgsConstructor;
@@ -50,13 +50,13 @@ public class Room {
 	 * @param endTime   end time of the timeslot of which to check the reserved workplaces on.
 	 * @return an int representing the amount of reserved workplaces.
 	 */
-	public int countReservedWorkspaces(LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public int countReservedWorkplaces(LocalDate date, LocalTime startTime, LocalTime endTime) {
 		return this.getReservations().stream().filter(reservation ->
-				(date.isAfter(reservation.getDate()) ||
-						date.isEqual(reservation.getDate())) &&
-						DateTimeUtils.timeslotsOverlap(reservation.getDate(),
-								reservation.getStartTime(), reservation.getEndTime(),
-								reservation.getRecurrence(), date, startTime, endTime))
+						(date.isAfter(reservation.getDate()) ||
+								date.isEqual(reservation.getDate())) &&
+								DateTimeUtils.timeslotsOverlap(reservation.getDate(),
+										reservation.getStartTime(), reservation.getEndTime(),
+										reservation.getRecurrence(), date, startTime, endTime))
 				.mapToInt(Reservation::getWorkplaceAmount).sum();
 	}
 
@@ -77,7 +77,7 @@ public class Room {
 							reservation.getStartTime(), reservation.getEndTime(),
 							reservation.getRecurrence(), reservation1.getDate(),
 							reservation1.getStartTime(), reservation1.getEndTime())
-							? reservation1.getWorkplaceAmount() : 0;
+							? reservation1.getWorkplaceAmount() : 0; //TODO: create test that hits this condition (now 1 of 2 is hit)
 				}
 				if ((total + reservation.getWorkplaceAmount()) > this.capacity) {
 					return false;
@@ -95,7 +95,7 @@ public class Room {
 	 */
 	public void addReservation(Reservation reservation) {
 		int wanted = reservation.getWorkplaceAmount();
-		int available = this.capacity - countReservedWorkspaces(reservation.getDate(),
+		int available = this.capacity - countReservedWorkplaces(reservation.getDate(),
 				reservation.getStartTime(), reservation.getEndTime());
 		if (wanted <= available) {
 			if (isWorkplaceRecurrentlyAvailable(reservation)) {
@@ -107,7 +107,7 @@ public class Room {
 	}
 
 	public List<Reservation> getReservationsThatOverlap(LocalDate date,
-	                                                    LocalTime startTime, LocalTime endTime) {
+														LocalTime startTime, LocalTime endTime) {
 		return this.reservations.stream()
 				.filter(reservation ->
 						DateTimeUtils.timeslotsOverlap(reservation.getDate(),

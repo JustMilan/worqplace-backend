@@ -110,7 +110,7 @@ public class RoomService {
 	 * @return the amount of available workplaces in the given  {@link Room}
 	 */
 	private int calculateAvailable(LocalDate date, LocalTime startTime, LocalTime endTime, Room room) {
-		return room.getCapacity() - room.countReservedWorkspaces(date, startTime, endTime);
+		return room.getCapacity() - room.countReservedWorkplaces(date, startTime, endTime);
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class RoomService {
 		List<Room> allRooms = findRoomsByLocationId(locationId);
 
 		return allRooms.stream()
-				.filter(room -> room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
+				.filter(room -> room.countReservedWorkplaces(date, startTime, endTime) < room.getCapacity())
 				.collect(Collectors.toUnmodifiableList());
 	}
 

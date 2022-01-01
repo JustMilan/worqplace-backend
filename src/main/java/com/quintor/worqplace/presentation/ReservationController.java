@@ -2,6 +2,7 @@ package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.ReservationService;
 import com.quintor.worqplace.application.exceptions.*;
+import com.quintor.worqplace.domain.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
