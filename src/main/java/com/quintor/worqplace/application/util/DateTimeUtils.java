@@ -34,8 +34,8 @@ public class DateTimeUtils {
 	 *                                         this exception is thrown.
 	 */
 	public static void checkReservationDateTime(LocalDate date,
-												LocalTime startTime,
-												LocalTime endTime) {
+	                                            LocalTime startTime,
+	                                            LocalTime endTime) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 
@@ -61,17 +61,17 @@ public class DateTimeUtils {
 	 * @return a boolean indicating whether the existing and the new timeslot overlap.
 	 */
 	public static boolean timeslotsOverlap(LocalDate existingDate, LocalTime existingStartTime,
-										   LocalTime existingEndTime, Recurrence recurrence,
-										   LocalDate newDate, LocalTime newStartTime,
-										   LocalTime newEndTime) {
+	                                       LocalTime existingEndTime, Recurrence recurrence,
+	                                       LocalDate newDate, LocalTime newStartTime,
+	                                       LocalTime newEndTime) {
 
 		return (existingDate.equals(newDate) || recurrence.isActive())
 				&& checkStartAndEndTimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
 	}
 
 	private static boolean checkStartAndEndTimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime,
-													   LocalTime newStartTime, LocalTime newEndTime) {
-		return ! newStartTime.isAfter(existingEndTime) &&
-				! newEndTime.isBefore(existingStartTime);
+	                                                   LocalTime newStartTime, LocalTime newEndTime) {
+		return !newStartTime.isAfter(existingEndTime) &&
+				!newEndTime.isBefore(existingStartTime);
 	}
 }

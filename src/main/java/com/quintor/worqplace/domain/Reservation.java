@@ -63,7 +63,7 @@ public class Reservation {
 	 */
 	@SuppressWarnings("squid:S00107") // Suppresses the too many parameters warning as the id is used for testing.
 	public Reservation(Long id, LocalDate date, LocalTime startTime, LocalTime endTime,
-					   Employee employee, Room room, int amount, Recurrence recurrence) {
+	                   Employee employee, Room room, int amount, Recurrence recurrence) {
 		this(date, startTime, endTime, employee, room, amount, recurrence);
 		this.id = id;
 	}
@@ -81,7 +81,7 @@ public class Reservation {
 	 * @param recurrence handles the {@link Recurrence recurrence} of the reservation.
 	 */
 	public Reservation(LocalDate date, LocalTime startTime, LocalTime endTime,
-					   Employee employee, Room room, int amount, Recurrence recurrence) {
+	                   Employee employee, Room room, int amount, Recurrence recurrence) {
 		if (startTime.isAfter(endTime))
 			throw new InvalidStartAndEndTimeException();
 

@@ -107,7 +107,7 @@ public class Room {
 	}
 
 	public List<Reservation> getReservationsThatOverlap(LocalDate date,
-														LocalTime startTime, LocalTime endTime) {
+	                                                    LocalTime startTime, LocalTime endTime) {
 		return this.reservations.stream()
 				.filter(reservation ->
 						DateTimeUtils.timeslotsOverlap(reservation.getDate(),

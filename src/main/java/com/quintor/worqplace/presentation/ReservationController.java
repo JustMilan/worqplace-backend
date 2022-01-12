@@ -219,7 +219,7 @@ public class ReservationController {
 			var jwt = getAuthorization();
 			var employeeId = extractIdFromToken(jwt);
 
-			if (! reservationService.reservationFromEmployee(id, employeeId))
+			if (!reservationService.reservationFromEmployee(id, employeeId))
 				return new ResponseEntity<>("Reservation was not made by this employee", HttpStatus.FORBIDDEN);
 
 			reservationService.deleteReservation(id);
