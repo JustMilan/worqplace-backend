@@ -187,6 +187,12 @@ public class ReservationController {
 		);
 	}
 
+	/**
+	 * Function that retrieves all reservations at the given location.
+	 *
+	 * @param id locationId
+	 * @return List of {@link ReservationDTO}
+	 */
 	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/location/{id}")
 	public ResponseEntity<List<ReservationDTO>> getAllByLocation(@PathVariable long id) {
