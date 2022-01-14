@@ -2,6 +2,7 @@ package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.ReservationService;
 import com.quintor.worqplace.application.exceptions.*;
+import com.quintor.worqplace.domain.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,27 @@ public class ReservationController {
 	private final ReservationMapper reservationMapper;
 
 	/**
+	 * Function that takes the subject from the jwt token.
+	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 *
+	 * @param token JW token with "Bearer " still in front of it.
+	 * @return Employee ID of that is embedded in the token.
+	 */
+	private static long extractIdFromToken(String token) {
+		//Strip the "Bearer "
+		var bearToken = token.split(" ")[1].split("\\.");
+
+		var decoder = Base64.getDecoder();
+
+		//header would be: jwChunks[0]
+		var payload = new String(decoder.decode(bearToken[1]));
+
+		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
+
+		return Long.decode(employeeId);
+	}
+
+	/**
 	 * Function that calls to the {@link ReservationService} to get all
 	 * {@link com.quintor.worqplace.domain.Reservation reservations} and then maps
 	 * them to a list of
@@ -52,8 +74,14 @@ public class ReservationController {
 	 */
 	@GetMapping
 	public ResponseEntity<List<ReservationDTO>> getAllReservations() {
-		return new ResponseEntity<>(reservationService.getAllReservations().stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+		return new ResponseEntity<>(
+				reservationService
+						.getAllReservations()
+						.stream()
+						.map(reservationMapper::toReservationDTO)
+						.collect(Collectors.toList()),
+				HttpStatus.OK
+		);
 	}
 
 	/**
@@ -70,12 +98,12 @@ public class ReservationController {
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getReservationById(@PathVariable long id) {
 		try {
-			return new ResponseEntity<>(reservationMapper
-					.toReservationDTO(reservationService.getReservationById(id)),
-					HttpStatus.OK);
-		} catch (ReservationNotFoundException reservationNotFoundException) {
-			return new ResponseEntity<>(reservationNotFoundException.getMessage(),
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(
+					reservationMapper.toReservationDTO(reservationService.getReservationById(id)),
+					HttpStatus.OK
+			);
+		} catch (ReservationNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -94,15 +122,14 @@ public class ReservationController {
 	public ResponseEntity<?> reserveWorkplaces(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			String jwt = getAuthorization();
-
 			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
 
 			return new ResponseEntity<>(
 					reservationMapper.toReservationDTO(reservationService.reserveWorkplaces(reservationDTO)),
 					HttpStatus.CREATED
 			);
-		} catch (WorkplacesNotAvailableException | RoomNotAvailableException | InvalidStartAndEndTimeException |
-				InvalidDayException e) {
+		} catch (WorkplacesNotAvailableException | RoomNotAvailableException |
+				InvalidStartAndEndTimeException | InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 	}
@@ -123,12 +150,12 @@ public class ReservationController {
 	public ResponseEntity<?> reserveRoom(@RequestBody ReservationDTO reservationDTO) {
 		try {
 			String jwt = getAuthorization();
-
 			reservationDTO.setEmployeeId(extractIdFromToken(jwt));
 
-			return new ResponseEntity<>(reservationMapper
-					.toReservationDTO(reservationService.reserveRoom(reservationDTO)),
-					HttpStatus.CREATED);
+			return new ResponseEntity<>(
+					reservationMapper.toReservationDTO(reservationService.reserveRoom(reservationDTO)),
+					HttpStatus.CREATED
+			);
 		} catch (RoomNotAvailableException | WorkplacesNotAvailableException |
 				InvalidStartAndEndTimeException | InvalidDayException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
@@ -149,17 +176,34 @@ public class ReservationController {
 	@GetMapping("/all")
 	public ResponseEntity<List<ReservationDTO>> getAllMyReservations() {
 		String jwt = getAuthorization();
-		return new ResponseEntity<>(reservationService.getAllMyReservations(extractIdFromToken(jwt))
-				.stream().map(reservationMapper::toReservationDTO).collect(Collectors.toUnmodifiableList()),
-				HttpStatus.OK);
+		var id = extractIdFromToken(jwt);
+		return new ResponseEntity<>(
+				reservationService
+						.getAllMyReservations(id)
+						.stream()
+						.map(reservationMapper::toReservationDTO)
+						.collect(Collectors.toList()),
+				HttpStatus.OK
+		);
 	}
 
+	/**
+	 * Function that retrieves all reservations at the given location.
+	 *
+	 * @param id locationId
+	 * @return List of {@link ReservationDTO}
+	 */
 	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/location/{id}")
 	public ResponseEntity<List<ReservationDTO>> getAllByLocation(@PathVariable long id) {
-		return new ResponseEntity<>(reservationService.getAllByLocation(id)
-				.stream().map(reservationMapper::toReservationDTO)
-				.collect(Collectors.toUnmodifiableList()), HttpStatus.OK);
+		return new ResponseEntity<>(
+				reservationService
+						.getAllByLocation(id)
+						.stream()
+						.map(reservationMapper::toReservationDTO)
+						.collect(Collectors.toList()),
+				HttpStatus.OK
+		);
 	}
 
 	/**
@@ -172,39 +216,17 @@ public class ReservationController {
 	@PostMapping("/delete/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable long id) {
 		try {
-			String jwt = getAuthorization();
-			long employeeId = extractIdFromToken(jwt);
+			var jwt = getAuthorization();
+			var employeeId = extractIdFromToken(jwt);
 
-			if (!reservationService.reservationFromEmployee(id, employeeId)) {
+			if (!reservationService.reservationFromEmployee(id, employeeId))
 				return new ResponseEntity<>("Reservation was not made by this employee", HttpStatus.FORBIDDEN);
-			}
 
 			reservationService.deleteReservation(id);
 			return new ResponseEntity<>(id, HttpStatus.OK);
 		} catch (ReservationNotFoundException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
 		}
-	}
-
-	/**
-	 * Function that takes the subject from the jwt token.
-	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
-	 *
-	 * @param token JW token with "Bearer " still in front of it.
-	 * @return Employee ID of that is embedded in the token.
-	 */
-	private static long extractIdFromToken(String token) {
-		//Strip the "Bearer "
-		var bearToken = token.split(" ")[1].split("\\.");
-
-		var decoder = Base64.getDecoder();
-
-		//header would be: jwChunks[0]
-		var payload = new String(decoder.decode(bearToken[1]));
-
-		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
-
-		return Long.decode(employeeId);
 	}
 
 	private String getAuthorization() {

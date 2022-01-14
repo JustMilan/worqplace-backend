@@ -172,7 +172,6 @@
 						<configuration>
 							<excludes>
 								<exclude>**/security/**</exclude>
-								<exclude>**/*Mapper.*</exclude>
 								<exclude>**/*Impl.*</exclude>
 								<exclude>**/WorqplaceApplication.*</exclude>
 								<exclude>**/MavenWrapperDownloader.*</exclude>
@@ -187,7 +186,6 @@
 						<configuration>
 							<excludes>
 								<exclude>**/security/**</exclude>
-								<exclude>**/*Mapper.*</exclude>
 								<exclude>**/*Impl.*</exclude>
 								<exclude>**/WorqplaceApplication.**</exclude>
 								<exclude>**/MavenWrapperDownloader.*</exclude>

@@ -36,3 +36,10 @@ VALUES ('Quintor Groningen', 5);
 INSERT INTO room(floor, location_id, capacity)
 VALUES (3, 5, 24),
        (-1, 5, 6);
+
+/* Queries for admin user */
+INSERT INTO employee(id, first_name, last_name)
+VALUES (9, 'Adminner', 'Aminster');
+
+INSERT INTO users(id, password, role, username, employee_id)
+VALUES (9, '$2a$10$gF4.kpVpDOdjhXTiMxov6u/4gkl9bqNmm8kU7IhUWW8ATE3Qg4dP.', 1, 'admin@quintor.nl', 9); -- password is: Kaasje

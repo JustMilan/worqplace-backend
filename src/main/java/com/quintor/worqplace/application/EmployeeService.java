@@ -31,12 +31,20 @@ public class EmployeeService {
 	 * @see EmployeeNotFoundException
 	 * @see ReservationService
 	 */
-	public Employee getEmployeeById(Long id) {
+	public Employee getEmployeeById(Long id) throws EmployeeNotFoundException {
 		return employeeRepository
 				.findById(id)
 				.orElseThrow(() -> new EmployeeNotFoundException(id));
 	}
 
+	/**
+	 * Function that creates an employee with the given parameters
+	 * and then saves it.
+	 *
+	 * @param firstname first name of the employee
+	 * @param lastname  last name of the employee
+	 * @return the saved {@link Employee}
+	 */
 	public Employee saveEmployee(String firstname, String lastname) {
 		return employeeRepository.save(new Employee(firstname, lastname));
 	}

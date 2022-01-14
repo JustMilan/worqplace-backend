@@ -39,7 +39,7 @@ class AddressTest {
 	@Test
 	@DisplayName("Should throw InvalidHouseNumberException if housenumber is invalid")
 	void shouldThrowWhenInvalidHouseNumber() {
-		assertThrows(InvalidHouseNumberException.class, () -> new Address(- 1, addition, street, postalCode, city));
+		assertThrows(InvalidHouseNumberException.class, () -> new Address(-1, addition, street, postalCode, city));
 	}
 
 	@Test

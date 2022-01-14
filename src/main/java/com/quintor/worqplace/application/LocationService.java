@@ -43,7 +43,7 @@ public class LocationService {
 	 * @see LocationNotFoundException
 	 * @see RoomService
 	 */
-	public Location getLocationById(Long id) {
+	public Location getLocationById(Long id) throws LocationNotFoundException {
 		return locationRepository
 				.findById(id)
 				.orElseThrow(() -> new LocationNotFoundException(id));

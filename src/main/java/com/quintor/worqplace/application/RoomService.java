@@ -2,6 +2,7 @@ package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
 import com.quintor.worqplace.application.util.DateTimeUtils;
+import com.quintor.worqplace.application.util.RoomAvailability;
 import com.quintor.worqplace.data.RoomRepository;
 import com.quintor.worqplace.domain.Location;
 import com.quintor.worqplace.domain.Recurrence;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,26 +35,44 @@ public class RoomService {
 	private final RoomRepository roomRepository;
 	private final LocationService locationService;
 
-	@Lazy
+	@Lazy // The locationService also depends on this service, if not lazy it can never start.
 	public RoomService(RoomRepository roomRepository, LocationService locationService) {
 		this.roomRepository = roomRepository;
 		this.locationService = locationService;
 	}
 
 	/**
-	 * Function that gets the requested {@link Room} by the entered id.
+	 * Method that retrieves the availability for {@link Room} at the given {@link Location}
+	 * at the given date and times.
 	 *
-	 * @param id id of the requested {@link Room}.
-	 * @return the requested {@link Room}.
-	 * @throws RoomNotFoundException when there is no {@link Room} found in the database
-	 *                               with the corresponding id, this exception is thrown.
-	 * @see Room
-	 * @see RoomRepository
-	 * @see RoomNotFoundException
+	 * @param locationId id of the wanted room
+	 * @param date       date
+	 * @param startTime  start time
+	 * @param endTime    end time
+	 * @return a {@link List} of {@link RoomAvailability}.
+	 * @see RoomAvailability
 	 */
-	public Room getRoomById(Long id) {
-		return roomRepository.findById(id)
-				.orElseThrow(() -> new RoomNotFoundException(id));
+	public List<RoomAvailability> getRoomsAvailabilityAtDateTime(Long locationId, LocalDate date,
+	                                                             LocalTime startTime, LocalTime endTime) {
+		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime);
+		return mapToRoomAvailability(date, startTime, endTime, rooms);
+	}
+
+	/**
+	 * Method that retrieves the availability for workplaces at the given {@link Location}
+	 * at the given date and times.
+	 *
+	 * @param locationId id of the wanted room
+	 * @param date       date
+	 * @param startTime  start time
+	 * @param endTime    end time
+	 * @return a {@link List} of {@link RoomAvailability}.
+	 * @see RoomAvailability
+	 */
+	public List<RoomAvailability> getWorkplaceAvailabilityAtDateTime(Long locationId, LocalDate date,
+	                                                                 LocalTime startTime, LocalTime endTime) {
+		var rooms = getRoomsWithWorkplacesAvailableAtDateTime(locationId, date, startTime, endTime);
+		return mapToRoomAvailability(date, startTime, endTime, rooms);
 	}
 
 	/**
@@ -70,7 +88,8 @@ public class RoomService {
 	 * @see Room
 	 * @see Location
 	 */
-	public List<Room> getRoomsAvailableAtDateTime(Long locationId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	public List<Room> getRoomsAvailableAtDateTime(Long locationId, LocalDate date,
+	                                              LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 
 		var rooms = findRoomsByLocationId(locationId);
@@ -79,6 +98,19 @@ public class RoomService {
 				.stream()
 				.filter(room -> isRoomAvailable(room, date, startTime, endTime))
 				.collect(Collectors.toUnmodifiableList());
+	}
+
+	/**
+	 * Helper method that calculates the available workplaces in the given {@link Room}.
+	 *
+	 * @param date      date
+	 * @param startTime start time
+	 * @param endTime   end time
+	 * @param room      room
+	 * @return the amount of available workplaces in the given  {@link Room}
+	 */
+	private int calculateAvailable(LocalDate date, LocalTime startTime, LocalTime endTime, Room room) {
+		return room.getCapacity() - room.countReservedWorkplaces(date, startTime, endTime);
 	}
 
 	/**
@@ -95,12 +127,12 @@ public class RoomService {
 	 * @see Location
 	 */
 	public List<Room> getRoomsWithWorkplacesAvailableAtDateTime(Long locationId, LocalDate date,
-																LocalTime startTime, LocalTime endTime) {
+	                                                            LocalTime startTime, LocalTime endTime) {
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> allRooms = findRoomsByLocationId(locationId);
 
 		return allRooms.stream()
-				.filter(room -> room.countReservedWorkspaces(date, startTime, endTime) < room.getCapacity())
+				.filter(room -> room.countReservedWorkplaces(date, startTime, endTime) < room.getCapacity())
 				.collect(Collectors.toUnmodifiableList());
 	}
 
@@ -124,10 +156,54 @@ public class RoomService {
 	 */
 	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		DateTimeUtils.checkReservationDateTime(date, startTime, endTime);
-		return room.getReservations().stream().noneMatch((reservation -> DateTimeUtils.timeslotsOverlap(
-				reservation.getDate(), reservation.getStartTime(),
-				reservation.getEndTime(), reservation.getRecurrence(),
-				date, startTime, endTime)));
+		return room.getReservations()
+				.stream()
+				.noneMatch(reservation ->
+						DateTimeUtils.timeslotsOverlap(
+								reservation.getDate(), reservation.getStartTime(),
+								reservation.getEndTime(), reservation.getRecurrence(),
+								date, startTime, endTime)
+				);
+	}
+
+	/**
+	 * Method that will map the date, start time, end time and rooms to a list of {@link RoomAvailability}
+	 *
+	 * @param date      date
+	 * @param startTime start time
+	 * @param endTime   end time
+	 * @param rooms     rooms
+	 * @return a {@link List} of {@link RoomAvailability}
+	 */
+	private List<RoomAvailability> mapToRoomAvailability(LocalDate date, LocalTime startTime,
+	                                                     LocalTime endTime, List<Room> rooms) {
+		return rooms.stream()
+				.map(room ->
+						new RoomAvailability(
+								room.getId(),
+								room.getFloor(),
+								room.getCapacity(),
+								calculateAvailable(date, startTime, endTime, room)
+						)
+				)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Function that gets the requested {@link Room} by the entered id.
+	 *
+	 * @param id id of the requested {@link Room}.
+	 * @return the requested {@link Room}.
+	 * @throws RoomNotFoundException when there is no {@link Room} found in the database
+	 *                               with the corresponding id, this exception is thrown.
+	 * @see Room
+	 * @see RoomRepository
+	 * @see RoomNotFoundException
+	 */
+	public Room findRoomById(Long id) {
+		return roomRepository
+				.findById(id)
+				.orElseThrow(() -> new RoomNotFoundException(id));
 	}
 
 	/**
@@ -141,6 +217,6 @@ public class RoomService {
 	 */
 	public List<Room> findRoomsByLocationId(Long locationId) {
 		var location = locationService.getLocationById(locationId);
-		return new ArrayList<>(location.getRooms());
+		return List.copyOf(location.getRooms());
 	}
 }

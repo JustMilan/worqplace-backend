@@ -1,10 +1,13 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
+import com.quintor.worqplace.data.EmployeeRepository;
+import com.quintor.worqplace.data.LocationRepository;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
+import com.quintor.worqplace.security.data.SpringUserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,14 +15,16 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,10 +46,9 @@ class ReservationControllerIntegrationTest {
 	private ReservationRepository reservationRepository;
 
 	@Autowired
-	private ReservationMapper reservationMapper;
+	private LocationRepository locationRepository;
 
 	private Employee employee;
-	private Employee employee1;
 
 	private Room room;
 	private Room room1;
@@ -54,8 +58,8 @@ class ReservationControllerIntegrationTest {
 
 	private Location location;
 
-	private Recurrence recurrence;
-	private Recurrence recurrence1;
+	private Recurrence monthlyRecurrence;
+	private Recurrence weeklyRecurrence1;
 
 	private Reservation reservation;
 	private Reservation reservation1;
@@ -67,32 +71,30 @@ class ReservationControllerIntegrationTest {
 	void initialize() {
 //		Employee
 		this.employee = new Employee(1L, "Quinten", "Tor");
-		this.employee1 = new Employee(2L, "Quintara", "Tor");
 
 //		Address
 		this.address = new Address(1L, 1, "", "Torro", "4369GH", "Torr");
 		this.address1 = new Address(2L, 12, "A", "Zuidel straat", "1249LJ", "Quintara");
 
 //		Location
-		this.location = new Location(1L, "Quintor - Test", address, null);
+		this.location = new Location(6L, "Quintor - Test", address, null);
 
 //		Room
 		this.room = new Room(1L, 1, location, 5, null);
 		this.room1 = new Room(2L, 2, location, 8, null);
 
 //		Recurrence
-		this.recurrence = new Recurrence(true, RecurrencePattern.MONTHLY);
-		this.recurrence1 = new Recurrence(false, RecurrencePattern.WEEKLY);
+		this.monthlyRecurrence = new Recurrence(true, RecurrencePattern.MONTHLY);
+		this.weeklyRecurrence1 = new Recurrence(false, RecurrencePattern.WEEKLY);
 
 //		Workplace
-		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, recurrence);
-		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 2, recurrence);
+		this.reservation = new Reservation(1L, LocalDate.now().plusDays(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 1, monthlyRecurrence);
+		this.reservation1 = new Reservation(2L, LocalDate.now().plusWeeks(1), LocalTime.of(9, 0), LocalTime.of(19, 0), employee, room, 2, monthlyRecurrence);
 
 //		Room
-		this.reservation3 = new Reservation(4L, LocalDate.now().plusWeeks(2), LocalTime.of(7, 3), LocalTime.of(8, 7), employee1, room1, 8, recurrence1);
+		this.reservation3 = new Reservation(4L, LocalDate.now().plusWeeks(2), LocalTime.of(7, 3), LocalTime.of(8, 7), employee, room1, 8, weeklyRecurrence1);
 
 		setupBearerToken();
-		createNewEmployee();
 	}
 
 	@AfterEach
@@ -115,8 +117,8 @@ class ReservationControllerIntegrationTest {
 
 		ResponseEntity<String> result = getRequest("/reservations");
 
-		assertTrue(requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}") &&
-				requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}"));
+		assertTrue(requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}".formatted(employee.getId())) &&
+				requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}".formatted(employee.getId())));
 	}
 
 	@Test
@@ -131,7 +133,7 @@ class ReservationControllerIntegrationTest {
 	@DisplayName("getReservationById() should return reservation 200 OK there is one")
 	void getReservationByIdShouldReturn200() {
 		reservationRepository.save(reservation);
-		ResponseEntity<String> result = getRequest("/reservations/1");
+		ResponseEntity<String> result = getRequest("/reservations/" + reservation.getId());
 
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
@@ -143,7 +145,7 @@ class ReservationControllerIntegrationTest {
 		ResponseEntity<String> result = getRequest("/reservations");
 
 		assertTrue(
-				requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}")
+				requireNonNull(result.getBody()).contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}".formatted(employee.getId()))
 		);
 	}
 
@@ -165,7 +167,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(4);
-		reservationDTO.setRecurrence(recurrence1);
+		reservationDTO.setRecurrence(weeklyRecurrence1);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -184,7 +186,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(1);
-		reservationDTO.setRecurrence(recurrence1);
+		reservationDTO.setRecurrence(weeklyRecurrence1);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -192,7 +194,7 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), request, String.class).getBody();
 
-		assertTrue(requireNonNull(result).contains(String.format(",\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}", reservationDTO.getDate())));
+		assertTrue(requireNonNull(result).contains(String.format(",\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}", reservationDTO.getDate(), employee.getId())));
 	}
 
 	@Test
@@ -205,7 +207,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(13);
-		reservationDTO.setRecurrence(recurrence1);
+		reservationDTO.setRecurrence(weeklyRecurrence1);
 
 		reservationRepository.save(reservation3);
 
@@ -215,7 +217,7 @@ class ReservationControllerIntegrationTest {
 
 		String result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/workplaces", port), request, String.class).getBody();
 
-		assertTrue(requireNonNull(result).contains(String.format(",\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":13,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}", reservationDTO.getDate())));
+		assertTrue(requireNonNull(result).contains(String.format(",\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":13,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}", reservationDTO.getDate(), employee.getId())));
 	}
 
 	@Test
@@ -228,7 +230,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(4);
-		reservationDTO.setRecurrence(recurrence1);
+		reservationDTO.setRecurrence(weeklyRecurrence1);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -247,7 +249,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(1);
-		reservationDTO.setRecurrence(recurrence1);
+		reservationDTO.setRecurrence(weeklyRecurrence1);
 
 		reservationRepository.save(reservation3);
 
@@ -267,7 +269,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEndTime(LocalTime.of(19, 0));
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
-		reservationDTO.setRecurrence(recurrence1);
+		reservationDTO.setRecurrence(weeklyRecurrence1);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -286,7 +288,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(1);
-		reservationDTO.setRecurrence(recurrence);
+		reservationDTO.setRecurrence(monthlyRecurrence);
 
 		assertNotNull(this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/rooms", port), reservationDTO, String.class).getBody());
 	}
@@ -301,7 +303,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(1);
-		reservationDTO.setRecurrence(recurrence);
+		reservationDTO.setRecurrence(monthlyRecurrence);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -321,7 +323,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(1);
-		reservationDTO.setRecurrence(recurrence);
+		reservationDTO.setRecurrence(monthlyRecurrence);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -340,7 +342,7 @@ class ReservationControllerIntegrationTest {
 		reservationDTO.setEmployeeId(employee.getId());
 		reservationDTO.setRoomId(room.getId());
 		reservationDTO.setWorkplaceAmount(1);
-		reservationDTO.setRecurrence(recurrence);
+		reservationDTO.setRecurrence(monthlyRecurrence);
 
 		var headers = new HttpHeaders();
 		headers.set("Authorization", this.bearer);
@@ -365,8 +367,8 @@ class ReservationControllerIntegrationTest {
 
 		var result = getRequest("/reservations/all");
 
-		assertTrue(result.getBody().contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},", reservation.getDate())) &&
-				result.getBody().contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":1,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}]", reservation1.getDate())));
+		assertTrue(result.getBody().contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},", reservation.getDate(), employee.getId())) &&
+				result.getBody().contains(String.format("\"date\":\"%s\",\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":%s,\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}]", reservation1.getDate(), employee.getId())));
 	}
 
 	@Test
@@ -396,6 +398,8 @@ class ReservationControllerIntegrationTest {
 	@DisplayName("deleteReservation() should return 403 when not own")
 	void deleteOtherReservation() {
 		reservationRepository.save(reservation3);
+		register("Test", "Je", "test@quintor.nl");
+		login("test@quintor.nl");
 		var result = getRequest("/reservations/");
 		Matcher m = Pattern.compile("id\":(.*?),").matcher(result.getBody());
 		boolean found = m.find();
@@ -407,11 +411,27 @@ class ReservationControllerIntegrationTest {
 		assertEquals(HttpStatus.FORBIDDEN, result.getStatusCode());
 	}
 
+	@Test
+	@DisplayName("getAllByLocation should all reservations by location")
+	void getAllByLocationShouldReturnAllReservationsByLocation() {
+		locationRepository.save(location);
+		reservationRepository.save(reservation);
+		reservationRepository.save(reservation1);
+		reservationRepository.save(reservation3);
+
+		login("admin@quintor.nl");
+
+		var result = getRequest("/reservations/location/5");
+
+		assertTrue(result.getBody().contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":10,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}") &&
+				result.getBody().contains("\"startTime\":\"07:03:00\",\"endTime\":\"08:07:00\",\"employeeId\":10,\"roomId\":2,\"workplaceAmount\":8,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}"));
+	}
+
 	/**
 	 * Function that uses the {@link TestRestTemplate} to send a GET request
 	 * to the Back-End for testing during Continuous Integration.
 	 *
-	 * @param url the URL Path after "https://localhost:8080".
+	 * @param url the URL Path after "https://localhost:{port}".
 	 *            as a {@link String}
 	 * @return a {@link ResponseEntity} for the request.
 	 */
@@ -457,47 +477,65 @@ class ReservationControllerIntegrationTest {
 
 	private void setupBearerToken() {
 		try {
-			Map<String, String> map1 = new HashMap<>();
-			map1.put("username", "mdol@quintor.nl");
-			map1.put("password", "Kaasje");
-
-			this.bearer = (restTemplate.postForEntity("http://localhost:" + port + "/login", map1, String.class))
-					.getHeaders().get("Authorization")
-					.toString()
-					.replace("[", "")
-					.replace("]", "");
+			login();
 		} catch (Exception e) {
-			String url = "http://localhost:" + port + "/register";
-
-			Map<String, String> map = new HashMap<>();
-			map.put("firstname", "Milan");
-			map.put("lastname", "Dol");
-			map.put("username", "mdol@quintor.nl");
-			map.put("password", "Kaasje");
-
-			restTemplate.postForEntity(url, map, Void.class);
-
-			Map<String, String> map1 = new HashMap<>();
-			map1.put("username", "mdol@quintor.nl");
-			map1.put("password", "Kaasje");
-
-			this.bearer = (restTemplate.postForEntity("http://localhost:" + port + "/login", map1, String.class))
-					.getHeaders().get("Authorization")
-					.toString()
-					.replace("[", "")
-					.replace("]", "");
+			register();
+			login();
 		}
 	}
 
-	private void createNewEmployee() {
+	private void register() {
+		register("Milan", "Dol", "mdol@quintor.nl");
+	}
+
+	private void register(String firstname, String lastname, String username) {
 		String url = "http://localhost:" + port + "/register";
 
 		Map<String, String> map = new HashMap<>();
-		map.put("firstname", "Nieuwe");
-		map.put("lastname", "Employee");
-		map.put("username", "nemp@quintor.nl");
-		map.put("password", "Biertje");
+		map.put("firstname", firstname);
+		map.put("lastname", lastname);
+		map.put("username", username);
+		map.put("password", "Kaasje");
 
 		restTemplate.postForEntity(url, map, Void.class);
+	}
+
+	private void login() {
+		login("mdol@quintor.nl");
+	}
+
+	private void login(String username) {
+		Map<String, String> map1 = new HashMap<>();
+		map1.put("username", username);
+		map1.put("password", "Kaasje");
+
+		this.bearer = (restTemplate.postForEntity("http://localhost:" + port + "/login", map1, String.class))
+				.getHeaders().get("Authorization")
+				.toString()
+				.replace("[", "")
+				.replace("]", "");
+
+		this.employee.setId(extractIdFromToken(this.bearer));
+	}
+
+	/**
+	 * Function that takes the subject from the jwt token.
+	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 *
+	 * @param token JW token with "Bearer " still in front of it.
+	 * @return Employee ID of that is embedded in the token.
+	 */
+	private static long extractIdFromToken(String token) {
+		//Strip the "Bearer "
+		var bearToken = token.split(" ")[1].split("\\.");
+
+		var decoder = Base64.getDecoder();
+
+		//header would be: jwChunks[0]
+		var payload = new String(decoder.decode(bearToken[1]));
+
+		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
+
+		return Long.decode(employeeId);
 	}
 }

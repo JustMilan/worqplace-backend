@@ -2,16 +2,13 @@ package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
-import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
+import com.quintor.worqplace.application.util.RoomAvailability;
 import com.quintor.worqplace.data.EmployeeRepository;
 import com.quintor.worqplace.data.LocationRepository;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.data.RoomRepository;
-import com.quintor.worqplace.domain.Address;
-import com.quintor.worqplace.domain.Employee;
-import com.quintor.worqplace.domain.Location;
-import com.quintor.worqplace.domain.Room;
+import com.quintor.worqplace.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -58,13 +56,13 @@ class RoomServiceTest {
 	@Test
 	@DisplayName("getRoomById() should return a room if it exists")
 	void getRoomByIdShouldReturnRoom() {
-		assertEquals(room, roomService.getRoomById(room.getId()));
+		assertEquals(room, roomService.findRoomById(room.getId()));
 	}
 
 	@Test
 	@DisplayName("getRoomById() should throw RoomNotFoundException if it hasn't been found")
 	void getRoomByIdShouldThrowIfNotFound() {
-		assertThrows(RoomNotFoundException.class, () -> roomService.getRoomById(2L));
+		assertThrows(RoomNotFoundException.class, () -> roomService.findRoomById(2L));
 	}
 
 	@Test
@@ -109,6 +107,21 @@ class RoomServiceTest {
 	}
 
 	@Test
+	@DisplayName("isRoomAvailable() should return false if room is already booked at that moment")
+	void isRoomAvailableShouldTakeOverlapInAccount() {
+		var reservationDate = LocalDate.now().plusDays(3);
+		var startTime = LocalTime.of(11, 1);
+		var endTime = LocalTime.of(15, 59);
+		var recurrence = new Recurrence(false, RecurrencePattern.NONE);
+
+		var reservation = new Reservation(reservationDate, startTime, endTime, null, room, room.getCapacity(), recurrence);
+
+		room.addReservation(reservation);
+
+		assertFalse(roomService.isRoomAvailable(room, reservationDate, startTime, endTime));
+	}
+
+	@Test
 	@DisplayName("findRoomsByLocationId() should return rooms if there are any")
 	void findRoomsByLocationIdShouldReturnRooms() {
 		assertEquals(List.of(room), roomService.findRoomsByLocationId(1L));
@@ -134,12 +147,54 @@ class RoomServiceTest {
 	}
 
 	@Test
-	@DisplayName("Placeholder for roomNotFoundEceptions")
-	void roomNotFoundException() {
-		//TODO: create real test
-		assertThrows(RoomNotAvailableException.class, () -> {
-			throw new RoomNotAvailableException();
-		});
+	@DisplayName("getRoomsWithWorkplacesAvailableAtDateTime should filter unavailable rooms")
+	void getRoomsWithWorkplacesAvailableAtDateTimeShouldFilterUnavailableRooms() {
+		when(locationRepository.findById(2L)).thenReturn(Optional.of(location));
+
+		var room1 = new Room(1L, 1, location, 14, Collections.emptyList());
+		var room2 = new Room(2L, 2, location, 5, Collections.emptyList());
+		var room3 = new Room(3L, 0, location, 3, Collections.emptyList());
+		var rooms = List.of(room1, room2, room3);
+
+		var today = LocalDate.now();
+		var startTime = LocalTime.of(11, 0);
+		var endTime = LocalTime.of(12, 0);
+		var recurrence = new Recurrence(false, RecurrencePattern.NONE);
+
+		var reservation = new Reservation(1L, today, startTime, endTime, null, room1, room1.getCapacity(), recurrence);
+		room1.addReservation(reservation);
+		location.setRooms(rooms);
+
+		assertEquals(2,
+				roomService.getRoomsWithWorkplacesAvailableAtDateTime(2L, today, startTime, endTime).size());
+	}
+
+	@Test
+	@DisplayName("getRoomsAvailabilityAtDateTime should return list of RoomAvailability records")
+	void getRoomsAvailabilityAtDateTimeShouldReturnRoomAvailability() {
+		var locationId = 1L;
+		var date = LocalDate.now();
+		var startTime = LocalTime.of(9, 0);
+		var endTime = LocalTime.of(10, 0);
+		var capacity = room.getCapacity();
+		var roomAvailability = new RoomAvailability(room.getId(), room.getFloor(), capacity, capacity);
+
+		assertEquals(List.of(roomAvailability),
+				roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime));
+	}
+
+	@Test
+	@DisplayName("getWorkplaceAvailabilityAtDateTime should return list of RoomAvailability records")
+	void getWorkplaceAvailabilityAtDateTimeShouldReturnAvailability() {
+		var locationId = 1L;
+		var date = LocalDate.now();
+		var startTime = LocalTime.of(9, 0);
+		var endTime = LocalTime.of(10, 0);
+		var capacity = room.getCapacity();
+		var roomAvailability = new RoomAvailability(room.getId(), room.getFloor(), capacity, capacity);
+
+		assertEquals(List.of(roomAvailability),
+				roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime));
 	}
 
 	/**

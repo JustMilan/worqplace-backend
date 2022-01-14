@@ -1,7 +1,6 @@
 package com.quintor.worqplace.application;
 
 import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
-import com.quintor.worqplace.application.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.Employee;
@@ -100,7 +99,7 @@ public class ReservationService {
 	 */
 	public Reservation toReservation(ReservationDTO reservationDTO) {
 		var employee = employeeService.getEmployeeById(reservationDTO.getEmployeeId());
-		var room = roomService.getRoomById(reservationDTO.getRoomId());
+		var room = roomService.findRoomById(reservationDTO.getRoomId());
 		var workplaceAmount = Math.max(reservationDTO.getWorkplaceAmount(), 1);
 
 		return new Reservation(reservationDTO.getDate(),
@@ -115,13 +114,10 @@ public class ReservationService {
 	 *
 	 * @param reservationDTO DTO input for creating a reservation.
 	 * @return the generated {@link Reservation} object.
-	 * @throws RoomNotAvailableException when the selected {@link Room} is not available,
-	 *                                   this exception is thrown.
 	 * @see ReservationDTO
 	 * @see Reservation
 	 * @see ReservationRepository
 	 * @see RoomService
-	 * @see RoomNotAvailableException
 	 */
 	public Reservation reserveRoom(ReservationDTO reservationDTO) {
 		var reservation = this.toReservation(reservationDTO);
@@ -187,7 +183,7 @@ public class ReservationService {
 	 * made by the entered {@link Employee}.
 	 *
 	 * @param reservationId id of the wanted {@link Reservation}.
-	 * @param employeeId id of the wanted {@link Employee}.
+	 * @param employeeId    id of the wanted {@link Employee}.
 	 * @return a {@link Boolean} which is <code>true</code> if the {@link Reservation}
 	 * is made by the specified {@link Employee}
 	 * If not, <code>false</code>
