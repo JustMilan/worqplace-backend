@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service class that handles communication between the
@@ -45,7 +46,9 @@ public class ReservationService {
 	 * @see ReservationRepository
 	 */
 	public List<Reservation> getAllReservations() {
-		return reservationRepository.findAll();
+		return reservationRepository.findAll().stream()
+				.filter(Reservation::isReservationActive)
+				.collect(Collectors.toList());
 	}
 
 	/**
