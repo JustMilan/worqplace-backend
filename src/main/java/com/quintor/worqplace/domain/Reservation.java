@@ -107,4 +107,27 @@ public class Reservation {
 
 		this.date = date;
 	}
+
+	/**
+	 * Function that returns whether this reservation has passed or is yet to come.
+	 * @return a {@link Boolean} that which is true if the reservation will occur in the future,
+	 * or has already happened.
+	 */
+	public boolean isReservationActive() {
+		return this.date.compareTo(LocalDate.now()) >= 0 || this.recurrence.isActive();
+	}
+
+	@Override
+	public String toString() {
+		return "Reservation{" +
+				"id=" + id +
+				", date=" + date +
+				", startTime=" + startTime +
+				", endTime=" + endTime +
+				", employee=" + employee.getId() +
+				", room=" + room.getId() +
+				", workplaceAmount=" + workplaceAmount +
+				", recurring=" + recurrence +
+				'}';
+	}
 }
