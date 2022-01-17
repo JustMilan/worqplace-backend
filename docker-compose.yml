@@ -1,9 +1,7 @@
 version: "3"
 services:
     backend:
-        build:
-            context: .
-            dockerfile: dockerfile
+        image: registry.quintor.local:5000/worqplace-backend:latest
         ports:
             - "8080:8080"
         networks:
@@ -13,9 +11,7 @@ services:
             - db
 
     frontend:
-        build:
-            context: ../worqplace-frontend-development
-            dockerfile: dockerfile
+        image: registry.quintor.local:5000/worqplace-frontend:latest
         ports:
             - "80:80"
             - "4200:4200"
