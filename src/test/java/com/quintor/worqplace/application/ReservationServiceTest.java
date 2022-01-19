@@ -40,6 +40,7 @@ class ReservationServiceTest {
 	private Reservation reservation2;
 	private Reservation reservation3;
 	private Reservation reservation4;
+	private Reservation reservation5;
 
 	@BeforeEach
 	void initialize() {
@@ -67,6 +68,7 @@ class ReservationServiceTest {
 		this.reservation2 = new Reservation(3L, LocalDate.now().plusMonths(3), LocalTime.of(9, 36), LocalTime.of(13, 10), employee, room, 15, noRecurrence);
 		this.reservation3 = new Reservation(4L, LocalDate.now().plusDays(1), LocalTime.of(18, 0), LocalTime.of(19, 0), employee, room, 15, noRecurrence);
 		this.reservation4 = new Reservation(5L, LocalDate.now().plusDays(1), LocalTime.of(18, 0), LocalTime.of(19, 0), employee, room1, 15, noRecurrence);
+		this.reservation5 = new Reservation(6L, LocalDate.now().minusDays(1), LocalTime.of(18, 0), LocalTime.of(19, 0), employee, room1, 15, noRecurrence, true);
 		this.room.setLocation(location);
 		this.room1.setLocation(location1);
 		this.room.setReservations(List.of(reservation1));
@@ -78,7 +80,13 @@ class ReservationServiceTest {
 	@Test
 	@DisplayName("getAllReservations() should return all reservations if there are any")
 	void getAllReservationsShouldReturnAllReservations() {
-		assertEquals(List.of(reservation, reservation1), reservationService.getAllReservations());
+		assertEquals(List.of(reservation, reservation1, reservation5), reservationService.getAllReservations(true));
+	}
+
+	@Test
+	@DisplayName("getAllReservations() should return only active reservations when includeOld is false")
+	void getAllReservationsWithoutOldReservationsShouldReturnOnlyActiveReservations() {
+		assertEquals(List.of(reservation, reservation1), reservationService.getAllReservations(false));
 	}
 
 	@Test
@@ -239,7 +247,7 @@ class ReservationServiceTest {
 //		Reservation repository
 		when(reservationRepository.findById(3L)).thenReturn(Optional.empty());
 		when(reservationRepository.save(reservation)).thenReturn(reservation);
-		when(reservationRepository.findAll()).thenReturn(List.of(reservation, reservation1));
+		when(reservationRepository.findAll()).thenReturn(List.of(reservation, reservation1, reservation5));
 		when(reservationRepository.findById(reservation.getId())).thenReturn(java.util.Optional.ofNullable(reservation));
 		when(reservationRepository.findAllByEmployeeId(employee.getId()))
 				.thenReturn(List.of(reservation, reservation1, reservation2));

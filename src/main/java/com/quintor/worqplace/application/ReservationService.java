@@ -45,9 +45,9 @@ public class ReservationService {
 	 * @see Reservation
 	 * @see ReservationRepository
 	 */
-	public List<Reservation> getAllReservations() {
+	public List<Reservation> getAllReservations(boolean includeOld) {
 		return reservationRepository.findAll().stream()
-				.filter(Reservation::isReservationActive)
+				.filter(reservation -> includeOld || reservation.isReservationActive())
 				.collect(Collectors.toList());
 	}
 
@@ -171,8 +171,7 @@ public class ReservationService {
 	 * the entered {@link Employee}.
 	 *
 	 * @param id id of the wanted {@link Employee}.
-	 * @void does not return, only deletes an existing reservation {@link Reservation reservation} made by
-	 * the selected {@link Employee}
+	 * 
 	 * @see Employee
 	 * @see Reservation
 	 * @see ReservationRepository
