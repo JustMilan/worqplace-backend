@@ -222,7 +222,7 @@ class ReservationServiceTest {
 	@Test
 	@DisplayName("getAllMyReservations should return all reservations made by the given user")
 	void getAllMyReservationsReturnsAllReservationsByUser() {
-		assertEquals(3, reservationService.getAllMyReservations(this.employee.getId()).size());
+		assertEquals(3, reservationService.getAllMyReservations(this.employee.getId(), null, null).size());
 	}
 
 	@Test

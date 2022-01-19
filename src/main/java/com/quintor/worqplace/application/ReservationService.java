@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -142,8 +143,14 @@ public class ReservationService {
 	 * @see Reservation
 	 * @see ReservationRepository
 	 */
-	public List<Reservation> getAllMyReservations(Long id) {
-		return reservationRepository.findAllByEmployeeId(id);
+	public List<Reservation> getAllMyReservations(Long id, Long locationId, LocalDate date) {
+		LocalDate finalDate = date == null ? LocalDate.now() : date;
+		return reservationRepository.findAllByEmployeeId(id).stream()
+				.filter(reservation ->
+						(locationId == null ||
+								Objects.equals(reservation.getRoom().getLocation().getId(), locationId))
+								&& (reservation.getDate().compareTo(finalDate) >= 0 ||
+								reservation.getRecurrence().isActive())).toList();
 	}
 
 	/**

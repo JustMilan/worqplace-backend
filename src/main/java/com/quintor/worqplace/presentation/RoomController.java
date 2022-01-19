@@ -75,10 +75,11 @@ public class RoomController {
 			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
 			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
-			@RequestParam("recurrencePattern") RecurrencePattern recurrencePattern) {
+			@RequestParam(value = "amount", required = false) Integer amount,
+			@RequestParam(value = "recurrencePattern", required = false) RecurrencePattern recurrencePattern) {
 		try {
 			return new ResponseEntity<>(
-					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, recurrencePattern),
+					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, amount, recurrencePattern),
 					HttpStatus.OK
 			);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
