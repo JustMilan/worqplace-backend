@@ -115,7 +115,8 @@ class RoomControllerIntegrationTest {
 		urlPart += "locationId=5&";
 		urlPart += "date=6000-01-01&";
 		urlPart += "start=14:00&";
-		urlPart += "end=15:00";
+		urlPart += "end=15:00&";
+		urlPart += "recurrencePattern=NONE";
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
@@ -129,7 +130,8 @@ class RoomControllerIntegrationTest {
 		urlPart += "locationId=5&";
 		urlPart += "date=6000-01-01&";
 		urlPart += "start=14:00&";
-		urlPart += "end=15:00";
+		urlPart += "end=15:00&";
+		urlPart += "recurrencePattern=NONE";
 
 		ResponseEntity<String> result = getRequest(urlPart);
 
@@ -143,7 +145,8 @@ class RoomControllerIntegrationTest {
 		urlPart += "locationId=5&";
 		urlPart += "date=2010-01-01&";
 		urlPart += "start=14:00&";
-		urlPart += "end=15:00";
+		urlPart += "end=15:00&";
+		urlPart += "recurrencePattern=NONE";
 
 		ResponseEntity<String> result = getRequest(urlPart);
 

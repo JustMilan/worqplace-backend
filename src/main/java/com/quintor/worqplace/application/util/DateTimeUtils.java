@@ -64,7 +64,6 @@ public class DateTimeUtils {
 	                                       LocalTime existingEndTime, Recurrence recurrence,
 	                                       LocalDate newDate, LocalTime newStartTime,
 	                                       LocalTime newEndTime) {
-
 		return (existingDate.equals(newDate) || recurrence.isActive())
 				&& checkStartAndEndTimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
 	}

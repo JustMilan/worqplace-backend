@@ -69,14 +69,15 @@ public class ReservationController {
 	 * {@link com.quintor.worqplace.presentation.dto.reservation.ReservationDTO
 	 * ReservationDTOs}.
 	 *
+	 * @param includeOld an optional parameter for when one also wants past reservations.
 	 * @return a ResponseEntity containing a list of
 	 * {@link com.quintor.worqplace.presentation.dto.reservation.ReservationDTO ReservationDTOs}.
 	 */
 	@GetMapping
-	public ResponseEntity<List<ReservationDTO>> getAllReservations() {
+	public ResponseEntity<List<ReservationDTO>> getAllReservations(@RequestParam(required = false) boolean includeOld) {
 		return new ResponseEntity<>(
 				reservationService
-						.getAllReservations()
+						.getAllReservations(includeOld)
 						.stream()
 						.map(reservationMapper::toReservationDTO)
 						.collect(Collectors.toList()),
