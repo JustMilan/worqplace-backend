@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Service class that handles communication between the
@@ -44,8 +45,10 @@ public class ReservationService {
 	 * @see Reservation
 	 * @see ReservationRepository
 	 */
-	public List<Reservation> getAllReservations() {
-		return reservationRepository.findAll();
+	public List<Reservation> getAllReservations(boolean includeOld) {
+		return reservationRepository.findAll().stream()
+				.filter(reservation -> includeOld || reservation.isReservationActive())
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -168,8 +171,7 @@ public class ReservationService {
 	 * the entered {@link Employee}.
 	 *
 	 * @param id id of the wanted {@link Employee}.
-	 * @void does not return, only deletes an existing reservation {@link Reservation reservation} made by
-	 * the selected {@link Employee}
+	 * 
 	 * @see Employee
 	 * @see Reservation
 	 * @see ReservationRepository
