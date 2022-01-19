@@ -3,6 +3,7 @@ package com.quintor.worqplace.presentation;
 import com.quintor.worqplace.application.RoomService;
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
+import com.quintor.worqplace.domain.RecurrencePattern;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -73,10 +74,11 @@ public class RoomController {
 			@RequestParam("locationId") Long locationId,
 			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
+			@RequestParam("recurrencePattern") RecurrencePattern recurrencePattern) {
 		try {
 			return new ResponseEntity<>(
-					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime),
+					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, recurrencePattern),
 					HttpStatus.OK
 			);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {

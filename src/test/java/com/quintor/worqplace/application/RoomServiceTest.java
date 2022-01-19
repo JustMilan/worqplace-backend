@@ -136,14 +136,14 @@ class RoomServiceTest {
 
 
 		assertThrows(InvalidDayException.class,
-				() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(locationId, reservationDate, reservationTime, reservationTime));
+				() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(locationId, reservationDate, reservationTime, reservationTime, RecurrencePattern.NONE));
 	}
 
 	@Test
 	@DisplayName("getRoomsWithWorkplacesAvailableAtDateTime() should not throw if parameter data is correct")
 	void getRoomsWithWorkplacesAvailableAtDateTimeShouldExecute() {
 		assertDoesNotThrow(() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L,
-				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON));
+				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON, RecurrencePattern.NONE));
 	}
 
 	@Test
@@ -166,7 +166,7 @@ class RoomServiceTest {
 		location.setRooms(rooms);
 
 		assertEquals(2,
-				roomService.getRoomsWithWorkplacesAvailableAtDateTime(2L, today, startTime, endTime).size());
+				roomService.getRoomsWithWorkplacesAvailableAtDateTime(2L, today, startTime, endTime, RecurrencePattern.NONE).size());
 	}
 
 	@Test
@@ -194,7 +194,7 @@ class RoomServiceTest {
 		var roomAvailability = new RoomAvailability(room.getId(), room.getFloor(), capacity, capacity);
 
 		assertEquals(List.of(roomAvailability),
-				roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime));
+				roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, RecurrencePattern.NONE));
 	}
 
 	/**

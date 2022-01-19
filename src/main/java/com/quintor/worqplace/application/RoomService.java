@@ -4,9 +4,7 @@ import com.quintor.worqplace.application.exceptions.RoomNotFoundException;
 import com.quintor.worqplace.application.util.DateTimeUtils;
 import com.quintor.worqplace.application.util.RoomAvailability;
 import com.quintor.worqplace.data.RoomRepository;
-import com.quintor.worqplace.domain.Location;
-import com.quintor.worqplace.domain.Recurrence;
-import com.quintor.worqplace.domain.Room;
+import com.quintor.worqplace.domain.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -70,8 +68,10 @@ public class RoomService {
 	 * @see RoomAvailability
 	 */
 	public List<RoomAvailability> getWorkplaceAvailabilityAtDateTime(Long locationId, LocalDate date,
-	                                                                 LocalTime startTime, LocalTime endTime) {
-		var rooms = getRoomsWithWorkplacesAvailableAtDateTime(locationId, date, startTime, endTime);
+	                                                                 LocalTime startTime, LocalTime endTime,
+	                                                                 RecurrencePattern recurrencePattern) {
+		var rooms = getRoomsWithWorkplacesAvailableAtDateTime(locationId, date, startTime, endTime,
+				recurrencePattern);
 		return mapToRoomAvailability(date, startTime, endTime, rooms);
 	}
 
@@ -127,12 +127,16 @@ public class RoomService {
 	 * @see Location
 	 */
 	public List<Room> getRoomsWithWorkplacesAvailableAtDateTime(Long locationId, LocalDate date,
-	                                                            LocalTime startTime, LocalTime endTime) {
+	                                                            LocalTime startTime, LocalTime endTime,
+	                                                            RecurrencePattern recurrencePattern) {
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> allRooms = findRoomsByLocationId(locationId);
+		Recurrence recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
 
 		return allRooms.stream()
-				.filter(room -> room.countReservedWorkplaces(date, startTime, endTime) < room.getCapacity())
+				.filter(room -> (room.countReservedWorkplaces(date, startTime, endTime) < room.getCapacity())
+						&& (room.isWorkplaceRecurrentlyAvailable(new Reservation(date, startTime, endTime,
+						null, room, 1, recurrence))))
 				.collect(Collectors.toUnmodifiableList());
 	}
 
