@@ -140,7 +140,7 @@ public class RoomService {
 		Recurrence recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
 
 		return allRooms.stream()
-				.filter(room -> (room.countReservedWorkplaces(date, startTime, endTime) + finalAmount < room.getCapacity())
+				.filter(room -> (room.countReservedWorkplaces(date, startTime, endTime) + finalAmount <= room.getCapacity())
 						&& (room.isWorkplaceRecurrentlyAvailable(new Reservation(date, startTime, endTime,
 						null, room, finalAmount, recurrence)))).toList();
 	}
