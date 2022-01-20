@@ -48,10 +48,11 @@ public class RoomController {
 			@RequestParam("locationId") Long locationId,
 			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
-			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime) {
+			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
+			@RequestParam(value = "recurrencePattern", required = false) RecurrencePattern recurrencePattern) {
 		try {
 			return new ResponseEntity<>(
-					roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime),
+					roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime, recurrencePattern),
 					HttpStatus.OK);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
@@ -75,10 +76,11 @@ public class RoomController {
 			@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 			@RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime,
 			@RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime endTime,
-			@RequestParam("recurrencePattern") RecurrencePattern recurrencePattern) {
+			@RequestParam(value = "amount", required = false) Integer amount,
+			@RequestParam(value = "recurrencePattern", required = false) RecurrencePattern recurrencePattern) {
 		try {
 			return new ResponseEntity<>(
-					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, recurrencePattern),
+					roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, amount, recurrencePattern),
 					HttpStatus.OK
 			);
 		} catch (InvalidDayException | InvalidStartAndEndTimeException e) {

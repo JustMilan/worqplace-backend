@@ -136,14 +136,14 @@ class RoomServiceTest {
 
 
 		assertThrows(InvalidDayException.class,
-				() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(locationId, reservationDate, reservationTime, reservationTime, RecurrencePattern.NONE));
+				() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(locationId, reservationDate, reservationTime, reservationTime, 1, RecurrencePattern.NONE));
 	}
 
 	@Test
 	@DisplayName("getRoomsWithWorkplacesAvailableAtDateTime() should not throw if parameter data is correct")
 	void getRoomsWithWorkplacesAvailableAtDateTimeShouldExecute() {
 		assertDoesNotThrow(() -> roomService.getRoomsWithWorkplacesAvailableAtDateTime(1L,
-				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON, RecurrencePattern.NONE));
+				LocalDate.now().plusDays(1), LocalTime.MIDNIGHT, LocalTime.NOON, 1, RecurrencePattern.NONE));
 	}
 
 	@Test
@@ -166,7 +166,7 @@ class RoomServiceTest {
 		location.setRooms(rooms);
 
 		assertEquals(2,
-				roomService.getRoomsWithWorkplacesAvailableAtDateTime(2L, today, startTime, endTime, RecurrencePattern.NONE).size());
+				roomService.getRoomsWithWorkplacesAvailableAtDateTime(2L, today, startTime, endTime, 1, RecurrencePattern.NONE).size());
 	}
 
 	@Test
@@ -180,7 +180,7 @@ class RoomServiceTest {
 		var roomAvailability = new RoomAvailability(room.getId(), room.getFloor(), capacity, capacity);
 
 		assertEquals(List.of(roomAvailability),
-				roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime));
+				roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime, RecurrencePattern.NONE));
 	}
 
 	@Test
@@ -194,7 +194,7 @@ class RoomServiceTest {
 		var roomAvailability = new RoomAvailability(room.getId(), room.getFloor(), capacity, capacity);
 
 		assertEquals(List.of(roomAvailability),
-				roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, RecurrencePattern.NONE));
+				roomService.getWorkplaceAvailabilityAtDateTime(locationId, date, startTime, endTime, 1, RecurrencePattern.NONE));
 	}
 
 	/**
