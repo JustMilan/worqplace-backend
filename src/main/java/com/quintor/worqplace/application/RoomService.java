@@ -51,8 +51,13 @@ public class RoomService {
 	 * @see RoomAvailability
 	 */
 	public List<RoomAvailability> getRoomsAvailabilityAtDateTime(Long locationId, LocalDate date,
-	                                                             LocalTime startTime, LocalTime endTime) {
-		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime);
+	                                                             LocalTime startTime, LocalTime endTime,
+	                                                             RecurrencePattern recurrencePattern) {
+		Recurrence recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
+		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime)
+				.stream().filter(room -> room.isWorkplaceRecurrentlyAvailable(
+						new Reservation(date, startTime, endTime, null, room, room.getCapacity(), recurrence)))
+				.collect(Collectors.toList());
 		return mapToRoomAvailability(date, startTime, endTime, rooms);
 	}
 
@@ -97,8 +102,7 @@ public class RoomService {
 
 		return rooms
 				.stream()
-				.filter(room -> isRoomAvailable(room, date, startTime, endTime))
-				.collect(Collectors.toUnmodifiableList());
+				.filter(room -> isRoomAvailable(room, date, startTime, endTime)).toList();
 	}
 
 	/**

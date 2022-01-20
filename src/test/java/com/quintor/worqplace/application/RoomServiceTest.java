@@ -180,7 +180,7 @@ class RoomServiceTest {
 		var roomAvailability = new RoomAvailability(room.getId(), room.getFloor(), capacity, capacity);
 
 		assertEquals(List.of(roomAvailability),
-				roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime));
+				roomService.getRoomsAvailabilityAtDateTime(locationId, date, startTime, endTime, RecurrencePattern.NONE));
 	}
 
 	@Test
