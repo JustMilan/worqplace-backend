@@ -30,6 +30,8 @@ services:
             MYSQL_ROOT_PASSWORD: adminadmin
         volumes:
             - worqplace-db:/var/lib/mysql
+            - "./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+            - "./src/main/resources/data.sql:/docker-entrypoint-initdb.d/2.sql"
         networks:
             app_network:
                 ipv4_address: 172.1.0.2
