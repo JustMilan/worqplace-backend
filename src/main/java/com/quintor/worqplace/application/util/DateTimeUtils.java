@@ -6,6 +6,8 @@ import com.quintor.worqplace.domain.Recurrence;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.WeekFields;
+import java.util.Locale;
 
 /**
  * Utility class containing functions to verify input dates and times and
@@ -64,8 +66,38 @@ public class DateTimeUtils {
 	                                       LocalTime existingEndTime, Recurrence recurrence,
 	                                       LocalDate newDate, LocalTime newStartTime,
 	                                       LocalTime newEndTime) {
-		return (existingDate.equals(newDate) || recurrence.isActive())
-				&& checkStartAndEndTimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
+		var weekFields = WeekFields.of(Locale.getDefault());
+		int oldWeekNumber = existingDate.get(weekFields.weekOfWeekBasedYear());
+		int newWeekNumber = newDate.get(weekFields.weekOfWeekBasedYear());
+
+		if (!existingDate.equals(newDate) && !recurrence.isActive()) return false;
+
+		if (recurrence.isActive()) switch (recurrence.getRecurrencePattern()) {
+			case WEEKLY:
+				if (checkSameDate(existingDate, newDate))
+					return false;
+				break;
+			case BIWEEKLY:
+				if (checkIfBiWeekly(oldWeekNumber, newWeekNumber) ||
+						checkSameDate(existingDate, newDate))
+					return false;
+				break;
+			case MONTHLY:
+				if (existingDate.getDayOfMonth() != newDate.getDayOfMonth())
+					return false;
+				break;
+			default:
+				break;
+		}
+		return checkStartAndEndTimeOverlap(existingStartTime, existingEndTime, newStartTime, newEndTime);
+	}
+
+	private static boolean checkIfBiWeekly(int oldWeekNumber, int newWeekNumber) {
+		return (newWeekNumber - oldWeekNumber) % 2 > 0;
+	}
+
+	private static boolean checkSameDate(LocalDate existingDate, LocalDate newDate) {
+		return !existingDate.getDayOfWeek().equals(newDate.getDayOfWeek());
 	}
 
 	private static boolean checkStartAndEndTimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime,

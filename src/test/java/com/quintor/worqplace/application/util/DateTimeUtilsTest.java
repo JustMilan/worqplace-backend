@@ -146,4 +146,22 @@ class DateTimeUtilsTest {
 		var eight = LocalTime.of(8, 0);
 		assertFalse(timeslotsOverlap(TODAY, NINE, TWELVE, MONTHLY_RECURRENCE, TODAY, seven, eight));
 	}
+
+	@Test
+	@DisplayName("should return false when dates don't equal with weekly recurrence")
+	void shouldReturnFalseWhenDifferentDatesWithWeeklyRecurrence() {
+		assertFalse(timeslotsOverlap(TOMORROW, ONE, FOUR, WEEKLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
+
+	@Test
+	@DisplayName("should return false when dates don't equal with bi weekly recurrence")
+	void shouldReturnFalseWhenDifferentDatesWithBiWeeklyRecurrence() {
+		assertFalse(timeslotsOverlap(TOMORROW, ONE, FOUR, BIWEEKLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
+
+	@Test
+	@DisplayName("should return false when dates don't equal with monthly recurrence")
+	void shouldReturnFalseWhenDifferentDatesWithMonthlyRecurrence() {
+		assertFalse(timeslotsOverlap(TOMORROW, ONE, FOUR, MONTHLY_RECURRENCE, TODAY, ONE, FOUR));
+	}
 }
