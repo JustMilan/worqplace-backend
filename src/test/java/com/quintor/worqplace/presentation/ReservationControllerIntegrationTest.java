@@ -423,8 +423,8 @@ class ReservationControllerIntegrationTest {
 
 		var result = getRequest("/reservations/location/5");
 
-		assertTrue(result.getBody().contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeId\":10,\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}}") &&
-				result.getBody().contains("\"startTime\":\"07:03:00\",\"endTime\":\"08:07:00\",\"employeeId\":10,\"roomId\":2,\"workplaceAmount\":8,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\"}}"));
+		assertTrue(result.getBody().contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeFirstName\":\"Milan\",\"employeeLastName\":\"Dol\",\"roomId\":1,\"workplaceAmount\":1,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"") &&
+				result.getBody().contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeFirstName\":\"Milan\",\"employeeLastName\":\"Dol\",\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},{\"id\":3,\"date\":\"2022-02-08\",\"startTime\":\"07:03:00\",\"endTime\":\"08:07:00\",\"employeeFirstName\":\"Milan\",\"employeeLastName\":\"Dol\",\"roomId\":2,\"workplaceAmount\":8,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\""));
 	}
 
 	/**
