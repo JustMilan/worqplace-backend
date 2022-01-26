@@ -3,6 +3,8 @@ package com.quintor.worqplace.presentation;
 import com.quintor.worqplace.application.ReservationService;
 import com.quintor.worqplace.application.exceptions.*;
 import com.quintor.worqplace.domain.exceptions.RoomNotAvailableException;
+import com.quintor.worqplace.presentation.dto.reservation.AdminReservationDTO;
+import com.quintor.worqplace.presentation.dto.reservation.AdminReservationMapper;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
 import lombok.AllArgsConstructor;
@@ -42,6 +44,7 @@ import static java.util.Objects.requireNonNull;
 public class ReservationController {
 	private final ReservationService reservationService;
 	private final ReservationMapper reservationMapper;
+	private final AdminReservationMapper adminReservationMapper;
 
 	/**
 	 * Function that takes the subject from the jwt token.
@@ -201,12 +204,12 @@ public class ReservationController {
 	 */
 	@RolesAllowed("ROLE_ADMIN")
 	@GetMapping("/location/{id}")
-	public ResponseEntity<List<ReservationDTO>> getAllByLocation(@PathVariable long id) {
+	public ResponseEntity<List<AdminReservationDTO>> getAllByLocation(@PathVariable long id) {
 		return new ResponseEntity<>(
 				reservationService
 						.getAllByLocation(id)
 						.stream()
-						.map(reservationMapper::toReservationDTO)
+						.map(adminReservationMapper::toAdminReservationDTO)
 						.collect(Collectors.toList()),
 				HttpStatus.OK
 		);
