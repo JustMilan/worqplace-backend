@@ -178,7 +178,6 @@ public class ReservationService {
 	 * the entered {@link Employee}.
 	 *
 	 * @param id id of the wanted {@link Employee}.
-	 * 
 	 * @see Employee
 	 * @see Reservation
 	 * @see ReservationRepository
@@ -204,5 +203,17 @@ public class ReservationService {
 		var reservation = getReservationById(reservationId);
 
 		return Objects.equals(reservation.getEmployee().getId(), employeeId);
+	}
+
+	public Reservation updateReservation(ReservationDTO reservationDTO) {
+		var oldReservation = getReservationById(reservationDTO.getId());
+		var newReservation = toReservation(reservationDTO);
+
+		var room = oldReservation.getRoom();
+
+		room.updateReservation(oldReservation, newReservation);
+		reservationRepository.delete(oldReservation);
+		reservationRepository.save(newReservation);
+		return newReservation;
 	}
 }

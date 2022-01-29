@@ -1,17 +1,24 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.application.ReservationService;
-import com.quintor.worqplace.application.exceptions.*;
+import com.quintor.worqplace.application.exceptions.InvalidDayException;
+import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
+import com.quintor.worqplace.application.exceptions.ReservationNotFoundException;
+import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.domain.exceptions.RoomNotAvailableException;
 import com.quintor.worqplace.presentation.dto.reservation.AdminReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.AdminReservationMapper;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
+import com.quintor.worqplace.security.data.UserRoles;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -22,8 +29,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
@@ -65,6 +74,15 @@ public class ReservationController {
 		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
 
 		return Long.decode(employeeId);
+	}
+
+	/**
+	 * Function that retrieves all Authorities (c.q. roles) from the current user.
+	 *
+	 * @return List of grandted authorities (aka roles).
+	 */
+	private Collection<? extends GrantedAuthority> getGrantedAuthorities() {
+		return SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 	}
 
 	/**
@@ -238,8 +256,50 @@ public class ReservationController {
 		}
 	}
 
+	/**
+	 * Function that updates a reservation if the suggestion for the new reservation is available.
+	 * Only lets admins change reservations of other people, otherwise a response will be returned that you cannot
+	 * change reservations of others.
+	 *
+	 * @param reservationDTO {@link ReservationDTO}
+	 * @return Whether the update could be performed successfully, if not, a small explanation will be given.
+	 */
+	@PostMapping("/update")
+	public ResponseEntity<?> updateReservation(@RequestBody ReservationDTO reservationDTO) {
+		try {
+			var jwt = getAuthorization();
+			var employeeId = extractIdFromToken(jwt);
+
+			if (!isAdmin() && !reservationService.reservationFromEmployee(reservationDTO.getId(), employeeId))
+				return new ResponseEntity<>("You cannot alter the reservation of others.",
+						HttpStatus.UNAUTHORIZED);
+
+			return new ResponseEntity<>(
+					Stream.of(reservationService.updateReservation(reservationDTO))
+							.map(reservationMapper::toReservationDTO),
+					HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}
+	}
+
+	/**
+	 * Function that gets the authorization header from the received request.
+	 *
+	 * @return Bearer token.
+	 */
 	private String getAuthorization() {
 		return ((ServletRequestAttributes) requireNonNull(RequestContextHolder.getRequestAttributes()))
 				.getRequest().getHeader("Authorization");
+	}
+
+	/**
+	 * Function that checks if the current user is an admin.
+	 *
+	 * @return if the user is an admin.
+	 */
+	private boolean isAdmin() {
+		var adminAuthority = new SimpleGrantedAuthority(UserRoles.ADMIN.getRoleName());
+		return getGrantedAuthorities().contains(adminAuthority);
 	}
 }

@@ -3,6 +3,7 @@ package com.quintor.worqplace.application.util;
 import com.quintor.worqplace.application.exceptions.InvalidDayException;
 import com.quintor.worqplace.application.exceptions.InvalidStartAndEndTimeException;
 import com.quintor.worqplace.domain.Recurrence;
+import com.quintor.worqplace.domain.Reservation;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -100,9 +101,32 @@ public class DateTimeUtils {
 		return !existingDate.getDayOfWeek().equals(newDate.getDayOfWeek());
 	}
 
+	/**
+	 * Function that checks if the start and end time from the existing reservation overlap with the
+	 * start and end time from the new reservation.
+	 *
+	 * @param existingStartTime start time of the existing reservation.
+	 * @param existingEndTime   end time of the existing reservation.
+	 * @param newStartTime      start time of the new reservation.
+	 * @param newEndTime        end time of the new reservation.
+	 * @return if there is an overlap.
+	 */
 	private static boolean checkStartAndEndTimeOverlap(LocalTime existingStartTime, LocalTime existingEndTime,
 	                                                   LocalTime newStartTime, LocalTime newEndTime) {
 		return !newStartTime.isAfter(existingEndTime) &&
 				!newEndTime.isBefore(existingStartTime);
+	}
+
+	/**
+	 * Function that takes to reservations and returns {@link DateTimeUtils#timeslotsOverlap(LocalDate, LocalTime, LocalTime, Recurrence, LocalDate, LocalTime, LocalTime)}.
+	 *
+	 * @param reservation Reservation.
+	 * @param reservation1 Reservation.
+	 * @return if the timeslots from both reservations overlap.
+	 */
+	public static boolean timeslotsOverlap(Reservation reservation, Reservation reservation1) {
+		return timeslotsOverlap(reservation.getDate(), reservation.getStartTime(), reservation.getEndTime(),
+				reservation.getRecurrence(), reservation1.getDate(), reservation1.getStartTime(),
+				reservation1.getEndTime());
 	}
 }

@@ -1,13 +1,10 @@
 package com.quintor.worqplace.presentation;
 
 import com.quintor.worqplace.CiTestConfiguration;
-import com.quintor.worqplace.data.EmployeeRepository;
 import com.quintor.worqplace.data.LocationRepository;
 import com.quintor.worqplace.data.ReservationRepository;
 import com.quintor.worqplace.domain.*;
 import com.quintor.worqplace.presentation.dto.reservation.ReservationDTO;
-import com.quintor.worqplace.presentation.dto.reservation.ReservationMapper;
-import com.quintor.worqplace.security.data.SpringUserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,7 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,6 +66,27 @@ class ReservationControllerIntegrationTest {
 	private Reservation reservation3;
 
 	private String bearer;
+
+	/**
+	 * Function that takes the subject from the jwt token.
+	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
+	 *
+	 * @param token JW token with "Bearer " still in front of it.
+	 * @return Employee ID of that is embedded in the token.
+	 */
+	private static long extractIdFromToken(String token) {
+		//Strip the "Bearer "
+		var bearToken = token.split(" ")[1].split("\\.");
+
+		var decoder = Base64.getDecoder();
+
+		//header would be: jwChunks[0]
+		var payload = new String(decoder.decode(bearToken[1]));
+
+		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
+
+		return Long.decode(employeeId);
+	}
 
 	@BeforeAll
 	void initialize() {
@@ -427,6 +448,123 @@ class ReservationControllerIntegrationTest {
 				result.getBody().contains("\"startTime\":\"09:00:00\",\"endTime\":\"19:00:00\",\"employeeFirstName\":\"Milan\",\"employeeLastName\":\"Dol\",\"roomId\":1,\"workplaceAmount\":2,\"recurrence\":{\"active\":true,\"recurrencePattern\":\"MONTHLY\"}},{\"id\":3,\"date\":\"2022-02-08\",\"startTime\":\"07:03:00\",\"endTime\":\"08:07:00\",\"employeeFirstName\":\"Milan\",\"employeeLastName\":\"Dol\",\"roomId\":2,\"workplaceAmount\":8,\"recurrence\":{\"active\":false,\"recurrencePattern\":\"NONE\""));
 	}
 
+	@Test
+	@DisplayName("updateReservation should update if admin updates someone else's reservation")
+	void updateReservationShouldUpdateIfAdminUpdatesReservationOfOtherPerson() {
+		login();
+		reservation.setEmployee(employee);
+		var savedReservation = reservationRepository.save(reservation);
+		login("admin@quintor.nl");
+
+		var reservationDTO = new ReservationDTO();
+		reservationDTO.setId(savedReservation.getId());
+		reservationDTO.setDate(reservation.getDate().plusDays(1));
+		reservationDTO.setStartTime(reservation.getStartTime());
+		reservationDTO.setEndTime(reservation.getEndTime());
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(reservation.getId());
+		reservationDTO.setWorkplaceAmount(reservation.getWorkplaceAmount());
+		reservationDTO.setRecurrence(reservation.getRecurrence());
+
+		var headers = new HttpHeaders();
+		headers.set("Authorization", this.bearer);
+
+		var request = new HttpEntity<>(reservationDTO, headers);
+
+		var result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/update", port), request, String.class);
+
+		System.out.println(result.getBody());
+
+		assertEquals(HttpStatus.OK, result.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("updateReservation should update if data is correct")
+	void updateReservationShouldUpdateIfDataIsCorrect() {
+		login();
+		reservation.setEmployee(employee);
+		var savedReservation = reservationRepository.save(reservation);
+
+		var reservationDTO = new ReservationDTO();
+		reservationDTO.setId(savedReservation.getId());
+		reservationDTO.setDate(reservation.getDate().plusDays(1));
+		reservationDTO.setStartTime(reservation.getStartTime());
+		reservationDTO.setEndTime(reservation.getEndTime());
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(reservation.getId());
+		reservationDTO.setWorkplaceAmount(reservation.getWorkplaceAmount());
+		reservationDTO.setRecurrence(reservation.getRecurrence());
+
+		var headers = new HttpHeaders();
+		headers.set("Authorization", this.bearer);
+
+		var request = new HttpEntity<>(reservationDTO, headers);
+
+		var result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/update", port), request, String.class);
+		System.out.println(result.getBody());
+
+		assertEquals(HttpStatus.OK, result.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("updateReservation should return UNAUTHORIZED if it is not their reservation")
+	void updateReservationShouldReturnUnauthorizedIfItIsNotTheirReservation() {
+		login("admin@quintor.nl");
+		reservation.setEmployee(employee);
+		var savedReservation = reservationRepository.save(reservation);
+
+		var reservationDTO = new ReservationDTO();
+		reservationDTO.setId(savedReservation.getId());
+		reservationDTO.setDate(reservation.getDate().plusDays(1));
+		reservationDTO.setStartTime(reservation.getStartTime());
+		reservationDTO.setEndTime(reservation.getEndTime());
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(reservation.getId());
+		reservationDTO.setWorkplaceAmount(reservation.getWorkplaceAmount());
+		reservationDTO.setRecurrence(reservation.getRecurrence());
+
+		login();
+
+		var headers = new HttpHeaders();
+		headers.set("Authorization", this.bearer);
+
+		var request = new HttpEntity<>(reservationDTO, headers);
+
+		var result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/update", port), request, String.class);
+
+		System.out.println(result.getBody());
+		assertEquals(HttpStatus.UNAUTHORIZED, result.getStatusCode());
+	}
+
+	@Test
+	@DisplayName("updateReservation should return conflict if the update is not possible")
+	void updateReservationShouldReturnConflictIfTheUpdateIsNotPossible() {
+		login("admin@quintor.nl");
+		reservation.setEmployee(employee);
+		reservationRepository.save(reservation);
+		login();
+
+		var reservationDTO = new ReservationDTO();
+		reservationDTO.setId(reservation.getId());
+		reservationDTO.setDate(reservation.getDate().plusDays(1));
+		reservationDTO.setStartTime(reservation.getStartTime());
+		reservationDTO.setEndTime(reservation.getEndTime());
+		reservationDTO.setEmployeeId(employee.getId());
+		reservationDTO.setRoomId(reservation.getId());
+		reservationDTO.setWorkplaceAmount(reservation.getWorkplaceAmount());
+		reservationDTO.setRecurrence(reservation.getRecurrence());
+
+		var headers = new HttpHeaders();
+		headers.set("Authorization", this.bearer);
+
+		var request = new HttpEntity<>(reservationDTO, headers);
+
+		var result = this.restTemplate.postForEntity(String.format("http://localhost:%s/reservations/update", port), request, String.class);
+
+		assertEquals(HttpStatus.CONFLICT, result.getStatusCode());
+	}
+
+
 	/**
 	 * Function that uses the {@link TestRestTemplate} to send a GET request
 	 * to the Back-End for testing during Continuous Integration.
@@ -516,26 +654,5 @@ class ReservationControllerIntegrationTest {
 				.replace("]", "");
 
 		this.employee.setId(extractIdFromToken(this.bearer));
-	}
-
-	/**
-	 * Function that takes the subject from the jwt token.
-	 * The subject is the employeeId as set in de {@link com.quintor.worqplace.security.filter.JwtAuthenticationFilter#successfulAuthentication(HttpServletRequest, HttpServletResponse, FilterChain, Authentication)}
-	 *
-	 * @param token JW token with "Bearer " still in front of it.
-	 * @return Employee ID of that is embedded in the token.
-	 */
-	private static long extractIdFromToken(String token) {
-		//Strip the "Bearer "
-		var bearToken = token.split(" ")[1].split("\\.");
-
-		var decoder = Base64.getDecoder();
-
-		//header would be: jwChunks[0]
-		var payload = new String(decoder.decode(bearToken[1]));
-
-		var employeeId = payload.substring(payload.indexOf("sub\":") + 6).split("\"")[0];
-
-		return Long.decode(employeeId);
 	}
 }
