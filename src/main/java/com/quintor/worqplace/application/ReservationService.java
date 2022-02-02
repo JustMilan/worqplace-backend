@@ -48,7 +48,7 @@ public class ReservationService {
 	 */
 	public List<Reservation> getAllReservations(boolean includeOld) {
 		return reservationRepository.findAll().stream()
-				.filter(reservation -> includeOld || reservation.isReservationActive())
+				.filter(reservation -> includeOld || reservation.isReservationActive(LocalDate.now()))
 				.collect(Collectors.toList());
 	}
 

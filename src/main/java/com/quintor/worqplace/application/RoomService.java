@@ -47,6 +47,7 @@ public class RoomService {
 	 * @param date       date
 	 * @param startTime  start time
 	 * @param endTime    end time
+	 * @param recurrencePattern the pattern of {@link Recurrence} for which to check
 	 * @return a {@link List} of {@link RoomAvailability}.
 	 * @see RoomAvailability
 	 */
@@ -54,8 +55,8 @@ public class RoomService {
 	                                                             LocalTime startTime, LocalTime endTime,
 	                                                             RecurrencePattern recurrencePattern) {
 		Recurrence recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
-		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime)
-				.stream().filter(room -> room.isWorkplaceRecurrentlyAvailable(
+		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime);
+		rooms = rooms.stream().filter(room -> !recurrence.isActive() || room.isWorkplaceRecurrentlyAvailable(
 						new Reservation(date, startTime, endTime, null, room, room.getCapacity(), recurrence)))
 				.collect(Collectors.toList());
 		return mapToRoomAvailability(date, startTime, endTime, rooms);
@@ -165,7 +166,9 @@ public class RoomService {
 	 */
 	public boolean isRoomAvailable(Room room, LocalDate date, LocalTime startTime, LocalTime endTime) {
 		DateTimeUtils.checkReservationDateTime(date, startTime, endTime);
-		return room.getReservations()
+		var activeReservations = room.getReservations().stream()
+				.filter(reservation -> reservation.isReservationActive(date)).toList();
+		return activeReservations
 				.stream()
 				.noneMatch(reservation ->
 						DateTimeUtils.timeslotsOverlap(

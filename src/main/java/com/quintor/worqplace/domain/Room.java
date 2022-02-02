@@ -3,10 +3,7 @@ package com.quintor.worqplace.domain;
 import com.quintor.worqplace.application.exceptions.WorkplacesNotAvailableException;
 import com.quintor.worqplace.application.util.DateTimeUtils;
 import com.quintor.worqplace.domain.exceptions.RoomNotAvailableException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -74,8 +71,8 @@ public class Room {
 				this.getReservations().stream().filter(reservation ->
 						!reservation.getId().equals(excludedReservation.getId())).toList();
 
-
 		return usedReservations.stream().filter(reservation ->
+				reservation.isReservationActive(date) &&
 				(date.isAfter(reservation.getDate()) ||
 						date.isEqual(reservation.getDate())) &&
 						DateTimeUtils.timeslotsOverlap(reservation.getDate(),
@@ -105,7 +102,6 @@ public class Room {
 		var reservationsClone = new ArrayList<>(this.getReservations());
 		var reservationUsed = newReservation != null ? newReservation : oldReservation;
 		reservationsClone.remove(reservationUsed);
-
 		return !requestedAmountExceedsAvailableAmount(reservationUsed, reservationsClone);
 	}
 
@@ -121,6 +117,7 @@ public class Room {
 		var total = 0;
 
 		for (Reservation existingReservation : reservationsClone) {
+			if (!existingReservation.isReservationActive(reservationUsed.getDate())) continue;
 			var overlappingReservations = this.getReservationsThatOverlap(existingReservation, reservationsClone);
 
 			for (Reservation reservation : overlappingReservations)
