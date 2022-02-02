@@ -92,7 +92,7 @@ class RoomTest {
 	@DisplayName("addReservation should throw RoomNotAvailableException when room isn't recurrently available")
 	void addReservationShouldThrowWhenRoomNotRecurrentlyAvailable() {
 		var weeklyRecurrence = new Recurrence(true, RecurrencePattern.WEEKLY);
-		var biWeeklyRecurrence = new Recurrence(false, RecurrencePattern.BIWEEKLY);
+		var biWeeklyRecurrence = new Recurrence(true, RecurrencePattern.BIWEEKLY);
 
 		var reservation = new Reservation(1L, TODAY, ELEVEN, TWELVE, null, null, 15, biWeeklyRecurrence);
 		var room = new Room(this.id, this.floor, this.location, 15, new ArrayList<>());

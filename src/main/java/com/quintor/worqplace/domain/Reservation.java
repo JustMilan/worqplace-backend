@@ -143,11 +143,12 @@ public class Reservation {
 	/**
 	 * Function that returns whether this reservation has passed or is yet to come.
 	 *
+	 * @param date date on which to check if it is active
 	 * @return a {@link Boolean} that which is true if the reservation will occur in the future,
 	 * or has already happened.
 	 */
-	public boolean isReservationActive() {
-		return this.date.compareTo(LocalDate.now()) >= 0 || this.recurrence.isActive();
+	public boolean isReservationActive(LocalDate date) {
+		return this.date.compareTo(date) >= 0 || this.recurrence.isActive();
 	}
 
 	@Override

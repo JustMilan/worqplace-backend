@@ -68,14 +68,14 @@ class ReservationTest {
 	@DisplayName("isReservationActive check should return false when date has passed and recurrence is inactive")
 	void isReservationActiveBeforeTodayWithoutRecurrence() {
 		Reservation reservation = new Reservation(1L, yesterday, startTime, endTime, employee, room, 15, noRecurrence, true);
-		assertFalse(reservation.isReservationActive());
+		assertFalse(reservation.isReservationActive(LocalDate.now()));
 	}
 
 	@Test
 	@DisplayName("isReservationActive check should return true when date has passed but recurrence is active")
 	void isReservationActiveBeforeTodayWithRecurrence() {
 		Reservation reservation = new Reservation(1L, yesterday, startTime, endTime, employee, room, 15, activeRecurrence, true);
-		assertTrue(reservation.isReservationActive());
+		assertTrue(reservation.isReservationActive(LocalDate.now()));
 	}
 
 	@Test
