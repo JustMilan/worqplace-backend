@@ -1,8 +1,12 @@
 # worqplace-Backend | Quintor - Hogeschool Utrecht
 
+Worqplace is a workplace / room reservation platform. This solution is specifically build for Quintor.
+
 ## Table of contents
 
 - [Documentation](#documentation)
+    - [Technologies used](#technologies-used)
+    - [Installation](#installation)
 - [Team](#team)
 - [Git Strategy](#git-strategy)
 - [Agile](#agile)
@@ -10,6 +14,40 @@
 - [Git](#git)
 
 ## Documentation
+
+### Technologies used
+
+In this project we use the following technologies:
+
+- Java 17
+- Maven
+- Spring Boot
+- Hibernate
+- JWT
+- Jakarta
+- MySQL
+- H2
+- Lombok
+- JaCoCo
+
+### Installation
+
+#### Standalone
+1. Make sure you have installed the technologies used in this project installed
+2. Install the dependencies from the pom.xml
+3. Have a MySQL database running, see [application.properties](src/main/resources/application.properties) for specific
+   info
+4. Run the [init.sql](development/sql/init.sql) to insert the default info into the database
+5. Make sure you insert an admin user (role needs to be 1 for this)
+6. Run the project
+
+#### Docker-compose
+1. Make sure you have access to the Quintor docker hub repository
+2. Download the necessary technologies
+2. Clone the backend repository
+3. Go into the directory and run the docker-compose.yml file using the following command: `sudo docker-compose up -d`
+4. After the containers have started go to your browser. You can access the application using your machines IP
+5. Update the containers using the: `sudo docker-compose pull` command
 
 ## Team
 
@@ -68,14 +106,14 @@ that help keep our code clear.
 We implement design patterns wherever possible, by using the explanations from
 the [refactoring.guru](https://refactoring.guru/) website.
 
-Prefer explicitly typing your variable over `var`:
+Prefer using `var` instead of explicitly typing:
 
 ```java
 // Don't do this:
-var connection = new Connection();
+Connection connection=new Connection();
 
 // Instead, do this:
-Connection connection = new Connection();
+		var connection=new Connection();
 ```
 
 Do not add unnecessary comments:
@@ -98,13 +136,13 @@ Remove unnecessary newlines:
 // Don't do this:
 public class Xyz {
 
-    private int i = 1;
+	private int i = 1;
 
 }
 
 // Do this:
 public class Xyz {
-    private int i = 1;
+	private int i = 1;
 }
 ```
 
@@ -113,32 +151,31 @@ Prefer Lombok over standard boilerplate code:
 ```java
 // Don't do this
 public class Aircraft {
-    private String id;
-    private Type type;
-    private Flight current;
-    private List<Flight> past;
-    private Fleet fleet;
+	private String id;
+	private Type type;
+	private Flight current;
+	private List<Flight> past;
+	private Fleet fleet;
 
-    public Aircraft(String id, Type type, Flight current, List<Flight> past, Fleet fleet) {
-        this.id = id;
-        this.type = type;
-        this.current = current;
-        this.past = past;
-        this.fleet = fleet;
-    }
+	public Aircraft(String id, Type type, Flight current, List<Flight> past, Fleet fleet) {
+		this.id = id;
+		this.type = type;
+		this.current = current;
+		this.past = past;
+		this.fleet = fleet;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public Type getType() {
-        return type;
-    }
-
+	public Type getType() {
+		return type;
+	}
     ...
 }
 
@@ -146,11 +183,11 @@ public class Aircraft {
 @Data
 @AllArgsConstructor
 public class Aircraft {
-    private String id;
-    private Type type;
-    private Flight current;
-    private List<Flight> past;
-    private Fleet fleet;
+	private String id;
+	private Type type;
+	private Flight current;
+	private List<Flight> past;
+	private Fleet fleet;
 }
 ```
 
