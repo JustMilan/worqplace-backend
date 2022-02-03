@@ -54,7 +54,7 @@ public class RoomService {
 	public List<RoomAvailability> getRoomsAvailabilityAtDateTime(Long locationId, LocalDate date,
 	                                                             LocalTime startTime, LocalTime endTime,
 	                                                             RecurrencePattern recurrencePattern) {
-		Recurrence recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
+		var recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
 		var rooms = getRoomsAvailableAtDateTime(locationId, date, startTime, endTime);
 		rooms = rooms.stream().filter(room -> !recurrence.isActive() || room.isWorkplaceRecurrentlyAvailable(
 						new Reservation(date, startTime, endTime, null, room, room.getCapacity(), recurrence)))
@@ -138,7 +138,7 @@ public class RoomService {
 		int finalAmount = amount == null ? 1 : amount;
 		checkReservationDateTime(date, startTime, endTime);
 		List<Room> allRooms = findRoomsByLocationId(locationId);
-		Recurrence recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
+		var recurrence = new Recurrence(recurrencePattern != RecurrencePattern.NONE, recurrencePattern);
 
 		return allRooms.stream()
 				.filter(room -> (room.countReservedWorkplaces(date, startTime, endTime) + finalAmount <= room.getCapacity())

@@ -3,7 +3,6 @@ package com.quintor.worqplace.presentation.dto.reservation;
 import com.quintor.worqplace.domain.Recurrence;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
