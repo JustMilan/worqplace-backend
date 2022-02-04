@@ -7,6 +7,7 @@ Worqplace is a workplace / room reservation platform. This solution is specifica
 - [Documentation](#documentation)
     - [Technologies used](#technologies-used)
     - [Installation](#installation)
+    - [Transfer Documentation](#transfer-documentation)
 - [Team](#team)
 - [Git Strategy](#git-strategy)
 - [Agile](#agile)
@@ -48,6 +49,9 @@ In this project we use the following technologies:
 3. Go into the directory and run the docker-compose.yml file using the following command: `sudo docker-compose up -d`
 4. After the containers have started go to your browser. You can access the application using your machines IP
 5. Update the containers using the: `sudo docker-compose pull` command
+
+### Transfer Documentation
+The transfer documentation can be found here [Transfer document](development/documentation/Overdrachts%20document.pdf)
 
 ## Team
 
